@@ -1,0 +1,518 @@
+<gating:Gating-ML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:gating="http://www.isac-net.org/std/Gating-ML/v2.0/gating"  xmlns:transforms="http://www.isac-net.org/std/Gating-ML/v2.0/transformations"  xmlns:data-type="http://www.isac-net.org/std/Gating-ML/v2.0/datatypes"  xsi:schemaLocation="http://www.isac-net.org/std/Gating-ML/v2.0/gating http://www.isac-net.org/std/Gating-ML/v2.0/gating/Gating-ML.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/transformations http://www.isac-net.org/std/Gating-ML/v2.0/gating/Transformations.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/datatypes http://www.isac-net.org/std/Gating-ML/v2.0/gating/DataTypes.v2.0.xsd " >
+  <gating:PolygonGate eventsInside="1"  annoOffsetX="99"  annoOffsetY="56"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256"  gating:id="ID1152036930" >
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="FSC-A" />
+    </gating:dimension>
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="SSC-A" />
+    </gating:dimension>
+    <gating:vertex>
+      <gating:coordinate data-type:value="121241" />
+      <gating:coordinate data-type:value="27904" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="101580" />
+      <gating:coordinate data-type:value="13952" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="72089" />
+      <gating:coordinate data-type:value="8128" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="58982" />
+      <gating:coordinate data-type:value="12800" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="53521" />
+      <gating:coordinate data-type:value="22080" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="56797" />
+      <gating:coordinate data-type:value="41920" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="67720" />
+      <gating:coordinate data-type:value="59392" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="95027" />
+      <gating:coordinate data-type:value="74560" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="122333" />
+      <gating:coordinate data-type:value="75712" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="139810" />
+      <gating:coordinate data-type:value="67520" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="146363" />
+      <gating:coordinate data-type:value="53568" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="137625" />
+      <gating:coordinate data-type:value="36096" />
+    </gating:vertex>
+  </gating:PolygonGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="5"  annoOffsetY="-106"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID1073341880"  gating:parent_id="ID1152036930" >
+    <gating:dimension gating:min="14199.0"  gating:max="78643.0" >
+      <data-type:fcs-dimension data-type:name="FSC-H" />
+    </gating:dimension>
+    <gating:dimension gating:min="17472.0"  gating:max="201536.0" >
+      <data-type:fcs-dimension data-type:name="FSC-W" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="5"  annoOffsetY="-77"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID325928510"  gating:parent_id="ID1073341880" >
+    <gating:dimension gating:min="34952.0"  gating:max="80827.0" >
+      <data-type:fcs-dimension data-type:name="SSC-H" />
+    </gating:dimension>
+    <gating:dimension gating:min="1152.0"  gating:max="120000.0" >
+      <data-type:fcs-dimension data-type:name="SSC-W" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID2057965263"  gating:parent_id="ID325928510" >
+    <gating:dimension gating:min="-1426.7637370519542"  gating:max="1172.780811418228" >
+      <data-type:fcs-dimension data-type:name="Comp-PE-Cy5-A" />
+    </gating:dimension>
+    <gating:dimension gating:min="43690.666666666664"  gating:max="152917.33333333334" >
+      <data-type:fcs-dimension data-type:name="FSC-A" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:PolygonGate eventsInside="1"  annoOffsetX="-29"  annoOffsetY="251"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256"  gating:id="ID1229333490"  gating:parent_id="ID2057965263" >
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-Cy7-A" />
+    </gating:dimension>
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-A" />
+    </gating:dimension>
+    <gating:vertex>
+      <gating:coordinate data-type:value="35.4592696087" />
+      <gating:coordinate data-type:value="104159.1594129415" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-168.5237797686" />
+      <gating:coordinate data-type:value="96441.2710383184" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-313.7158947257" />
+      <gating:coordinate data-type:value="65664.6342451766" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-412.2788484222" />
+      <gating:coordinate data-type:value="29418.6464398559" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-397.3390384489" />
+      <gating:coordinate data-type:value="12821.4496784689" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-275.1401788153" />
+      <gating:coordinate data-type:value="6134.5140191083" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-27.863252165" />
+      <gating:coordinate data-type:value="4769.7736813701" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="222.9821909953" />
+      <gating:coordinate data-type:value="5504.8493824723" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="350.4413767511" />
+      <gating:coordinate data-type:value="8216.1412668604" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="454.6336516898" />
+      <gating:coordinate data-type:value="20128.5706321298" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="423.2445952737" />
+      <gating:coordinate data-type:value="44766.029965827" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="297.0238107359" />
+      <gating:coordinate data-type:value="73677.0000892816" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="176.6532713706" />
+      <gating:coordinate data-type:value="92800.3397745459" />
+    </gating:vertex>
+  </gating:PolygonGate>
+  <gating:PolygonGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256"  gating:id="ID275096433"  gating:parent_id="ID2057965263" >
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-Cy7-A" />
+    </gating:dimension>
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-A" />
+    </gating:dimension>
+    <gating:vertex>
+      <gating:coordinate data-type:value="2434.3841185104" />
+      <gating:coordinate data-type:value="60322.9663422423" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1181.6270852828" />
+      <gating:coordinate data-type:value="42305.9085769538" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="754.1739736953" />
+      <gating:coordinate data-type:value="20009.9891348967" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="591.2043240124" />
+      <gating:coordinate data-type:value="9577.5843948637" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="591.2043240124" />
+      <gating:coordinate data-type:value="5084.5248984176" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="865.5272800203" />
+      <gating:coordinate data-type:value="2556.6333718288" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1513.0502271702" />
+      <gating:coordinate data-type:value="1875.8914042539" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="4332.3388759331" />
+      <gating:coordinate data-type:value="1875.8914042539" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="10098.4213693158" />
+      <gating:coordinate data-type:value="2878.4673023285" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="15926.5495786437" />
+      <gating:coordinate data-type:value="6008.3371016241" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="16606.0588747432" />
+      <gating:coordinate data-type:value="11875.8461198702" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="14654.6213098639" />
+      <gating:coordinate data-type:value="23847.8658834893" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="9301.538405799" />
+      <gating:coordinate data-type:value="46229.3116617047" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="4687.6581793401" />
+      <gating:coordinate data-type:value="63063.9418963904" />
+    </gating:vertex>
+  </gating:PolygonGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#000000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID2056235295"  gating:parent_id="ID325928510" >
+    <gating:dimension gating:min="-561.1640912930403"  gating:max="1267.3892242649708" >
+      <data-type:fcs-dimension data-type:name="Comp-PE-A" />
+    </gating:dimension>
+    <gating:dimension gating:min="43690.666666666664"  gating:max="154067.08771929826" >
+      <data-type:fcs-dimension data-type:name="FSC-A" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:PolygonGate eventsInside="1"  annoOffsetX="64"  annoOffsetY="-43"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256"  gating:id="ID52300206"  gating:parent_id="ID2056235295" >
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-Cy5-A" />
+    </gating:dimension>
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-Cy7-A" />
+    </gating:dimension>
+    <gating:vertex>
+      <gating:coordinate data-type:value="6444.1530500714" />
+      <gating:coordinate data-type:value="721.4039107599" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="2336.3166327833" />
+      <gating:coordinate data-type:value="445.5166236475" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1379.1718301732" />
+      <gating:coordinate data-type:value="191.0346532353" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1379.1718301732" />
+      <gating:coordinate data-type:value="-56.9105384103" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="2263.4036362" />
+      <gating:coordinate data-type:value="-250.3453504874" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="5029.0542243484" />
+      <gating:coordinate data-type:value="-434.0114657929" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="14024.5985735928" />
+      <gating:coordinate data-type:value="-547.4050353945" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="37025.4274205085" />
+      <gating:coordinate data-type:value="-583.5320769908" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="72752.6634018685" />
+      <gating:coordinate data-type:value="-496.5060172483" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="122497.7972761529" />
+      <gating:coordinate data-type:value="-298.4598141165" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="183190.6716125487" />
+      <gating:coordinate data-type:value="-46.743540111" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="190724.3498126847" />
+      <gating:coordinate data-type:value="247.6164903524" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="127521.2139901349" />
+      <gating:coordinate data-type:value="543.2931189428" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="69903.6987523893" />
+      <gating:coordinate data-type:value="767.5072062065" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="17643.1710855235" />
+      <gating:coordinate data-type:value="868.4706955562" />
+    </gating:vertex>
+  </gating:PolygonGate>
+  <gating:PolygonGate eventsInside="1"  annoOffsetX="-50"  annoOffsetY="-16"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256"  gating:id="ID1758852169"  gating:parent_id="ID2056235295" >
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-Cy5-A" />
+    </gating:dimension>
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-PE-Cy7-A" />
+    </gating:dimension>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-102.7401444915" />
+      <gating:coordinate data-type:value="58862.9609486051" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-540.2316354303" />
+      <gating:coordinate data-type:value="46815.7558223703" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-1048.0017896628" />
+      <gating:coordinate data-type:value="29657.2692242296" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-1383.7395336218" />
+      <gating:coordinate data-type:value="16842.7795040396" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-1498.3882448586" />
+      <gating:coordinate data-type:value="6685.9668424839" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-1262.136918013" />
+      <gating:coordinate data-type:value="2502.4201860273" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-756.1278933546" />
+      <gating:coordinate data-type:value="1045.7981599866" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-371.3439724094" />
+      <gating:coordinate data-type:value="657.0730353563" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="63.6474686162" />
+      <gating:coordinate data-type:value="525.9969781092" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="605.9628258147" />
+      <gating:coordinate data-type:value="636.8108165119" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1182.8122989909" />
+      <gating:coordinate data-type:value="982.8487698736" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1934.846771463" />
+      <gating:coordinate data-type:value="2677.605456574" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="2125.0850256295" />
+      <gating:coordinate data-type:value="5998.8143153988" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1709.5167515793" />
+      <gating:coordinate data-type:value="21915.4964762294" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="980.5379121883" />
+      <gating:coordinate data-type:value="43379.3759494457" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="270.6145980354" />
+      <gating:coordinate data-type:value="58862.9609486051" />
+    </gating:vertex>
+  </gating:PolygonGate>
+  <gating:PolygonGate eventsInside="1"  annoOffsetX="-13"  annoOffsetY="-50"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256"  gating:id="ID785879196"  gating:parent_id="ID1758852169" >
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-APC-A" />
+    </gating:dimension>
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-APC-Cy7-A" />
+    </gating:dimension>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-226.3126957368" />
+      <gating:coordinate data-type:value="115.5168265614" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-38.4335784608" />
+      <gating:coordinate data-type:value="41.6064125204" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="132.0515469352" />
+      <gating:coordinate data-type:value="66.1137494161" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="297.0238107359" />
+      <gating:coordinate data-type:value="217.3644128771" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="504.5815475039" />
+      <gating:coordinate data-type:value="589.9852977916" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="616.7942322192" />
+      <gating:coordinate data-type:value="1449.5252121495" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="616.7942322192" />
+      <gating:coordinate data-type:value="3761.0585117023" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="540.0167808476" />
+      <gating:coordinate data-type:value="7135.098987271" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="323.261846162" />
+      <gating:coordinate data-type:value="13908.7382526132" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="77.953484998" />
+      <gating:coordinate data-type:value="18121.1336571462" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-214.4989562578" />
+      <gating:coordinate data-type:value="15574.3349157834" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-475.4888755756" />
+      <gating:coordinate data-type:value="10311.4164799432" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-632.5453235767" />
+      <gating:coordinate data-type:value="3167.7321378901" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-632.5453235767" />
+      <gating:coordinate data-type:value="1280.3328714017" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-527.0302571532" />
+      <gating:coordinate data-type:value="670.7653026913" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="-397.3390384489" />
+      <gating:coordinate data-type:value="355.7250290807" />
+    </gating:vertex>
+  </gating:PolygonGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID1570643440"  gating:parent_id="ID785879196" >
+    <gating:dimension gating:min="581.0691298559802" >
+      <data-type:fcs-dimension data-type:name="Comp-PE-Texas Red-A" />
+    </gating:dimension>
+    <gating:dimension gating:max="711.9443741515632" >
+      <data-type:fcs-dimension data-type:name="Comp-Pacific Blue-A" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID935307156"  gating:parent_id="ID785879196" >
+    <gating:dimension gating:min="581.0691298559802" >
+      <data-type:fcs-dimension data-type:name="Comp-PE-Texas Red-A" />
+    </gating:dimension>
+    <gating:dimension gating:min="711.9443741515632" >
+      <data-type:fcs-dimension data-type:name="Comp-Pacific Blue-A" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID127074852"  gating:parent_id="ID785879196" >
+    <gating:dimension gating:max="581.0691298559802" >
+      <data-type:fcs-dimension data-type:name="Comp-PE-Texas Red-A" />
+    </gating:dimension>
+    <gating:dimension gating:max="711.9443741515632" >
+      <data-type:fcs-dimension data-type:name="Comp-Pacific Blue-A" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:RectangleGate eventsInside="1"  annoOffsetX="0"  annoOffsetY="0"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  percentX="0"  percentY="0"  gating:id="ID1148292446"  gating:parent_id="ID785879196" >
+    <gating:dimension gating:max="581.0691298559802" >
+      <data-type:fcs-dimension data-type:name="Comp-PE-Texas Red-A" />
+    </gating:dimension>
+    <gating:dimension gating:min="711.9443741515632" >
+      <data-type:fcs-dimension data-type:name="Comp-Pacific Blue-A" />
+    </gating:dimension>
+  </gating:RectangleGate>
+  <gating:PolygonGate eventsInside="1"  annoOffsetX="86"  annoOffsetY="-21"  tint="#ac0000"  isTinted="0"  lineWeight="Normal"  userDefined="1"  quadId="-1"  gateResolution="256"  gating:id="ID188379411"  gating:parent_id="ID1758852169" >
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-APC-A" />
+    </gating:dimension>
+    <gating:dimension>
+      <data-type:fcs-dimension data-type:name="Comp-APC-Cy7-A" />
+    </gating:dimension>
+    <gating:vertex>
+      <gating:coordinate data-type:value="2574.7939611063" />
+      <gating:coordinate data-type:value="1241.4539105827" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="1141.4723141984" />
+      <gating:coordinate data-type:value="808.6041404311" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="577.3593316978" />
+      <gating:coordinate data-type:value="326.6641037261" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="540.0167808476" />
+      <gating:coordinate data-type:value="4.958817618" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="909.747635817" />
+      <gating:coordinate data-type:value="-273.3430617521" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="2087.8150859363" />
+      <gating:coordinate data-type:value="-574.5100894347" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="8391.8894802569" />
+      <gating:coordinate data-type:value="-593.6255580177" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="18952.3264572258" />
+      <gating:coordinate data-type:value="-373.3814683362" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="35637.6345437697" />
+      <gating:coordinate data-type:value="-130.3328972101" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="41770.2571140465" />
+      <gating:coordinate data-type:value="270.7941893608" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="30414.9909435517" />
+      <gating:coordinate data-type:value="784.0507253558" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="14413.1907201292" />
+      <gating:coordinate data-type:value="1320.5234626652" />
+    </gating:vertex>
+    <gating:vertex>
+      <gating:coordinate data-type:value="5964.6222640705" />
+      <gating:coordinate data-type:value="1449.5252121495" />
+    </gating:vertex>
+  </gating:PolygonGate>
+</gating:Gating-ML>

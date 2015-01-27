@@ -1,0 +1,32 @@
+\name{NewData}
+\alias{NewData}
+\title{Map new data to a FlowSOM grid}
+\description{New data from a flowframe is mapped to an existing FlowSOM 
+object. A new FlowSOM object is created, with the same grid, but a new
+mapping, node sizes and mean values. We assume the data is already
+compensated and transformed, but not scaled yet. The same scaling parameters
+as from the original grid will be used.}
+\usage{NewData(fsom,ff)}
+\arguments{
+    \item{fsom}{FlowSOM object}
+    \item{ff}{Flow frame with the data to map}
+}
+\value{A new FlowSOM object}
+\seealso{
+    \code{\link{FlowSOMSubset}} if you want to get a subset of the current
+    data instead of a new dataset
+}
+\examples{
+    # Build FlowSom result
+    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+    ff <- read.FCS(fileName)
+    ff <- compensate(ff,ff@description$SPILL)
+    ff <- transform(ff,transformList(colnames(ff@description$SPILL),
+                    logicleTransform()))
+    flowSOM.res <- FlowSOM(ff[1:1000,],scale=TRUE,colsToUse=c(9,12,14:18),
+    maxMeta=10)
+    
+    # Map new data
+    print(colnames(ff[1001:2000,]))
+    fSOM2 <- NewData(flowSOM.res[[1]], ff[1001:2000,])
+}

@@ -1,0 +1,219 @@
+%
+%\VignetteIndexEntry{Using SOMs for visualization of cytometry data}
+%\VignetteDepends{FlowSOM}
+%\VignetteKeywords{}
+%\VignettePackage{FlowSOM}
+%
+
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{babel}
+<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@ 
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\begin{center}
+{\Large Using self-organizing maps for visualization and interpretation of 
+cytometry data}
+\par\end{center}{\Large \par}
+
+\begin{center}
+Sofie Van Gassen, Britt Callebaut and Yvan Saeys
+\par\end{center}
+
+\begin{center}
+Ghent University
+\par\end{center}
+
+\begin{center}
+{\footnotesize September, 2014\bigskip{}
+\bigskip{}
+}
+\par\end{center}{\footnotesize \par}
+
+\begin{center}
+\textbf{Abstract\bigskip{}
+}
+\par\end{center}
+
+The \Biocpkg{FlowSOM} package provides new visualization opportunities for cytometry 
+data. A four-step algorithm is provided: first, the data is read and 
+preprocessed, then a self-organizing map is trained and a minimal spanning 
+tree is build, and finally, a meta-clustering is computed. Several plotting 
+options are available, using star charts to visualize marker intensities and 
+pie charts to visualize correspondence with manual gating results or other 
+automatic clustering results.
+\bigskip{}
+\bigskip{}
+
+
+\textbf{1. Reading the data}
+
+The FlowSOM package has several input options.
+
+The first possibility is to use an array of character strings,
+specifying paths to files or directories. When given a path to a
+directory, all files in the directory will be considered. This process
+does not happen recursively. You can specify a pattern to use only a
+selection of the files. The default pattern is \Rcode{".fcs"}, making
+sure that only fcs-files are selected.  When you are already working
+with your data in \R{}, it might be easier to use a \Rclass{flowFrame}
+or \Rclass{flowSet} from the \Biocpkg{flowCore} package as input. This
+is also supported.  If multiple paths or a \Rclass{flowSet} are
+provided, all data will be concatenated.
+
+When reading the data, several pre-processing options are available. The data 
+can be automatically compensated using a specified matrix, or using the 
+\Rcode{\$SPILL} variable from the fcs-file. 
+The data can be logicle transformed for specified columns. If no columns are 
+provided, all columns from the spillover matrix will be transformed.
+Finally, the data can be scaled. By default, it will scale to a mean of zero 
+and standard deviation of one. However, specific scaling parameters can be set 
+(see the base \R{} \Rfunction{scale} function for more detail).
+
+\medskip{}
+
+\noindent 
+<<>>=
+set.seed(42)
+library(flowCore)
+library(FlowSOM)
+
+fileName <- system.file("extdata","lymphocytes.fcs",
+                        package="FlowSOM")
+fSOM <- ReadInput(fileName,compensate = TRUE,transform = TRUE, 
+                    toTransform=c(8:18),scale = TRUE)
+
+ff <- read.FCS(fileName)
+fSOM <- ReadInput(ff,compensate = TRUE,transform = TRUE, scale = TRUE)
+@
+
+\noindent \medskip{}
+
+This function returns a FlowSOM object, which is actually a list containing 
+several parameters. The data is stored as a matrix in \$data, and all parameter
+settings to read the data are also stored. The begin and end indices of the
+subsets from the different files can be found in \$metadata.
+
+<<>>=
+str(fSOM)
+@
+\bigskip{}
+
+\textbf{2. Building the self-organizing map}
+
+The next step in the algorithm is to build a self-organizing map. Several
+parameters for the self-organizing map algorithm can be provided, such as the
+dimensions of the grid, the learning rate, the number of times the dataset has
+to be presented. However, the most important parameter to decide is on which
+columns the self-organizing map should be trained. This should contain all the
+parameters that are useful to identify cell types, and exclude parameters of
+which you want to study the behaviour on all cell types such as activation
+markers.
+
+
+The BuildSOM function expects a FlowSOM object as input, and will return a 
+FlowSOM object with all information about the self organizing map added in the
+map parameter of the FlowSOM object.
+\medskip{}
+<<>>=
+fSOM <- BuildSOM(fSOM,colsToUse = c(9,12,14:18))
+str(fSOM$map)
+@
+
+\bigskip{}
+
+\textbf{3. Building the minimal spanning tree}
+
+The third step of FlowSOM is to build the minimal spanning tree. 
+This will again return a FlowSOM object, with extra information contained in
+the \$MST parameter.
+
+\medskip{}
+<<>>=
+fSOM <- BuildMST(fSOM)
+str(fSOM$MST)
+@
+
+Once this step is finished, the FlowSOM object can be used for visualization.
+
+\medskip{}
+<<fig=TRUE>>=
+PlotStars(fSOM)
+@
+
+If you do not want the size to depend on the number of cells assigned to a 
+node, you can reset the node size.
+<<fig=TRUE>>=
+fSOM <- UpdateNodeSize(fSOM, reset=TRUE)
+PlotStars(fSOM,MST=FALSE)
+fSOM <- UpdateNodeSize(fSOM)
+@
+
+It might also be interesting to compare with a manual gating.
+<<fig=TRUE>>=
+library(flowUtils)
+flowEnv <- new.env()
+ff_c <- compensate(ff,ff@description$SPILL)
+colnames(ff_c)[8:18] <- paste("Comp-",colnames(ff_c)[8:18],sep="")
+gatingFile <- system.file("extdata","manualGating.xml", 
+                        package="FlowSOM")
+read.gatingML(gatingFile, flowEnv) 
+filterList <- list( "B cells" = flowEnv$ID52300206,
+                    "ab T cells" = flowEnv$ID785879196,
+                    "yd T cells" = flowEnv$ID188379411,
+                    "NK cells" = flowEnv$ID1229333490,
+                    "NKT cells" = flowEnv$ID275096433
+                )
+
+results <- list()
+for(cellType in names(filterList)){
+    results[[cellType]] <- filter(ff_c,filterList[[cellType]])@subSet
+}
+
+manual <- rep("Unknown",nrow(ff))
+for(celltype in names(results)){
+    manual[results[[celltype]]] <- celltype
+}
+# Use a factor to define order of the cell types
+manual <- factor(manual,levels = c("Unknown","B cells",
+                                    "ab T cells","yd T cells", 
+                                    "NK cells","NKT cells"))
+
+PlotPies(fSOM,cellTypes=manual)
+@
+
+\bigskip{}
+
+\textbf{4. Metaclustering the data}
+
+The fourth step of the FlowSOM algorithm is to perform a meta-clustering of
+the data. This can be the first step in further analysis of the data, and
+often gives a good approximation of manual gating results.
+
+If you have background knowledge about the number of cell types you are
+looking for, it might be optimal to provide this number to the algorithm.
+
+<<fig=TRUE>>=
+metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
+PlotPies(fSOM,cellTypes=manual,clusters = metaClustering)
+@
+
+You can also extract the metaClustering for each cell individually
+<<>>=
+metaClustering_perCell <- metaClustering[fSOM$map$mapping[,1]]
+@
+
+\bigskip{}
+
+\textbf{5. Summary}
+
+In summary, the FlowSOM package provides some new ways to look at cytometry
+data.
+It can help to keep an overview of how all markers are behaving on different
+cell types, and to reduce the probability of overlooking interesting things
+that are present in the data.
+\end{document}

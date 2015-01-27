@@ -1,0 +1,27 @@
+\name{AggregateFlowFrames}
+\alias{AggregateFlowFrames}
+\title{Aggregate multiple fcs files together}
+\description{Aggregate multiple fcs files to analyze them simultaneously. 
+A new fcs file is written, which contains about \code{cTotal} cells,
+with \code{ceiling(cTotal/nFiles)} cells from each file. Two new columns
+are added: a column indicating the original file by index, and a noisy version
+of this for better plotting opportunities (index plus or minus a value between
+0 and 0.1.}
+\usage{AggregateFlowFrames(fileNames, outputFile, cTotal)}
+\arguments{
+    \item{fileNames}{Character vector containing full paths to the fcs files
+    to aggregate}
+    \item{outputFile}{Full path to output file}
+    \item{cTotal}{Total number of cells to write to the output file}
+}
+\value{This function does not return anything, but will write a file with
+about \code{cTotal} cells to \code{outputFile}}
+\seealso{
+    \code{\link{ceiling}}
+}
+\examples{
+    # Define filename
+    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+    # This example will sample 2 times 500 cells.
+    AggregateFlowFrames(c(fileName,fileName),"tmp.fcs",1000)
+}
