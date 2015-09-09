@@ -1,5 +1,5 @@
 Package: FlowSOM
-Version: 0.99.3
+Version: 1.1.1
 Date: 2014-10-16
 Title: Using self-organizing maps for visualization and interpretation
         of cytometry data
@@ -10,10 +10,11 @@ Authors@R: c(person("Sofie", "Van Gassen", role = c("aut", "cre"),
             person("Yvan", "Saeys", role = "aut", email="yvan.saeys@ugent.be"))
 Author: Sofie Van Gassen, Britt Callebaut and Yvan Saeys
 Maintainer: Sofie Van Gassen <sofie.vangassen@ugent.be>
-Depends: R (>= 2.11), flowCore, igraph, ConsensusClusterPlus, BiocGenerics
+Depends: R (>= 3.2), flowCore, igraph, ConsensusClusterPlus, BiocGenerics, 
+    tsne
 Suggests: flowUtils, BiocStyle
 Description: FlowSOM offers visualization options for cytometry data, 
-    by using Self-Organizing Map clustering and Minimal Spanning Trees
+    by using Self-Organizing Map clustering and Minimal Spanning Trees.
 License: GPL (>= 2)
 URL: http://www.r-project.org, http://dambi.ugent.be
 biocViews: CellBiology, FlowCytometry, Clustering, Visualization,

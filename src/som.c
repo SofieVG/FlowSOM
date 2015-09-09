@@ -57,10 +57,10 @@ double cosine(double * p1, double * p2, int px, int n, int ncodes){
     double denom2 = 0;
     for (j = 0; j < px; j++) {
         nom += p1[j*n] * p2[j*ncodes];
-        denom1 += p1[j*n] * p1[j*ncodes];
-        denom2 +=  p2[j*n] * p2[j*ncodes];
+        denom1 += p1[j*n] * p1[j*n];
+        denom2 +=  p2[j*ncodes] * p2[j*ncodes];
     }
-    return -nom/(sqrt(denom1)*sqrt(denom2));
+    return (-nom/(sqrt(denom1)*sqrt(denom2)))+1;
 }
 
 void C_SOM(double *data,
@@ -144,25 +144,37 @@ void C_SOM(double *data,
 
 void C_mapDataToCodes(double *data, double *codes,
         int *pncodes, int *pnd, int *pp, 
-        int *nnCodes, double *nnDists){
+        int *nnCodes, double *nnDists,
+        int *dist){
     int ncodes = *pncodes, nd = *pnd, p = *pp;
-    int i, j, cd, counter,minid;
-    double tmp, mindist, tmp2;
+    int i, cd, counter, minid;
+    double tmp, mindist;
+    double (*distf)(double*,double*,int,int,int);
 
+    if(*dist == 1){
+        distf = &manh;
+    } else if (*dist == 2){
+        distf = &eucl;
+    } else if (*dist == 3){
+        distf = &chebyshev;
+    } else if (*dist == 4){
+        distf = &cosine;
+    } else {
+        distf = &eucl;
+    }
+    
     /* i is a counter over objects in data, cd  is a counter over SOM
-    units, and j is a counter over variables. */
+    units, p is the number of columns, nd is the number of datapoints
+    and ncodes is the number of SOM units*/
     counter = -1;
     for (i = 0; i < nd; i++) {
         minid = -1;
         mindist = DBL_MAX; 
         for (cd = 0; cd < ncodes; cd++) {
-            tmp2 = 0;
-            for (j = 0; j < p; j++) {
-                tmp = data[i + j*nd] - codes[cd + j*ncodes];
-                tmp2 += tmp * tmp;
-            }
-            if(tmp2 < mindist){
-                mindist = tmp2;
+            tmp = distf(&data[i], &codes[cd], p, nd, ncodes);
+            //Rprintf("\ndist: %f",tmp2);
+            if(tmp < mindist){
+                mindist = tmp;
                 minid = cd;
             }
         }
@@ -174,7 +186,7 @@ void C_mapDataToCodes(double *data, double *codes,
 
 static const R_CMethodDef cMethods[] = {
     {"C_SOM", (DL_FUNC) &C_SOM, 11},
-    {"C_mapDataToCodes", (DL_FUNC) &C_mapDataToCodes, 7},
+    {"C_mapDataToCodes", (DL_FUNC) &C_mapDataToCodes, 8},
     {NULL, NULL, 0}
 };
 

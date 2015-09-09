@@ -1,12 +1,34 @@
+#' MetaClustering
+#'
+#' Cluster data with automatic number of cluster determination for 
+#' several algorithms
+#'
+#' @param data   Matrix containing the data to cluster
+#' @param method Clustering method to use
+#' @param max    Maximum number of clusters to try out
+#' @param ...    Extra parameters to pass along
+#' 
+#' @return Numeric array indicating cluster for each datapoint
+#' @seealso   \code{\link{metaClustering_consensus}}
+#'
+#' @examples
+#'    # Read from file, build self-organizing map and minimal spanning tree
+#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
+#'                             scale=TRUE)
+#'    flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
+#'    flowSOM.res <- BuildMST(flowSOM.res)
+#'    
+#'    # Apply metaclustering
+#'    metacl <- MetaClustering(flowSOM.res$map$codes,
+#'                             "metaClustering_consensus",
+#'                             max=10)
+#'    
+#'    # Get metaclustering per cell
+#'    flowSOM.clustering <- metacl[flowSOM.res$map$mapping[,1]]    
+#'
+#' @export
 MetaClustering <- function(data,method,max=20,...){
-    # Cluster data with automatic number of cluster determination 
-    # for several algorithms
-    #
-    # Args:
-    #     data:     Matrix containing the data to cluster
-    #     method: Clustering method to use
-    #     max:        Maximum number of clusters to try out
-    
     res <- DetermineNumberOfClusters(data,max,method,...)
     method <- get(method)
     method(data,k=res)
@@ -72,8 +94,30 @@ findElbow <- function(data){
     optimal
 }
 
+#' MetaClustering
+#' 
+#' Cluster data using hierarchical consensus clustering with k clusters
+#'
+#' @param data Matrix containing the data to cluster
+#' @param k    Number of clusters
+#' 
+#' @return  Numeric array indicating cluster for each datapoint
+#' @seealso \code{\link{MetaClustering}}
+#' @examples
+#'    # Read from file, build self-organizing map and minimal spanning tree
+#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
+#'                             scale=TRUE)
+#'    flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
+#'    flowSOM.res <- BuildMST(flowSOM.res)
+#'    
+#'    # Apply consensus metaclustering
+#'    metacl <- metaClustering_consensus(flowSOM.res$map$codes,k=10)    
+#'
+#' @export
 metaClustering_consensus <- function(data, k=7){
-    results <- suppressMessages(ConsensusClusterPlus(t(data),
+    results <- suppressMessages(ConsensusClusterPlus::ConsensusClusterPlus(
+                                t(data),
                                 maxK=k, reps=100, pItem=0.9, pFeature=1, 
                                 title=tempdir(), plot="pdf", verbose=FALSE,
                                 clusterAlg="hc", # "hc","km","kmdist","pam"
@@ -85,7 +129,8 @@ metaClustering_consensus <- function(data, k=7){
 }
 
 consensus <- function(data,max,...){
-    results <- suppressMessages(ConsensusClusterPlus(t(data),
+    results <- suppressMessages(ConsensusClusterPlus::ConsensusClusterPlus(
+                                t(data),
                                 maxK=max, reps=100, pItem=0.9, pFeature=1,
                                 title=tempdir(), plot="pdf", verbose=FALSE,
                                 clusterAlg="hc", # "hc","km","kmdist","pam"
@@ -125,6 +170,25 @@ SSE <- function(data,clustering){
 
 
 
+#' F measure
+#' 
+#' Compute the F measure between two clustering results
+#'
+#' @param realClusters Array containing real cluster labels for each sample
+#' @param predictedClusters Array containing predicted cluster labels for each
+#'                          sample
+#' @param silent    Logical, if FALSE (default), print some information about 
+#'                  precision and recall
+#' 
+#' @return  F measure score
+#' @examples
+#' # Generate some random data as an example
+#' realClusters <- sample(1:5,100,replace = TRUE)
+#' predictedClusters <- sample(1:6, 100, replace = TRUE)
+#' 
+#' # Calculate the FMeasure
+#' FMeasure(realClusters,predictedClusters)
+#' @export
 FMeasure <- function(realClusters, predictedClusters,silent=FALSE){
     if (sum(predictedClusters)==0)
         return(0);

@@ -131,24 +131,34 @@ the \Rcode{\$MST} parameter.
 
 \medskip{}
 <<>>=
-fSOM <- BuildMST(fSOM)
+fSOM <- BuildMST(fSOM,tSNE=TRUE)
 str(fSOM$MST)
 @
 
 Once this step is finished, the FlowSOM object can be used for visualization.
-
+You can plot the nodes in several layouts ("MST": Minimal spanning tree
+(default),"grid": SOM grid, "tSNE": alternative layout, only possible when 
+tSNE was TRUE in \Rcode{BuildMST})
 \medskip{}
 <<fig=TRUE>>=
 PlotStars(fSOM)
+@
+<<fig=TRUE>>=
+PlotStars(fSOM,view="grid")
+@
+<<fig=TRUE>>=
+PlotStars(fSOM,view="tSNE")
 @
 
 If you do not want the size to depend on the number of cells assigned to a 
 node, you can reset the node size.
 <<fig=TRUE>>=
 fSOM <- UpdateNodeSize(fSOM, reset=TRUE)
-PlotStars(fSOM,MST=FALSE)
+fSOM$MST$size <- fSOM$MST$size/2
+PlotStars(fSOM)
 fSOM <- UpdateNodeSize(fSOM)
 @
+
 
 It might also be interesting to compare with a manual gating.
 <<fig=TRUE>>=
@@ -194,13 +204,19 @@ looking for, it might be optimal to provide this number to the algorithm.
 
 <<fig=TRUE>>=
 metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
-PlotPies(fSOM,cellTypes=manual,clusters = metaClustering)
+PlotPies(fSOM,cellTypes=manual,backgroundValues = metaClustering)
 @
 
 You can also extract the meta-clustering for each cell individually
 <<>>=
 metaClustering_perCell <- metaClustering[fSOM$map$mapping[,1]]
 @
+
+\section{Detecting nodes with a specific pattern}
+
+
+\section{Comparing different groups}
+
 
 \section{Summary}
 
@@ -210,3 +226,7 @@ It can help to keep an overview of how all markers are behaving on different
 cell types, and to reduce the probability of overlooking interesting things
 that are present in the data.
 \end{document}
+
+<<>>=
+sessionInfo()
+@

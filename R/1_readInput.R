@@ -1,33 +1,70 @@
-ReadInput <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
-                        transform=FALSE, toTransform=NULL, scale=FALSE, 
-                        scaled.center=TRUE, scaled.scale=TRUE, silent=FALSE){
-    # Take all possible inputs and return a matrix with preprocessed data
-    # (compensated, transformed, scaled)
-    #
-    # Args:
-    #     input:      a flowFrame, a flowSet or an array of paths to files 
-    #                 or directories
-    #     pattern:    if input is an array of file- or directorynames, select
-    #                 only files containing pattern
-    #     compensate: logical, does the data need to be compensated
-    #     spillover:  spillover matrix to compensate with. 
-    #                 If NULL and compensate=TRUE, we will look for $SPILL 
-    #                 description in fcs file.
-    #     transform:  logical, does the data need to be transformed with 
-    #                 a logicle transform
-    #     toTransform:column names or indices that need to be transformed.
-    #                 If NULL and transform=TRUE, column names of $SPILL 
-    #                 description in fcs file will be used.
-    #     scale:      logical, does the data needs to be rescaled
-    #     scaled.center: see scale
-    #     scaled.scale:  see scale
-    #     silent:     if T, no progress updates will be printed
-    #
-    # Returns:
-    #     FlowSOM object containing the preprocessed data
+#' Read fcs-files or flowframes
+#' 
+#' Take some input and return FlowSOM object containing a matrix with 
+#' the preprocessed data (compensated, transformed, scaled)
+#'
+#' @param input         a flowFrame, a flowSet or an array of paths to files 
+#'                      or directories
+#' @param pattern       if input is an array of file- or directorynames, 
+#'                      select only files containing pattern
+#' @param compensate    logical, does the data need to be compensated
+#' @param spillover     spillover matrix to compensate with
+#'                      If \code{NULL} and compensate=\code{TRUE}, we will
+#'                      look for \code{$SPILL} description in fcs file.
+#' @param transform     logical, does the data need to be transformed
+#' @param toTransform   column names or indices that need to be transformed.
+#'                      If \code{NULL} and transform=\code{TRUE}, column names
+#'                      of \code{$SPILL} description in fcs file will be used.
+#' @param transformFunction Defaults to logicleTransform()
+#' @param scale         logical, does the data needs to be rescaled
+#' @param scaled.center see \code{\link{scale}}
+#' @param scaled.scale  see \code{\link{scale}}
+#' @param silent        if \code{TRUE}, no progress updates will be printed
+#'
+#' @return FlowSOM object containing the data, which can be used as input
+#' for the BuildSOM function
+#'
+#' @seealso \code{\link{scale}},\code{\link{BuildSOM}}
+#' 
+#' @examples
+#' # Read from file
+#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
+#'                          scale=TRUE)
+#' 
+#' # Or read from flowFrame object
+#' ff <- read.FCS(fileName)
+#' ff <- compensate(ff,ff@@description$SPILL)
+#' ff <- transform(ff,transformList(colnames(ff@@description$SPILL),
+#'                                  logicleTransform()))
+#' flowSOM.res <- ReadInput(ff,scale=TRUE)
+#' 
+#' # Build the self-organizing map and the minimal spanning tree
+#' flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
+#' flowSOM.res <- BuildMST(flowSOM.res)
+#' 
+#' # Apply metaclustering
+#' metacl <- MetaClustering(flowSOM.res$map$codes,
+#'                          "metaClustering_consensus",max=10)
+#' 
+#' # Get metaclustering per cell
+#' flowSOM.clustering <- metacl[flowSOM.res$map$mapping[,1]]    
+#'  
+#' @export
+ReadInput <- function(input, pattern=".fcs", 
+                        compensate=FALSE, 
+                        spillover=NULL,
+                        transform=FALSE, 
+                        toTransform=NULL, 
+                        transformFunction = flowCore::logicleTransform(),
+                        scale=FALSE, 
+                        scaled.center=TRUE, 
+                        scaled.scale=TRUE, 
+                        silent=FALSE){
     
     fsom <- list(pattern=pattern, compensate=compensate, spillover=spillover,
-            transform=transform, toTransform=toTransform, scale=scale)
+                transform=transform, toTransform=toTransform,
+                transformFunction = transformFunction, scale=scale)
     class(fsom) <- "FlowSOM"
     
     if(class(input) == "flowFrame"){
@@ -43,7 +80,7 @@ ReadInput <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
         for(i in seq_along(input)){
             if(file.info(input[i])$isdir){
                 toAdd <- c(toAdd, list.files(input[i], pattern=pattern,
-                full.names=TRUE))
+                                            full.names=TRUE))
                 toRemove <- c(toRemove, i)
             }
         }
@@ -53,7 +90,7 @@ ReadInput <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
         
         # Select all files corresponding to the pattern
         input <- grep(pattern, input, value=TRUE)
-                
+        
         # Read all files
         if(length(input) > 0){
             for(i in seq_along(input)){
@@ -62,20 +99,21 @@ ReadInput <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
                     if (tools::file_ext(input[i]) == "csv") {
                         flowFrame <- flowFrame(read.table(input[i]))
                     } else { #else if(tools::file_ext(input[i]) == "fcs"){
-                        flowFrame <- suppressWarnings(read.FCS(input[i]))
+                        flowFrame <- suppressWarnings(
+                            flowCore::read.FCS(input[i]))
                     }
                     fsom <- AddFlowFrame(fsom, flowFrame)
                 }
             }
         } else {
-                stop("No files containing the pattern are found.")
+            stop("No files containing the pattern are found.")
         }
     } else {
         stop(paste("Inputs of type", class(input), "are not supported. 
-        Please supply either a FlowFrame, a FlowSet or an array of valid 
-        paths to files or directories."))
+                    Please supply either a FlowFrame, a FlowSet or an array
+                    of valid paths to files or directories."))
     }
-
+    
     if(scale){
         if(!silent) message("Scaling the data\n")
         fsom$data <- scale(fsom$data, scaled.center, scaled.scale)
@@ -88,16 +126,15 @@ ReadInput <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
     fsom
 }
 
+#' Add a flowFrame to the data variable of the FlowSOM object
+#'
+#' @param fsom      FlowSOM object, as constructed by the ReadInput function
+#' @param flowFrame flowFrame to add to the FlowSOM object
+#'
+#' @return FlowSOM object with data added
+#'
+#' @seealso \code{\link{ReadInput}}
 AddFlowFrame <- function(fsom, flowFrame){
-    # Add a flowFrame to the data variable of the FlowSOM object
-    #
-    # Args:
-    #     fsom:      FlowSOM object, as constructed by the ReadInput function
-    #     flowFrame: flowFrame to add to the FlowSOM object
-    #
-    # Returns:
-    #     FlowSOM object with data added
-    
     # Compensation
     if(fsom$compensate){
         if(is.null(fsom$spillover)){
@@ -115,7 +152,7 @@ AddFlowFrame <- function(fsom, flowFrame){
                 stop("No compensation matrix found")
             }
         }
-        flowFrame <- compensate(flowFrame, fsom$spillover)
+        flowFrame <- flowCore::compensate(flowFrame, fsom$spillover)
     }
     
     # Logicle transform
@@ -123,21 +160,29 @@ AddFlowFrame <- function(fsom, flowFrame){
         if(is.null(fsom$toTransform)){ 
             fsom$toTransform <- colnames(flowFrame@description$SPILL)
         } else{ 
-            fsom$toTransform <- colnames(exprs(flowFrame)[,fsom$toTransform])
+            fsom$toTransform <- colnames(flowCore::exprs(flowFrame)[,
+                                                            fsom$toTransform])
         }
-        flowFrame <- transform(flowFrame, transformList(fsom$toTransform,
-                                logicleTransform()))
+        flowFrame <- flowCore::transform(flowFrame, 
+            flowCore::transformList(fsom$toTransform,
+                                    flowCore::logicleTransform()))
     }
     
     # Save pretty names for nicer visualisation later on
     n <- flowFrame@parameters@data[, "name"]
     d <- flowFrame@parameters@data[, "desc"]
     d[is.na(d)] <- n[is.na(d)]
-    fsom$prettyColnames <- paste(d, " <", n, ">", sep="")
-    names(fsom$prettyColnames) <- colnames(exprs(flowFrame))
+    if(any(grepl("#",d))){
+        # Support for hashtag notation: 
+        # antibody#fluorochrome -> antibody (fluorochrome)
+        fsom$prettyColnames <- gsub("#(.*)$"," (\\1)",d)
+    } else {
+        fsom$prettyColnames <- paste(d, " <", n, ">", sep="")
+    }
+    names(fsom$prettyColnames) <- colnames(flowCore::exprs(flowFrame))
     
     # Add the data to the matrix
-    f <- exprs(flowFrame)
+    f <- flowCore::exprs(flowFrame)
     attr(f, "ranges") <- NULL
     if(is.null(fsom$data)){ 
         fsom$data <- f 
@@ -148,5 +193,6 @@ AddFlowFrame <- function(fsom, flowFrame){
         fsom$metaData[[flowFrame@description$FIL]] <- c(nrow(fsom$data) - 
                                                 nrow(f) + 1, nrow(fsom$data))
     }
+    
     fsom
 }
