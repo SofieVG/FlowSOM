@@ -1,11 +1,11 @@
-FlowSOM
-=======
+# FlowSOM
+Using self-organizing maps for visualization and interpretation of cytometry data
 
-R FlowSOM package
+If you use the FlowSOM package, please use the following citation: 
 
-## Install
+Sofie Van Gassen, Britt Callebaut, Mary J. Van Helden, Bart N. Lambrecht, Piet Demeester, Tom Dhaene and Yvan Saeys. FlowSOM: Using self-organizing maps for visualization and interpretation of cytometry data. Cytometry A. DOI: 10.1002/cyto.a.22625
 
-```bash
-# System wide:
-sudo Rscript install.R
-```
+## Get package
+
+Check the [releases](https://github.com/saeyslab/FlowSOM/releases) to obtain the [latest release](https://github.com/saeyslab/FlowSOM/releases/latest)
+
