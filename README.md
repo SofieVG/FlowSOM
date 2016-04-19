@@ -7,4 +7,4 @@ Sofie Van Gassen, Britt Callebaut, Mary J. Van Helden, Bart N. Lambrecht, Piet D
 
 ## Get package
 
-Check the [releases](https://github.com/saeyslab/FlowSOM/releases) to obtain the latest release
+Check the [releases](https://github.com/saeyslab/FlowSOM/releases) to obtain the [latest release](https://github.com/saeyslab/FlowSOM/releases/latest)
