@@ -10,4 +10,5 @@ DOI: 10.1002/cyto.a.22625
 You can install this package using the devtools library.
 
 library(devtools)
+
 install_github("SofieVG/FlowSOM")
