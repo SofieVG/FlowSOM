@@ -1,0 +1,325 @@
+%
+%\VignetteIndexEntry{FlowSOM}
+%\VignetteDepends{FlowSOM}
+%\VignetteKeywords{}
+%\VignettePackage{FlowSOM}
+%
+
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{babel}
+<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@ 
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\begin{center}
+\bioctitle[FlowSOM]{Using self-organizing maps for visualization and 
+interpretation of cytometry data}
+\par\end{center}{\Large \par}
+
+\begin{center}
+Sofie Van Gassen, Britt Callebaut and Yvan Saeys
+\par\end{center}
+
+\begin{center}
+Ghent University
+\par\end{center}
+
+\begin{center}
+{\footnotesize September, 2014\bigskip{}
+\bigskip{}
+}
+\par\end{center}{\footnotesize \par}
+
+\begin{center}
+\textbf{Abstract\bigskip{}
+}
+\par\end{center}
+
+The \Biocpkg{FlowSOM} package provides new visualization opportunities for
+cytometry data. A four-step algorithm is provided: first, the data is read and 
+preprocessed, then a self-organizing map is trained and a minimal spanning 
+tree is built, and finally, a meta-clustering is computed. Several plotting 
+options are available, using star charts to visualize marker intensities and 
+pie charts to visualize correspondence with manual gating results or other 
+automatic clustering results.
+\bigskip{}
+\bigskip{}
+
+\section{The easy way}
+The easiest way to use this package is using the wrapper function 
+\Rfunction{FlowSOM}. It has less options than using the separate functions, 
+but in general it has enough power. It returns a list, of which the first
+item is the FlowSOM object (as required as input by many functions in this 
+package) and the second item is the result of the metaclustering.
+
+<<fig=TRUE>>=
+set.seed(42)
+library(FlowSOM)
+
+fileName <- system.file("extdata","lymphocytes.fcs",
+                        package="FlowSOM")
+fSOM <- FlowSOM(fileName,
+                # Input options:
+                compensate = TRUE,transform = TRUE,toTransform=c(8:18),
+                scale = TRUE,
+                # SOM options:
+                colsToUse = c(9,12,14:18), xdim = 7, ydim = 7,
+                # Metaclustering options:
+                nClus = 10)
+
+PlotStars(fSOM[[1]],
+            backgroundValues = as.factor(fSOM[[2]]))
+@
+
+
+\section{Reading the data}
+
+The FlowSOM package has several input options.
+
+The first possibility is to use an array of character strings,
+specifying paths to files or directories. When given a path to a
+directory, all files in the directory will be considered. This process
+does not happen recursively. You can specify a pattern to use only a
+selection of the files. The default pattern is \Rcode{".fcs"}, making
+sure that only fcs-files are selected.  When you are already working
+with your data in \R{}, it might be easier to use a \Rclass{flowFrame}
+or \Rclass{flowSet} from the \Biocpkg{flowCore} package as input. This
+is also supported.  If multiple paths or a \Rclass{flowSet} are
+provided, all data will be concatenated. You should check and apply 
+normalization if needed using other packages.
+
+When reading the data, several preprocessing options are available. The data 
+can be automatically compensated using a specified matrix, or using the 
+\Rcode{\$SPILL} variable from the fcs-file (when \Rcode{compensate} is 
+\Rcode{TRUE} but no value is given for \Rcode{spillover}). 
+The data can be transformed for specified columns. If no columns are 
+provided, all columns from the spillover matrix will be transformed.
+Finally, the data can be scaled. By default, it will scale to a mean of zero 
+and standard deviation of one. However, specific scaling parameters can be set 
+(see the base \R{} \Rfunction{scale} function for more detail).
+
+\medskip{}
+
+\noindent 
+<<>>=
+set.seed(42)
+library(flowCore)
+library(FlowSOM)
+
+fileName <- system.file("extdata","lymphocytes.fcs",
+                        package="FlowSOM")
+fSOM <- ReadInput(fileName,compensate = TRUE,transform = TRUE, 
+                    toTransform=c(8:18),scale = TRUE)
+
+ff <- suppressWarnings(flowCore::read.FCS(fileName))
+fSOM <- ReadInput(ff,compensate = TRUE,transform = TRUE, scale = TRUE)
+@
+
+\noindent \medskip{}
+
+This function returns a FlowSOM object, which is actually a \Rclass{list} 
+containing several parameters. The data is stored as a matrix in 
+\Rcode{\$data}, and all parameter settings to read the data are also stored. 
+The begin and end indices of the subsets from the different files can be 
+found in \Rcode{\$metadata}.
+
+<<>>=
+str(fSOM,max.level = 2)
+@
+
+\section{Building the self-organizing map}
+
+The next step in the algorithm is to build a self-organizing map. Several
+parameters for the self-organizing map algorithm can be provided, such as the
+dimensions of the grid, the learning rate, the number of times the dataset has
+to be presented. However, the most important parameter to decide is on which
+columns the self-organizing map should be trained. This should contain all the
+parameters that are useful to identify cell types, and exclude parameters of
+which you want to study the behavior on all cell types such as activation
+markers.
+
+The \Rfunction{BuildSOM} function expects a FlowSOM object as input, and will
+return a FlowSOM object with all information about the self organizing map
+added in the \Rcode{\$map} parameter of the FlowSOM object.
+\medskip{}
+<<>>=
+fSOM <- BuildSOM(fSOM,colsToUse = c(9,12,14:18))
+str(fSOM$map,max.level = 2)
+@
+
+\section{Building the minimal spanning tree}
+
+The third step of FlowSOM is to build the minimal spanning tree. 
+This will again return a FlowSOM object, with extra information contained in
+the \Rcode{\$MST} parameter.
+
+\medskip{}
+<<>>=
+fSOM <- BuildMST(fSOM,tSNE=TRUE)
+str(fSOM$MST)
+@
+
+Once this step is finished, the FlowSOM object can be used for visualization.
+You can plot the nodes in several layouts ("MST": Minimal spanning tree
+(default),"grid": SOM grid, "tSNE": alternative layout, only possible when 
+tSNE was TRUE in \Rcode{BuildMST})
+\medskip{}
+<<fig=TRUE>>=
+PlotStars(fSOM)
+@
+<<fig=TRUE>>=
+PlotStars(fSOM,view="grid")
+@
+<<fig=TRUE>>=
+PlotStars(fSOM,view="tSNE")
+@
+
+If you do not want the size to depend on the number of cells assigned to a 
+node, you can reset the node size. This can be used in combination with any of
+the plotting functions.
+<<fig=TRUE>>=
+fSOM <- UpdateNodeSize(fSOM, reset=TRUE)
+fSOM$MST$size <- fSOM$MST$size/2
+PlotStars(fSOM)
+fSOM <- UpdateNodeSize(fSOM)
+@
+
+
+It might also be interesting to compare with a manual gating. The 
+\Rcode{cellTypes} can be any factor which has a value for each individual
+cell, so you can also map other clustering results.
+<<fig=TRUE>>=
+library(flowUtils)
+flowEnv <- new.env()
+ff_c <- compensate(ff,description(ff)$SPILL)
+colnames(ff_c)[8:18] <- paste("Comp-",colnames(ff_c)[8:18],sep="")
+gatingFile <- system.file("extdata","manualGating.xml", 
+                        package="FlowSOM")
+gateIDs <- c( "B cells"=8,
+                "ab T cells"=10,
+                "yd T cells"=15,
+                "NK cells"=5,
+                "NKT cells"=6)
+cellTypes <- names(gateIDs)
+gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
+
+PlotPies(fSOM,cellTypes=gatingResult$manual)
+@
+
+If you are interested in one specific marker, you can use the 
+\Rcode{PlotMarker} function.
+
+<<fig=TRUE>>=
+print(colnames(fSOM$map$medianValues))
+PlotMarker(fSOM,"Pacific Blue-A")
+@
+
+If you need to refer to the nodes, it might be useful to number them.
+<<fig=TRUE>>=
+PlotNumbers(UpdateNodeSize(fSOM,reset=TRUE))
+@
+
+You can use this number for a 2D scatter plot indicating the node values.
+<<fig=TRUE>>=
+PlotClusters2D(fSOM,"PE-Texas Red-A","Pacific Blue-A",c(81,82,91,92,93))
+@
+
+
+\section{Meta-clustering the data}
+
+The fourth step of the FlowSOM algorithm is to perform a meta-clustering of
+the data. This can be the first step in further analysis of the data, and
+often gives a good approximation of manual gating results.
+
+If you have background knowledge about the number of cell types you are
+looking for, it might be optimal to provide this number to the algorithm.
+
+<<fig=TRUE>>=
+metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
+PlotPies(fSOM,cellTypes=gatingResult$manual,
+        backgroundValues = as.factor(metaClustering))
+@
+
+You can also extract the meta-clustering for each cell individually
+<<>>=
+metaClustering_perCell <- metaClustering[fSOM$map$mapping[,1]]
+@
+
+\section{Detecting nodes with a specific pattern}
+If you do not have a manual gating to map on the tree, it might be time-
+consuming to interpret all the different nodes. Therefore, you can also
+query the tree to indicate nodes similar to a specified pattern. This function
+is still being optimized, so make sure to check the marker values to see if it
+corresponds to your expectations.
+
+<<fig=TRUE>>=
+# Look for CD8+ ab T cells
+query <- c("PE-Cy7-A" = "high", #CD3
+            "APC-Cy7-A" = "high", #TCRb
+            "Pacific Blue-A" = "high") #CD8
+query_res <- QueryStarPlot(UpdateNodeSize(fSOM,reset=TRUE), query, 
+                            plot = FALSE)
+
+cellTypes <- factor(rep("Unknown",49),levels=c("Unknown","CD8 T cells"))
+cellTypes[query_res$selected] <- "CD8 T cells"
+PlotStars(fSOM,
+            backgroundValues=cellTypes,
+            backgroundColor=c("#FFFFFF00","#0000FF22"))
+@
+
+\section{Comparing different groups}
+It is possible to compare between groups with the FlowSOM package as well. The tree should be build on either a concatenation of all files, or a representative subset of all cell types. Then a list identifying which files belong to specific groups should be defined, and the differences will be computed. For a smaller number of samples, you can look at the fold change between the groups. For coloring, a treshold is used. A treshold of 0.50 means the difference should be at least 50\% of the max of both groups, which corresponds with a 2-fold change. The higher the threshold, the stricter, a threshold of 0 will colour each node. For a larger number of samples you can also use a wilcox test. This will be selected when a value is provided for the p\_tresh parameter.
+
+<<fig=TRUE>>=
+library(FlowSOM)
+set.seed(1)
+
+# Build the FlowSOM tree on the example file
+fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
+scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10)
+
+# Have a look at the resulting tree
+# PlotStars(flowSOM.res[[1]],backgroundValues = as.factor(flowSOM.res[[2]]))
+
+# Select all cells except the branch that corresponds with automated
+# cluster 7 (CD3+ TCRyd +) and write te another file for the example
+# In practice you would not generate any new file but 
+# use your different files from your different groups
+ff <- flowCore::read.FCS(fileName)
+ff_tmp <- ff[flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] != 7),]
+flowCore::write.FCS(ff_tmp,file="ff_tmp.fcs")
+# Make an additional file without cluster 7 and double amount of cluster 10
+ff_tmp <- ff[c(which(flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] != 7)),
+which(flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] == 5))),]
+flowCore::write.FCS(ff_tmp,file="ff_tmp2.fcs")
+
+# Compare the original file with the two new files we made
+groupRes <- CountGroups(flowSOM.res[[1]], 
+                        groups=list("AllCells"=c(fileName),
+                                    "Without_ydTcells"=c("ff_tmp.fcs","ff_tmp2.fcs")))
+# PlotGroups(flowSOM.res[[1]], groupRes)
+
+# Compare only the file with the double amount of cluster 10
+groupRes <- CountGroups(flowSOM.res[[1]], 
+                        groups=list("AllCells"=c(fileName),
+                                    "Without_ydTcells"=c("ff_tmp2.fcs")))
+PlotGroups(flowSOM.res[[1]], groupRes)
+@
+
+\section{Summary}
+
+In summary, the FlowSOM package provides some new ways to look at cytometry
+data.
+It can help to keep an overview of how all markers are behaving on different
+cell types, and to reduce the probability of overlooking interesting things
+that are present in the data.
+\end{document}
+
+<<>>=
+sessionInfo()
+@

@@ -1,0 +1,27 @@
+CHANGES IN VERSION 1.5.4 (2016/09/06)
+--------------------------------------
+
+NEW FEATURES
+
+    o PlotNode() function to plot one "zoomed in" star plot
+
+CHANGES IN VERSION 1.1.0 (2015/07/06)
+--------------------------------------
+
+NEW FEATURES
+
+    o Cleaned up some code
+
+CHANGES IN VERSION 0.99.4 (2015/03/17)
+--------------------------------------
+
+NEW FEATURES
+
+    o Extra functionality to differentiate between groups of samples
+
+CHANGES IN VERSION 0.99.0 (2014/10/15)
+--------------------------------------
+
+NEW FEATURES
+
+    o First version of the package
