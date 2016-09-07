@@ -4,14 +4,19 @@
 \alias{MetaClustering}
 \title{MetaClustering}
 \usage{
-MetaClustering(data, method, max = 20, ...)
+MetaClustering(data, method, max = 20, nClus = NULL, ...)
 }
 \arguments{
 \item{data}{Matrix containing the data to cluster}
 
-\item{method}{Clustering method to use}
+\item{method}{Clustering method to use, given as a string. Options are
+metaClustering_consensus,metaClustering_hclust,
+metaClustering_kmeans,metaClustering_som}
 
 \item{max}{Maximum number of clusters to try out}
+
+\item{nClus}{Exact number of clusters to use. If not NULL, max will be
+ignored.}
 
 \item{...}{Extra parameters to pass along}
 }

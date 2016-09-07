@@ -8,6 +8,8 @@
 #'               metaClustering_consensus,metaClustering_hclust,
 #'               metaClustering_kmeans,metaClustering_som
 #' @param max    Maximum number of clusters to try out
+#' @param nClus  Exact number of clusters to use. If not NULL, max will be
+#'               ignored.
 #' @param ...    Extra parameters to pass along
 #' 
 #' @return Numeric array indicating cluster for each datapoint
@@ -30,10 +32,12 @@
 #'    flowSOM.clustering <- metacl[flowSOM.res$map$mapping[,1]]    
 #'
 #' @export
-MetaClustering <- function(data,method,max=20,...){
-    res <- DetermineNumberOfClusters(data,max,method,...)
+MetaClustering <- function(data,method,max=20,nClus=NULL,...){
+    if(is.null(nClus)){
+        nClus <- DetermineNumberOfClusters(data,max,method,...)
+    }
     method <- get(method)
-    method(data,k=res)
+    method(data,k=nClus)
 }
 
 DetermineNumberOfClusters <- function(data,max,method,plot=FALSE,smooth=0.2,
