@@ -1,3 +1,5 @@
 *.o
 *.dll
 *.Rhistory
+.Rproj.user
+FlowSOM.Rproj

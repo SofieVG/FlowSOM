@@ -4,7 +4,9 @@
 #' several algorithms
 #'
 #' @param data   Matrix containing the data to cluster
-#' @param method Clustering method to use
+#' @param method Clustering method to use, given as a string. Options are
+#'               metaClustering_consensus,metaClustering_hclust,
+#'               metaClustering_kmeans,metaClustering_som
 #' @param max    Maximum number of clusters to try out
 #' @param ...    Extra parameters to pass along
 #' 
@@ -152,8 +154,8 @@ metaClustering_kmeans <- function(data, k=7){
 }
 
 metaClustering_som <- function(data, k=7){
-    s <- SOM(data,xdim=k,ydim=1,rlen=100)
-    s$unit.classif
+    s <- SOM(data,xdim=k,ydim=1,rlen=100,silent = TRUE)
+    s$mapping[,1]
 }
 
 SSE <- function(data,clustering){
