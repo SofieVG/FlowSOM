@@ -258,8 +258,11 @@ Dist.MST <- function(X){
 #' @param  groups   List containing an array with file names for each group
 #' @param  plot     Logical. If TRUE, make a starplot of each individual file
 #' @param  silent   Logical. If TRUE, print progress messages
+#' @param  ...      Extra arguments to be passed on to the PlotStars function
 #'
 #' @return Distance matrix
+#' 
+#' @seealso \code{\link{PlotStars}},\code{\link{PlotGroups}}
 #'
 #' @examples
 #'    library(FlowSOM)
@@ -301,7 +304,7 @@ Dist.MST <- function(X){
 #'    PlotGroups(flowSOM.res[[1]], groupRes)
 #'
 #' @export 
-CountGroups <- function(fsom,groups,plot=TRUE,silent=FALSE){
+CountGroups <- function(fsom,groups,plot=TRUE,silent=FALSE,...){
     if(class(groups[[1]]) == "character"){
         files <- unlist(groups)
         counts <- matrix(0,nrow=length(files),ncol=fsom$map$nNodes,
@@ -315,11 +318,14 @@ CountGroups <- function(fsom,groups,plot=TRUE,silent=FALSE){
             counts[file,names(tmp)] <- tmp
         }
     } else {
-        
+        stop("The CountGroups function can currently only read from files.
+              groups should be given as a list of character arrays.")
     }
     
     pctgs <- t(sapply(seq_len(nrow(counts)),
                     function(i){counts[i,]/ rowSums(counts)[i]}))
+    rownames(pctgs) <- rownames(counts)
+    
     means <- apply(pctgs,2,function(x){
         tapply(x,
                 INDEX = factor(rep(names(groups),lapply(groups,length)),

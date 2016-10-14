@@ -3,7 +3,7 @@ devtools::check()
 devtools::build()
 
 
-devtools::install_github("saeyslab/FlowSOM")
+devtools::install_github("saeyslab/FlowSOM", build_vignettes = TRUE)
 
 library(FlowSOM)
 fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
