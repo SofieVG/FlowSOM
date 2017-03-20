@@ -17,5 +17,5 @@ Check the [releases](https://github.com/saeyslab/FlowSOM/releases) to obtain the
 Or you can install this package using the devtools library.
 
 ```
-devtools::install_github("saeyslab/FlowSOM")
+devtools::install_github("saeyslab/FlowSOM", build_vignettes = TRUE)
 ```
