@@ -89,10 +89,10 @@
 #' @importFrom ConsensusClusterPlus ConsensusClusterPlus
 #' @importFrom BiocGenerics colnames
 #' 
-#' @importFrom flowUtils read.gatingML
 #' @importFrom XML xmlToList xmlParse
 #' 
-#' @export
+#' @export 
+###@importFrom flowUtils read.gatingML
 FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL, 
                     transform=FALSE, toTransform=NULL, 
                     transformFunction=flowCore::logicleTransform(), scale=TRUE, 
@@ -225,28 +225,28 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 
 
 #' Process a gatingML file
-#' 
+#'
 #' Reads a gatingML file using the \code{\link{flowUtils}} library and
 #' returns a list with a matrix containing filtering results for each specified
 #' gate and a vector with a label for each cell
-#' 
+#'
 #' @param flowFrame     The flowFrame to apply the gating on
 #' @param gatingFile    The gatingML file to read
-#' @param gateIDs       Named vector containing ids to extract from the 
+#' @param gateIDs       Named vector containing ids to extract from the
 #'                      gatingML file to use in the matrix
 #' @param cellTypes     Cell types to use for labeling the cells. Should be a
 #'                      subset of the names of the gateIDs
 #' @param silent        If FALSE, show messages of which gates are being
 #'                      processed
-#'                  
-#' @return This function returns a list in which the first element ("matrix") 
-#' is a matrix containing filtering results for each specified gate and the 
+#'
+#' @return This function returns a list in which the first element ("matrix")
+#' is a matrix containing filtering results for each specified gate and the
 #' second element ("manual") is a vector which assigns a label to each cell
 #'
 #' @seealso \code{\link{PlotPies}}
 #'
 #' @examples
-#' 
+#'
 #'    # Read the flowFrame
 #'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
 #'    ff <- flowCore::read.FCS(fileName)
@@ -254,9 +254,9 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #'    flowCore::colnames(ff_c)[8:18] <- paste("Comp-",
 #'                                      flowCore::colnames(ff_c)[8:18],
 #'                                      sep="")
-#'        
+#'
 #'    # Specify the gating file and the gates of interest
-#'    gatingFile <- system.file("extdata","manualGating.xml", 
+#'    gatingFile <- system.file("extdata","manualGating.xml",
 #'                              package="FlowSOM")
 #'    gateIDs <- c( "B cells"=8,
 #'                  "ab T cells"=10,
@@ -266,8 +266,8 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #'    cellTypes <- c("B cells","ab T cells","yd T cells",
 #'                  "NK cells","NKT cells")
 #'    gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
-#'    
-#'    
+#'
+#'
 #'    # Build a FlowSOM tree
 #'    flowSOM.res <- FlowSOM(ff_c,compensate=FALSE,transform=TRUE,
 #'                          toTransform=8:18,colsToUse=c(9,12,14:18),nClus=10)
@@ -301,6 +301,6 @@ ProcessGatingML <- function(flowFrame,gatingFile,gateIDs,
         manual[results[,celltype]] <- celltype
     }
     manual <- factor(manual,levels = c("Unknown",cellTypes))
-    
+
     list("matrix"=results,"manual"=manual)
 }

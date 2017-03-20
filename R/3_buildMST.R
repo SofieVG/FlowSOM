@@ -80,6 +80,11 @@ BuildMST <- function(fsom, silent=FALSE, tSNE=FALSE){
 #' flowSOM.res <- UpdateNodeSize(flowSOM.res)
 #' PlotStars(flowSOM.res)
 #' 
+#' 
+#' # Smaller node sizes
+#' flowSOM.res <- UpdateNodeSize(flowSOM.res, maxNodeSize = 5)
+#' PlotStars(flowSOM.res)
+#' 
 #' @export
 UpdateNodeSize <- function(fsom, count = NULL, reset=FALSE, transform=sqrt,
                             maxNodeSize = 15,
@@ -281,8 +286,9 @@ PlotMarker <- function(fsom, marker=NULL, view="MST",main=NULL,
             vertex.label=NA,edge.lty=lty)
     }else{
         f <- fsom
-        igraph::V(f$MST$graph)$color <- colorPalette(100)[as.numeric(cut(
-            fsom$map$medianValues[, marker], breaks = 100))] 
+        values <- as.numeric(cut(fsom$map$medianValues[, marker], breaks = 100))
+        igraph::V(f$MST$graph)$color <- colorPalette(100)[values] 
+        igraph::V(f$MST$graph)$color[is.na(values)] <- "#000000"
         igraph::plot.igraph(f$MST$graph, 
             layout=layout, 
             vertex.size=fsom$MST$size, 
@@ -295,7 +301,7 @@ PlotMarker <- function(fsom, marker=NULL, view="MST",main=NULL,
         
         graphics::par(fig=c(0,0.2,0,1),mar=c(0,0,0,0),new=TRUE)
         legendContinuous(colorPalette(100),
-                   fsom$map$medianValues[, marker])
+                   stats::na.exclude(fsom$map$medianValues[, marker]))
     }
     graphics::par(oldpar)
 }
@@ -988,7 +994,7 @@ PlotStars <- function(fsom,
 
 
 ###############
-## PlotStars ##
+## PlotNode ##
 ###############
 #' Plot star chart
 #' 
@@ -1330,7 +1336,7 @@ PlotClusters2D <- function(fsom, marker1, marker2, nodes,
             pch=pchCluster, 
             col=col)
     graphics::points(fsom$map$medianValues[nodes,marker1],
-            fsom$map$meanValues[nodes,marker2],
+            fsom$map$medianValues[nodes,marker2],
             pch="x",col="blue")
     #cat(nodes,": \n",table(m[fsom$map$mapping[,1] %in% nodes]),"\n")
 }

@@ -71,8 +71,8 @@ fSOM <- FlowSOM(fileName,
                 # Metaclustering options:
                 nClus = 10)
 
-PlotStars(fSOM[[1]],
-            backgroundValues = as.factor(fSOM[[2]]))
+PlotStars(fSOM$FlowSOM,
+            backgroundValues = as.factor(fSOM$metaclustering))
 @
 
 
@@ -193,6 +193,7 @@ It might also be interesting to compare with a manual gating. The
 \Rcode{cellTypes} can be any factor which has a value for each individual
 cell, so you can also map other clustering results.
 <<fig=TRUE>>=
+#<<>>= 
 library(flowUtils)
 flowEnv <- new.env()
 ff_c <- compensate(ff,description(ff)$SPILL)
@@ -239,6 +240,7 @@ If you have background knowledge about the number of cell types you are
 looking for, it might be optimal to provide this number to the algorithm.
 
 <<fig=TRUE>>=
+#<<>>=
 metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
 PlotPies(fSOM,cellTypes=gatingResult$manual,
         backgroundValues = as.factor(metaClustering))

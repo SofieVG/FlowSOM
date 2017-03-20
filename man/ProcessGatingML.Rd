@@ -11,7 +11,7 @@ ProcessGatingML(flowFrame, gatingFile, gateIDs, cellTypes, silent = FALSE)
 
 \item{gatingFile}{The gatingML file to read}
 
-\item{gateIDs}{Named vector containing ids to extract from the 
+\item{gateIDs}{Named vector containing ids to extract from the
 gatingML file to use in the matrix}
 
 \item{cellTypes}{Cell types to use for labeling the cells. Should be a
@@ -21,8 +21,8 @@ subset of the names of the gateIDs}
 processed}
 }
 \value{
-This function returns a list in which the first element ("matrix") 
-is a matrix containing filtering results for each specified gate and the 
+This function returns a list in which the first element ("matrix")
+is a matrix containing filtering results for each specified gate and the
 second element ("manual") is a vector which assigns a label to each cell
 }
 \description{
@@ -39,9 +39,9 @@ gate and a vector with a label for each cell
    flowCore::colnames(ff_c)[8:18] <- paste("Comp-",
                                      flowCore::colnames(ff_c)[8:18],
                                      sep="")
-       
+
    # Specify the gating file and the gates of interest
-   gatingFile <- system.file("extdata","manualGating.xml", 
+   gatingFile <- system.file("extdata","manualGating.xml",
                              package="FlowSOM")
    gateIDs <- c( "B cells"=8,
                  "ab T cells"=10,
@@ -51,8 +51,8 @@ gate and a vector with a label for each cell
    cellTypes <- c("B cells","ab T cells","yd T cells",
                  "NK cells","NKT cells")
    gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
-   
-   
+
+
    # Build a FlowSOM tree
    flowSOM.res <- FlowSOM(ff_c,compensate=FALSE,transform=TRUE,
                          toTransform=8:18,colsToUse=c(9,12,14:18),nClus=10)

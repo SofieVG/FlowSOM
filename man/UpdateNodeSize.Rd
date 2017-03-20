@@ -48,6 +48,11 @@ PlotStars(flowSOM.res)
 flowSOM.res <- UpdateNodeSize(flowSOM.res)
 PlotStars(flowSOM.res)
 
+
+# Smaller node sizes
+flowSOM.res <- UpdateNodeSize(flowSOM.res, maxNodeSize = 5)
+PlotStars(flowSOM.res)
+
 }
 \seealso{
 \code{\link{BuildMST}}

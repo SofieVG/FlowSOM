@@ -313,7 +313,7 @@ CountGroups <- function(fsom,groups,plot=TRUE,silent=FALSE,...){
             if(!silent){print(file)}
             ff <- flowCore::read.FCS(file)
             fsom_f <- NewData(fsom,ff)
-            if(plot){PlotStars(fsom_f,main=file)}
+            if(plot){PlotStars(fsom_f,main=file,...)}
             tmp <- table(fsom_f$map$mapping[,1])
             counts[file,names(tmp)] <- tmp
         }
