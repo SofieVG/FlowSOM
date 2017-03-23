@@ -81,4 +81,3 @@ Plot FlowSOM grid or tree, with pies indicating another clustering
 \code{\link{PlotStars}},\code{\link{PlotMarker}},
 \code{\link{PlotCenters}},\code{\link{BuildMST}}
 }
-

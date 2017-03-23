@@ -57,4 +57,3 @@ PlotStars(flowSOM.res)
 \seealso{
 \code{\link{BuildMST}}
 }
-

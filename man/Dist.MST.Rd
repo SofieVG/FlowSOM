@@ -15,4 +15,3 @@ Distance matrix
 \description{
 Calculate distance matrix using a minimal spanning tree neighbourhood
 }
-

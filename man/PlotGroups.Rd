@@ -58,4 +58,3 @@ to the mean percentage of cells present in each
 \seealso{
 \code{\link{PlotStars}},\code{\link{CountGroups}}
 }
-

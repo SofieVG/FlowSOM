@@ -44,4 +44,3 @@ Plot a star chart indicating median marker values of a single node
 \code{\link{PlotStars}},\code{\link{PlotNumbers}},
  \code{\link{FlowSOM}}
 }
-

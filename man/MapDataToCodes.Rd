@@ -20,4 +20,3 @@ Array with nearest node id for each datapoint
 \description{
 Assign nearest node to each datapoint
 }
-

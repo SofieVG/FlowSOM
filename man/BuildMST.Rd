@@ -33,4 +33,3 @@ flowSOM.res <- BuildMST(flowSOM.res)
 \seealso{
 \code{\link{BuildSOM}}, \code{\link{PlotStars}}
 }
-

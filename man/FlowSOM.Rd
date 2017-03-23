@@ -97,4 +97,3 @@ flowSOM.clustering <- flowSOM.res[[2]][flowSOM.res[[1]]$map$mapping[,1]]
 \code{\link{scale}},\code{\link{ReadInput}},\code{\link{BuildSOM}},
          \code{\link{BuildMST}},\code{\link{MetaClustering}}
 }
-

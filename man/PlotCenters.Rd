@@ -39,4 +39,3 @@ Plot FlowSOM nodes on a 2D scatter plot of the data
 \code{\link{PlotStars}},\code{\link{PlotPies}},
          \code{\link{PlotMarker}},\code{\link{BuildMST}}
 }
-

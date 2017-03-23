@@ -66,4 +66,3 @@ top left will have index 91.
 \code{\link{PlotNumbers}},\code{\link{PlotCenters}},
          \code{\link{BuildMST}}
 }
-

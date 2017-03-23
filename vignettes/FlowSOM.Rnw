@@ -21,7 +21,7 @@ interpretation of cytometry data}
 \par\end{center}{\Large \par}
 
 \begin{center}
-Sofie Van Gassen, Britt Callebaut and Yvan Saeys
+Sofie Van Gassen, Britt Callebaut, Tom Dhaene and Yvan Saeys
 \par\end{center}
 
 \begin{center}
@@ -29,7 +29,7 @@ Ghent University
 \par\end{center}
 
 \begin{center}
-{\footnotesize September, 2014\bigskip{}
+{\footnotesize March, 2017\bigskip{}
 \bigskip{}
 }
 \par\end{center}{\footnotesize \par}
@@ -57,7 +57,6 @@ item is the FlowSOM object (as required as input by many functions in this
 package) and the second item is the result of the metaclustering.
 
 <<fig=TRUE>>=
-set.seed(42)
 library(FlowSOM)
 
 fileName <- system.file("extdata","lymphocytes.fcs",
@@ -69,7 +68,9 @@ fSOM <- FlowSOM(fileName,
                 # SOM options:
                 colsToUse = c(9,12,14:18), xdim = 7, ydim = 7,
                 # Metaclustering options:
-                nClus = 10)
+                nClus = 10,
+                # Seed for reproducible results:
+                seed = 42)
 
 PlotStars(fSOM$FlowSOM,
             backgroundValues = as.factor(fSOM$metaclustering))
@@ -278,12 +279,11 @@ It is possible to compare between groups with the FlowSOM package as well. The t
 
 <<fig=TRUE>>=
 library(FlowSOM)
-set.seed(1)
 
 # Build the FlowSOM tree on the example file
 fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
 flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10)
+scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10, seed=1)
 
 # Have a look at the resulting tree
 # PlotStars(flowSOM.res[[1]],backgroundValues = as.factor(flowSOM.res[[2]]))

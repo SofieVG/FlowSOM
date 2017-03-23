@@ -20,4 +20,3 @@ Add a flowFrame to the data variable of the FlowSOM object
 \seealso{
 \code{\link{ReadInput}}
 }
-

@@ -29,4 +29,3 @@ predictedClusters <- sample(1:6, 100, replace = TRUE)
 # Calculate the FMeasure
 FMeasure(realClusters,predictedClusters)
 }
-

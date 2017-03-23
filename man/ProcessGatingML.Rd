@@ -63,4 +63,3 @@ gate and a vector with a label for each cell
 \seealso{
 \code{\link{PlotPies}}
 }
-

@@ -62,4 +62,3 @@ PlotNumbers(flowSOM.res, nodeSize=14)
          \code{\link{PlotPies}},\code{\link{PlotCenters}},
          \code{\link{BuildMST}}
 }
-

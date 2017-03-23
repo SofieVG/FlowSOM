@@ -67,4 +67,3 @@ PlotVariable(flowSOM.res,rand)
          \code{\link{PlotPies}},\code{\link{PlotCenters}},
          \code{\link{BuildMST}}
 }
-

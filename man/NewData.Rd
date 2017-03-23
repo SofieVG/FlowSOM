@@ -40,4 +40,3 @@ as from the original grid will be used.
 \code{\link{FlowSOMSubset}} if you want to get a subset of the
          current data instead of a new dataset
 }
-

@@ -66,4 +66,3 @@ Calculate differences in cell counts between groups
 \seealso{
 \code{\link{PlotStars}},\code{\link{PlotGroups}}
 }
-

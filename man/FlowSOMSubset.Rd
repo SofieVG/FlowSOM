@@ -42,4 +42,3 @@ Take a subset from a FlowSOM object
 \seealso{
 \code{\link{BuildMST}}
 }
-

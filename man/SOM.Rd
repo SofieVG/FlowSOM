@@ -49,4 +49,3 @@ This code is strongly based on the \code{kohonen} package.
 \seealso{
 \code{\link{BuildSOM}}
 }
-

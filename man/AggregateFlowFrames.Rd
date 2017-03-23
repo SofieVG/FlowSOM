@@ -42,4 +42,3 @@ ff_new <- AggregateFlowFrames(c(fileName,fileName),1000)
 \seealso{
 \code{\link{ceiling}}
 }
-

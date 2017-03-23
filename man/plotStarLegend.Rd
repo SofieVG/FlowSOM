@@ -24,4 +24,3 @@ Plot a single star chart, annotated with labels
 \seealso{
 \code{\link{PlotStars}}
 }
-

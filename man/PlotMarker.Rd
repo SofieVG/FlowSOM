@@ -67,4 +67,3 @@ http://cytospade.org
 \code{\link{PlotStars}},\code{\link{PlotPies}},
          \code{\link{PlotCenters}},\code{\link{BuildMST}}
 }
-

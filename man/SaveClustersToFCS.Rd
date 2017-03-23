@@ -25,4 +25,3 @@ Saves the extended fcs file as [originalName]_FlowSOM.fcs
 \description{
 Write FlowSOM clustering results to the original FCS files
 }
-

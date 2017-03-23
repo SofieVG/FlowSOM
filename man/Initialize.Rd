@@ -17,4 +17,3 @@ array containing indices of selected rows
 \description{
 Select k well spread points from X
 }
-

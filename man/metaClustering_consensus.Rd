@@ -34,4 +34,3 @@ Cluster data using hierarchical consensus clustering with k clusters
 \seealso{
 \code{\link{MetaClustering}}
 }
-

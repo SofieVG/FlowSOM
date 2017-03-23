@@ -47,4 +47,3 @@ several algorithms
 \seealso{
 \code{\link{metaClustering_consensus}}
 }
-

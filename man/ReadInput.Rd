@@ -75,4 +75,3 @@ flowSOM.clustering <- metacl[flowSOM.res$map$mapping[,1]]
 \seealso{
 \code{\link{scale}},\code{\link{BuildSOM}}
 }
-

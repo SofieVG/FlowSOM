@@ -75,4 +75,3 @@ a star chart indicating median marker values
 \code{\link{PlotPies}},\code{\link{PlotMarker}},
 \code{\link{PlotCenters}}, \code{\link{BuildMST}}
 }
-

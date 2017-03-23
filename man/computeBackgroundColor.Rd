@@ -26,4 +26,3 @@ backgroundColor will be used (default 100).}
 \description{
 Internal function for computing background nodes
 }
-
