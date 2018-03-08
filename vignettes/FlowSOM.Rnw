@@ -21,7 +21,7 @@ interpretation of cytometry data}
 \par\end{center}{\Large \par}
 
 \begin{center}
-Sofie Van Gassen, Britt Callebaut, Tom Dhaene and Yvan Saeys
+Sofie Van Gassen, Britt Callebaut and Yvan Saeys
 \par\end{center}
 
 \begin{center}
@@ -29,7 +29,7 @@ Ghent University
 \par\end{center}
 
 \begin{center}
-{\footnotesize March, 2017\bigskip{}
+{\footnotesize September, 2014\bigskip{}
 \bigskip{}
 }
 \par\end{center}{\footnotesize \par}
@@ -57,6 +57,7 @@ item is the FlowSOM object (as required as input by many functions in this
 package) and the second item is the result of the metaclustering.
 
 <<fig=TRUE>>=
+set.seed(42)
 library(FlowSOM)
 
 fileName <- system.file("extdata","lymphocytes.fcs",
@@ -68,12 +69,10 @@ fSOM <- FlowSOM(fileName,
                 # SOM options:
                 colsToUse = c(9,12,14:18), xdim = 7, ydim = 7,
                 # Metaclustering options:
-                nClus = 10,
-                # Seed for reproducible results:
-                seed = 42)
+                nClus = 10)
 
-PlotStars(fSOM$FlowSOM,
-            backgroundValues = as.factor(fSOM$metaclustering))
+PlotStars(fSOM[[1]],
+            backgroundValues = as.factor(fSOM[[2]]))
 @
 
 
@@ -194,7 +193,6 @@ It might also be interesting to compare with a manual gating. The
 \Rcode{cellTypes} can be any factor which has a value for each individual
 cell, so you can also map other clustering results.
 <<fig=TRUE>>=
-#<<>>= 
 library(flowUtils)
 flowEnv <- new.env()
 ff_c <- compensate(ff,description(ff)$SPILL)
@@ -241,7 +239,6 @@ If you have background knowledge about the number of cell types you are
 looking for, it might be optimal to provide this number to the algorithm.
 
 <<fig=TRUE>>=
-#<<>>=
 metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
 PlotPies(fSOM,cellTypes=gatingResult$manual,
         backgroundValues = as.factor(metaClustering))
@@ -279,11 +276,12 @@ It is possible to compare between groups with the FlowSOM package as well. The t
 
 <<fig=TRUE>>=
 library(FlowSOM)
+set.seed(1)
 
 # Build the FlowSOM tree on the example file
 fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
 flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10, seed=1)
+scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10)
 
 # Have a look at the resulting tree
 # PlotStars(flowSOM.res[[1]],backgroundValues = as.factor(flowSOM.res[[2]]))

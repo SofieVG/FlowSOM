@@ -4,12 +4,8 @@
 #' several algorithms
 #'
 #' @param data   Matrix containing the data to cluster
-#' @param method Clustering method to use, given as a string. Options are
-#'               metaClustering_consensus,metaClustering_hclust,
-#'               metaClustering_kmeans,metaClustering_som
+#' @param method Clustering method to use
 #' @param max    Maximum number of clusters to try out
-#' @param nClus  Exact number of clusters to use. If not NULL, max will be
-#'               ignored.
 #' @param ...    Extra parameters to pass along
 #' 
 #' @return Numeric array indicating cluster for each datapoint
@@ -32,12 +28,10 @@
 #'    flowSOM.clustering <- metacl[flowSOM.res$map$mapping[,1]]    
 #'
 #' @export
-MetaClustering <- function(data,method,max=20,nClus=NULL,...){
-    if(is.null(nClus)){
-        nClus <- DetermineNumberOfClusters(data,max,method,...)
-    }
+MetaClustering <- function(data,method,max=20,...){
+    res <- DetermineNumberOfClusters(data,max,method,...)
     method <- get(method)
-    method(data,k=nClus)
+    method(data,k=res)
 }
 
 DetermineNumberOfClusters <- function(data,max,method,plot=FALSE,smooth=0.2,
@@ -158,8 +152,8 @@ metaClustering_kmeans <- function(data, k=7){
 }
 
 metaClustering_som <- function(data, k=7){
-    s <- SOM(data,xdim=k,ydim=1,rlen=100,silent = TRUE)
-    s$mapping[,1]
+    s <- SOM(data,xdim=k,ydim=1,rlen=100)
+    s$unit.classif
 }
 
 SSE <- function(data,clustering){
