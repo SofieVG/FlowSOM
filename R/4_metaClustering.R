@@ -204,3 +204,25 @@ FMeasure <- function(realClusters, predictedClusters,silent=FALSE){
     f[is.na(f)] <- 0
     sum(apply(f,1,max) * (rowSums(a)/sum(a)))
 }
+
+#' MetaclusterMFIs
+#' 
+#' Compute the median fluorescence intensities for the metaclusters
+#'
+#' @param fsom Result of calling the FlowSOM function
+#' @return  Metacluster MFIs
+#' @examples
+#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' ff <- flowCore::read.FCS(fileName)
+#' ff <- flowCore::compensate(ff,ff@@description$SPILL)
+#' ff <- flowCore::transform(ff,
+#'          flowCore::transformList(colnames(ff@@description$SPILL),
+#'                                 flowCore::logicleTransform()))
+#' flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),maxMeta=10)
+#' mfis <- MetaclusterMFIs(flowSOM.res)
+#' @export
+MetaclusterMFIs <- function(fsom){
+  return(t(apply(fsom$FlowSOM$data, 2, function(x){
+    tapply(x, fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]], stats::median)
+  })))
+}

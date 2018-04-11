@@ -75,14 +75,14 @@ Will scale the data and uses consensus meta-clustering by default.
 # Read from file
 fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
 flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-                      scale=TRUE,colsToUse=c(9,12,14:18),maxMeta=10)
+                      scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 # Or read from flowFrame object
 ff <- flowCore::read.FCS(fileName)
 ff <- flowCore::compensate(ff,ff@description$SPILL)
 ff <- flowCore::transform(ff,
          flowCore::transformList(colnames(ff@description$SPILL),
                                 flowCore::logicleTransform()))
-flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),maxMeta=10)
+flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 
 # Plot results
 PlotStars(flowSOM.res[[1]])
