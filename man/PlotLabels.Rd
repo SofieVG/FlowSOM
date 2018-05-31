@@ -5,7 +5,7 @@
 \title{Plot a label in each node}
 \usage{
 PlotLabels(fsom, labels, view = "MST", main = NULL,
-  nodeSize = fsom$MST$size, backgroundValues = NULL,
+  nodeSize = fsom$MST$size, fontSize = 1, backgroundValues = NULL,
   backgroundColor = function(n) {     grDevices::rainbow(n, alpha = 0.3) },
   backgroundLim = NULL, backgroundBreaks = NULL)
 }
@@ -21,6 +21,8 @@ option was selected while building the MST)}
 
 \item{nodeSize}{Nodesize. The plot might be easier to read if this is a 
 constant number, e.g. 10 or 15}
+
+\item{fontSize}{Fontsize, passed to label.cex}
 
 \item{backgroundValues}{Values to be used for background coloring, either
 numerical values or something that can be made into

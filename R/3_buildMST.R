@@ -559,6 +559,7 @@ PlotSD <- function(fsom,
 #' @param main         Title of the plot
 #' @param nodeSize   Nodesize. The plot might be easier to read if this is a 
 #'                   constant number, e.g. 10 or 15
+#' @param fontSize  Fontsize, passed to label.cex
 #' @param backgroundValues  Values to be used for background coloring, either
 #'                          numerical values or something that can be made into
 #'                          a factor (e.g. a clustering)
@@ -593,6 +594,7 @@ PlotSD <- function(fsom,
 #' 
 #' @export
 PlotNumbers <- function(fsom, view="MST",main=NULL,nodeSize=fsom$MST$size,
+                        fontSize = 1,
                         backgroundValues = NULL,
                         backgroundColor = function(n){
                             grDevices::rainbow(n,alpha=0.3)},
@@ -619,6 +621,7 @@ PlotNumbers <- function(fsom, view="MST",main=NULL,nodeSize=fsom$MST$size,
         layout=layout, 
         vertex.size=nodeSize, 
         vertex.label=seq_len(nrow(fsom$map$codes)),
+        vertex.label.cex = fontSize,
         edge.lty=lty,
         mark.groups=background$groups, 
         mark.col=background$col[background$values], 
@@ -638,6 +641,7 @@ PlotNumbers <- function(fsom, view="MST",main=NULL,nodeSize=fsom$MST$size,
 #' @param main         Title of the plot
 #' @param nodeSize   Nodesize. The plot might be easier to read if this is a 
 #'                   constant number, e.g. 10 or 15
+#' @param fontSize  Fontsize, passed to label.cex
 #' @param backgroundValues  Values to be used for background coloring, either
 #'                          numerical values or something that can be made into
 #'                          a factor (e.g. a clustering)
@@ -676,6 +680,7 @@ PlotLabels <- function(fsom,
                        view="MST",
                        main=NULL,
                        nodeSize=fsom$MST$size,
+                       fontSize = 1,
                        backgroundValues = NULL,
                        backgroundColor = function(n){
                          grDevices::rainbow(n,alpha=0.3)},
@@ -702,6 +707,7 @@ PlotLabels <- function(fsom,
                       layout=layout, 
                       vertex.size=nodeSize, 
                       vertex.label=labels,
+                      vertex.label.cex = fontSize,
                       edge.lty=lty,
                       mark.groups=background$groups, 
                       mark.col=background$col[background$values], 
@@ -1107,14 +1113,17 @@ PlotStars <- function(fsom,
     if(is.null(thresholds)){
         # Use MFIs
         data <- fsom$map$medianValues[, markers,drop=FALSE]
+        scale <- TRUE
     } else {
         # scale thresholds same as data
         if(fsom$transform){
             warning("Thresholds should be given in the transformed space")
         }
-        thresholds = scale(t(thresholds), 
-                           center = fsom$scaled.center[markers],
-                           scale = fsom$scaled.scale[markers])
+        if(!is.null(fsom$scaled.center)){
+          thresholds <- scale(t(thresholds), 
+                              center = fsom$scaled.center[markers],
+                              scale = fsom$scaled.scale[markers])
+        }
         # Use pctgs of cells above threshold as star plot values
         data <-
             t(sapply(seq_len(fsom$map$nNodes), function(i) {
@@ -1129,6 +1138,7 @@ PlotStars <- function(fsom,
                 }
                 res
             }))
+        scale <- FALSE
     }
     
     # Choose layout type
@@ -1182,20 +1192,19 @@ PlotStars <- function(fsom,
     
     # Plot the actual graph
     igraph::plot.igraph(fsom$MST$g, 
-        vertex.shape="star", 
-        vertex.label=NA, 
-        vertex.size=fsom$MST$size, 
-        vertex.data=data,
-        vertex.cP=colorPalette(ncol(data)),
-        vertex.scale=TRUE,
-        layout=layout, 
-        edge.lty=lty,  
-        mark.groups=background$groups, 
-        mark.col=background$col[background$values], 
-        mark.border=background$col[background$values],
-        main=main
+                        vertex.shape="star", 
+                        vertex.label=NA, 
+                        vertex.size=fsom$MST$size, 
+                        vertex.data=data,
+                        vertex.cP=colorPalette(ncol(data)),
+                        vertex.scale=scale,
+                        layout=layout, 
+                        edge.lty=lty,  
+                        mark.groups=background$groups, 
+                        mark.col=background$col[background$values], 
+                        mark.border=background$col[background$values],
+                        main=main
     )
-    
     # Reset plot window
     graphics::par(oldpar)
     graphics::layout(1)
