@@ -232,7 +232,7 @@ MetaclusterMFIs <- function(fsom){
 #' Compute the coefficient of variation for the metaclusters
 #'
 #' @param fsom Result of calling the FlowSOM function
-#' @return  Metacluster MFIs
+#' @return  Metacluster CVs
 #' @examples
 #' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
 #' ff <- flowCore::read.FCS(fileName)

@@ -39,8 +39,8 @@ Ghent University
 }
 \par\end{center}
 
-The \Biocpkg{FlowSOM} package provides new visualization opportunities for
-cytometry data. A four-step algorithm is provided: first, the data is read and 
+The \Biocpkg{FlowSOM} package provides clustering and visualization opportunities 
+for cytometry data. A four-step algorithm is provided: first, the data is read and 
 preprocessed, then a self-organizing map is trained and a minimal spanning 
 tree is built, and finally, a meta-clustering is computed. Several plotting 
 options are available, using star charts to visualize marker intensities and 
@@ -48,6 +48,13 @@ pie charts to visualize correspondence with manual gating results or other
 automatic clustering results.
 \bigskip{}
 \bigskip{}
+
+\section{Installation}
+
+<<>>==
+# install.packages("BiocManager")
+# BiocManager::install("FlowSOM")
+@
 
 \section{The easy way}
 The easiest way to use this package is using the wrapper function 
@@ -274,14 +281,15 @@ PlotStars(fSOM,
 \section{Comparing different groups}
 It is possible to compare between groups with the FlowSOM package as well. The tree should be build on either a concatenation of all files, or a representative subset of all cell types. Then a list identifying which files belong to specific groups should be defined, and the differences will be computed. For a smaller number of samples, you can look at the fold change between the groups. For coloring, a treshold is used. A treshold of 0.50 means the difference should be at least 50\% of the max of both groups, which corresponds with a 2-fold change. The higher the threshold, the stricter, a threshold of 0 will colour each node. For a larger number of samples you can also use a wilcox test. This will be selected when a value is provided for the p\_tresh parameter.
 
-<<fig=TRUE>>=
+<<>>=
+#fig=TRUE>>=
 library(FlowSOM)
 set.seed(1)
 
 # Build the FlowSOM tree on the example file
 fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
-flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10)
+flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
+scale = TRUE, colsToUse = c(9,12,14:18), nClus = 10)
 
 # Have a look at the resulting tree
 # PlotStars(flowSOM.res[[1]],backgroundValues = as.factor(flowSOM.res[[2]]))
@@ -296,18 +304,19 @@ flowCore::write.FCS(ff_tmp,file="ff_tmp.fcs")
 # Make an additional file without cluster 7 and double amount of cluster 10
 ff_tmp <- ff[c(which(flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] != 7)),
 which(flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] == 5))),]
-flowCore::write.FCS(ff_tmp,file="ff_tmp2.fcs")
+flowCore::write.FCS(ff_tmp, file="ff_tmp2.fcs")
 
 # Compare the original file with the two new files we made
 groupRes <- CountGroups(flowSOM.res[[1]], 
-                        groups=list("AllCells"=c(fileName),
-                                    "Without_ydTcells"=c("ff_tmp.fcs","ff_tmp2.fcs")))
+                        groups=list("AllCells" = c(fileName),
+                                    "Without_ydTcells" = c("ff_tmp.fcs",
+                                                           "ff_tmp2.fcs")))
 # PlotGroups(flowSOM.res[[1]], groupRes)
 
 # Compare only the file with the double amount of cluster 10
 groupRes <- CountGroups(flowSOM.res[[1]], 
-                        groups=list("AllCells"=c(fileName),
-                                    "Without_ydTcells"=c("ff_tmp2.fcs")))
+                        groups = list("AllCells" = c(fileName),
+                                    "Without_ydTcells" = c("ff_tmp2.fcs")))
 PlotGroups(flowSOM.res[[1]], groupRes)
 @
 
