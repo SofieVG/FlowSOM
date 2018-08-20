@@ -240,14 +240,14 @@ MetaclusterMFIs <- function(fsom){
 #' ff <- flowCore::transform(ff,
 #'          flowCore::transformList(colnames(ff@@description$SPILL),
 #'                                 flowCore::logicleTransform()))
-#' flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),maxMeta=10)
+#' flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18), nClus=10)
 #' cvs <- MetaclusterCVs(flowSOM.res)
 #' @export
 MetaclusterCVs <- function(fsom){
   return(t(apply(fsom$FlowSOM$data, 2, function(x){
     tapply(x, fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]], 
            function(y){
-             stats::sd(y) / stats::mean(y)
+             stats::sd(y) / mean(y)
            })
   })))
 }
