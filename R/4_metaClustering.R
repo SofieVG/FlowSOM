@@ -226,3 +226,28 @@ MetaclusterMFIs <- function(fsom){
     tapply(x, fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]], stats::median)
   })))
 }
+
+#' MetaclusterCVs
+#' 
+#' Compute the coefficient of variation for the metaclusters
+#'
+#' @param fsom Result of calling the FlowSOM function
+#' @return  Metacluster MFIs
+#' @examples
+#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' ff <- flowCore::read.FCS(fileName)
+#' ff <- flowCore::compensate(ff,ff@@description$SPILL)
+#' ff <- flowCore::transform(ff,
+#'          flowCore::transformList(colnames(ff@@description$SPILL),
+#'                                 flowCore::logicleTransform()))
+#' flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),maxMeta=10)
+#' cvs <- MetaclusterCVs(flowSOM.res)
+#' @export
+MetaclusterCVs <- function(fsom){
+  return(t(apply(fsom$FlowSOM$data, 2, function(x){
+    tapply(x, fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]], 
+           function(y){
+             stats::sd(y) / stats::mean(y)
+           })
+  })))
+}

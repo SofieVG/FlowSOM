@@ -1693,15 +1693,15 @@ FlowSOMSubset <- function(fsom,ids){
 #'    fSOM2 <- NewData(flowSOM.res[[1]], ff[1001:2000,])
 #'
 #' @export
-NewData <- function(fsom,ff){
+NewData <- function(fsom, ff){
     fsom_tmp <- fsom
     
     if(fsom$compensate){
-        ff <- flowCore::compensate(ff,fsom$spillover)    
+        ff <- flowCore::compensate(ff, fsom$spillover)    
     }
     if(fsom$transform){
-        ff <- flowCore::transform(ff,flowCore::transformList(
-            BiocGenerics::colnames(ff[,fsom$toTransform]),
+        ff <- flowCore::transform(ff, flowCore::transformList(
+            BiocGenerics::colnames(ff[, fsom$toTransform]),
             fsom$transformFunction))
     }
     
@@ -1726,6 +1726,25 @@ NewData <- function(fsom,ff){
     fsom_tmp$map$medianValues[aggr[,1],colnames(aggr[,-1])] <- 
         as.matrix(aggr[,-1])
     UpdateNodeSize(fsom_tmp)
+    
+    distances_mean <- tapply(fsom$map$mapping[,2],
+                             as.factor(fsom$map$mapping[,1]),
+                             mean)
+    
+    distances_sd <- tapply(fsom$map$mapping[,2],
+                           as.factor(fsom$map$mapping[,1]),
+                           stats::sd)
+    
+    thresholds <- distances_mean + 3*distances_sd
+    
+    maxDistance_newData <- tapply(fsom_tmp$map$mapping[,2],
+                                  as.factor(fsom_tmp$map$mapping[,1]), 
+                                  max)
+    if (any(maxDistance_newData > thresholds[names(maxDistance_newData)])) {
+      warning("Some new cells are far from their cluster centers!")
+    }
+    
+    return(fsom_tmp)
 }
 
 ################

@@ -4,7 +4,8 @@
 \alias{ProcessGatingML}
 \title{Process a gatingML file}
 \usage{
-ProcessGatingML(flowFrame, gatingFile, gateIDs, cellTypes, silent = FALSE)
+ProcessGatingML(flowFrame, gatingFile, gateIDs, cellTypes,
+  silent = FALSE)
 }
 \arguments{
 \item{flowFrame}{The flowFrame to apply the gating on}

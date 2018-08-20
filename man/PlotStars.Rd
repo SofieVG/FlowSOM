@@ -5,8 +5,8 @@
 \title{Plot star charts}
 \usage{
 PlotStars(fsom, markers = fsom$map$colsUsed, view = "MST",
-  colorPalette = grDevices::colorRampPalette(c("#00007F", "blue", "#007FFF",
-  "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000")),
+  colorPalette = grDevices::colorRampPalette(c("#00007F", "blue",
+  "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000")),
   backgroundValues = NULL, backgroundColor = function(n) {    
   grDevices::rainbow(n, alpha = 0.3) }, backgroundLim = NULL,
   backgroundBreaks = NULL, thresholds = NULL, legend = TRUE,

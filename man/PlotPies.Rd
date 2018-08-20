@@ -5,8 +5,8 @@
 \title{Plot comparison with other clustering}
 \usage{
 PlotPies(fsom, cellTypes, view = "MST",
-  colorPalette = grDevices::colorRampPalette(c("white", "#00007F", "blue",
-  "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red")),
+  colorPalette = grDevices::colorRampPalette(c("white", "#00007F",
+  "blue", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red")),
   backgroundValues = NULL, backgroundColor = function(n) {    
   grDevices::rainbow(n, alpha = 0.3) }, backgroundLim = NULL,
   backgroundBreaks = NULL, legend = TRUE, main = "")

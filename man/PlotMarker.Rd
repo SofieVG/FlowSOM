@@ -5,8 +5,8 @@
 \title{Plot marker values}
 \usage{
 PlotMarker(fsom, marker = NULL, view = "MST", main = NULL,
-  colorPalette = grDevices::colorRampPalette(c("#00007F", "blue", "#007FFF",
-  "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000")),
+  colorPalette = grDevices::colorRampPalette(c("#00007F", "blue",
+  "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000")),
   backgroundValues = NULL, backgroundColor = function(n) {    
   grDevices::rainbow(n, alpha = 0.3) }, backgroundBreaks = NULL,
   backgroundLim = NULL)

@@ -4,11 +4,12 @@
 \alias{FlowSOM}
 \title{Run the FlowSOM algorithm}
 \usage{
-FlowSOM(input, pattern = ".fcs", compensate = FALSE, spillover = NULL,
-  transform = FALSE, toTransform = NULL,
+FlowSOM(input, pattern = ".fcs", compensate = FALSE,
+  spillover = NULL, transform = FALSE, toTransform = NULL,
   transformFunction = flowCore::logicleTransform(), scale = TRUE,
-  scaled.center = TRUE, scaled.scale = TRUE, silent = TRUE, colsToUse,
-  nClus = NULL, maxMeta, importance = NULL, seed = NULL, ...)
+  scaled.center = TRUE, scaled.scale = TRUE, silent = TRUE,
+  colsToUse, nClus = NULL, maxMeta, importance = NULL, seed = NULL,
+  ...)
 }
 \arguments{
 \item{input}{a flowFrame, a flowSet or an array of paths to files or 

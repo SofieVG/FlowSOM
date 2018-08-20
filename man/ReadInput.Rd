@@ -4,8 +4,8 @@
 \alias{ReadInput}
 \title{Read fcs-files or flowframes}
 \usage{
-ReadInput(input, pattern = ".fcs", compensate = FALSE, spillover = NULL,
-  transform = FALSE, toTransform = NULL,
+ReadInput(input, pattern = ".fcs", compensate = FALSE,
+  spillover = NULL, transform = FALSE, toTransform = NULL,
   transformFunction = flowCore::logicleTransform(), scale = FALSE,
   scaled.center = TRUE, scaled.scale = TRUE, silent = FALSE)
 }

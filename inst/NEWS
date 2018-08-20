@@ -1,3 +1,13 @@
+CHANGES IN VERSION 1.13.2 (2018/08/20)
+--------------------------------------
+o Added a MetaclusterCVs function to get coefficient of variation for the metaclusters
+
+CHANGES IN VERSION 1.13.1 (2018/04/09)
+--------------------------------------
+o Added a warning when cells mapped with the NewData function seem
+   further away from their cluster center then normal
+
+
 CHANGES IN VERSION 1.10.3 (2018/04/09)
 --------------------------------------
 o Bugfix in PlotGroups

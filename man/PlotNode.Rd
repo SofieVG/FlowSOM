@@ -5,8 +5,8 @@
 \title{Plot star chart}
 \usage{
 PlotNode(fsom, id, markers = fsom$map$colsUsed,
-  colorPalette = grDevices::colorRampPalette(c("#00007F", "blue", "#007FFF",
-  "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000")),
+  colorPalette = grDevices::colorRampPalette(c("#00007F", "blue",
+  "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000")),
   main = paste0("Cluster ", id))
 }
 \arguments{
