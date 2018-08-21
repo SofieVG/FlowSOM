@@ -50,34 +50,40 @@ BuildSOM <- function(fsom, colsToUse=NULL, silent=FALSE, ...){
     
     fsom$map <- SOM(fsom$data[, colsToUse],silent=silent, ...)
     fsom$map$colsUsed <- colsToUse
-    fsom$map$medianValues <-
-        t(sapply(seq_len(fsom$map$nNodes), function(i) {
-            apply(subset(fsom$data, fsom$map$mapping[,1] == i),2,stats::median)
-        }))
-    fsom$map$medianValues[is.nan(fsom$map$medianValues)] <- NA 
-    colnames(fsom$map$medianValues) <- colnames(fsom$data)
-    
-    fsom$map$cvValues <-
-      t(sapply(seq_len(fsom$map$nNodes), function(i) {
-        apply(subset(fsom$data, fsom$map$mapping[,1] == i),
-              2,
-              function(y){
-                if(length(y) > 0 && mean(y) != 0){
-                  stats::sd(y)/mean(y)
-                } else {
-                  NA
-                }})
-      }))
-    fsom$map$cvValues[is.nan(fsom$map$cvValues)] <- NA 
-    colnames(fsom$map$medianValues) <- colnames(fsom$data)
-    
-    fsom$map$sdValues <-
-        t(sapply(seq_len(fsom$map$nNodes), function(i) {
-            apply(subset(fsom$data, fsom$map$mapping[,1] == i),2,stats::sd)
-        }))
-    fsom$map$sdValues[is.nan(fsom$map$sdValues)] <- 0 
-    colnames(fsom$map$sdValues) <- colnames(fsom$data)
+    fsom <- UpdateDerivedValues(fsom)
     fsom
+}
+
+UpdateDerivedValues <- function(fsom){
+  fsom$map$medianValues <-
+    t(sapply(seq_len(fsom$map$nNodes), function(i) {
+      apply(subset(fsom$data, fsom$map$mapping[,1] == i),2,stats::median)
+    }))
+  fsom$map$medianValues[is.nan(fsom$map$medianValues)] <- NA 
+  colnames(fsom$map$medianValues) <- colnames(fsom$data)
+  
+  fsom$map$cvValues <-
+    t(sapply(seq_len(fsom$map$nNodes), function(i) {
+      apply(subset(fsom$data, fsom$map$mapping[,1] == i),
+            2,
+            function(y){
+              if(length(y) > 0 && mean(y) != 0){
+                stats::sd(y)/mean(y)
+              } else {
+                NA
+              }})
+    }))
+  fsom$map$cvValues[is.nan(fsom$map$cvValues)] <- NA 
+  colnames(fsom$map$medianValues) <- colnames(fsom$data)
+  
+  fsom$map$sdValues <-
+    t(sapply(seq_len(fsom$map$nNodes), function(i) {
+      apply(subset(fsom$data, fsom$map$mapping[,1] == i),2,stats::sd)
+    }))
+  fsom$map$sdValues[is.nan(fsom$map$sdValues)] <- 0 
+  colnames(fsom$map$sdValues) <- colnames(fsom$data)
+  
+  return(fsom)
 }
 
 #' Build a self-organizing map

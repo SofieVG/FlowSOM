@@ -1717,15 +1717,17 @@ NewData <- function(fsom, ff){
     
     fsom_tmp$data <- newData
     fsom_tmp$map$mapping <- MapDataToCodes(fsom$map$codes,newData)
-    aggr <- stats::aggregate(fsom_tmp$data,
-                            by=list(fsom_tmp$map$mapping[,1]),mean)
-    fsom_tmp$map$medianValues <- matrix(NA,nrow = nrow(fsom$map$grid),
-                                    ncol = ncol(fsom$map$medianValues),
-                                    dimnames=list(NULL,
-                                            colnames(fsom$map$medianValues)))
-    fsom_tmp$map$medianValues[aggr[,1],colnames(aggr[,-1])] <- 
-        as.matrix(aggr[,-1])
-    UpdateNodeSize(fsom_tmp)
+    # aggr <- stats::aggregate(fsom_tmp$data,
+    #                         by=list(fsom_tmp$map$mapping[,1]),
+    #                         median)
+    # fsom_tmp$map$medianValues <- matrix(NA,nrow = nrow(fsom$map$grid),
+    #                                 ncol = ncol(fsom$map$medianValues),
+    #                                 dimnames=list(NULL,
+    #                                         colnames(fsom$map$medianValues)))
+    # fsom_tmp$map$medianValues[aggr[,1],colnames(aggr[,-1])] <- 
+    #     as.matrix(aggr[,-1])
+    fsom_tmp <- UpdateDerivedValues(fsom_tmp)
+    fsom_tmp <- UpdateNodeSize(fsom_tmp)
     
     distances_mean <- tapply(fsom$map$mapping[,2],
                              as.factor(fsom$map$mapping[,1]),
