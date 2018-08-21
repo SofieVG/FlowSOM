@@ -10,7 +10,7 @@ MetaclusterCVs(fsom)
 \item{fsom}{Result of calling the FlowSOM function}
 }
 \value{
-Metacluster MFIs
+Metacluster CVs
 }
 \description{
 Compute the coefficient of variation for the metaclusters
@@ -22,6 +22,6 @@ ff <- flowCore::compensate(ff,ff@description$SPILL)
 ff <- flowCore::transform(ff,
          flowCore::transformList(colnames(ff@description$SPILL),
                                 flowCore::logicleTransform()))
-flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),maxMeta=10)
+flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18), nClus=10)
 cvs <- MetaclusterCVs(flowSOM.res)
 }

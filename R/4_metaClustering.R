@@ -244,10 +244,14 @@ MetaclusterMFIs <- function(fsom){
 #' cvs <- MetaclusterCVs(flowSOM.res)
 #' @export
 MetaclusterCVs <- function(fsom){
-  return(t(apply(fsom$FlowSOM$data, 2, function(x){
-    tapply(x, fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]], 
-           function(y){
-             stats::sd(y) / mean(y)
-           })
-  })))
+  CVs <- t(sapply(seq_along(levels(fsom$metaclustering)), function(i) {
+    apply(subset(fsom$data, fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]] == i),
+          2,
+          function(y){
+            if(length(y) > 0 && mean(y) != 0){
+              stats::sd(y)/mean(y)
+            } else {
+              NA
+            }})
+  }))
 }
