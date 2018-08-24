@@ -194,7 +194,10 @@ PlotBackgroundLegend <- function(backgroundValues, background,
     } else {
         graphics::legend("center", legend=levels(background$values),
                fill=background$col, 
-               cex=0.7, ncol=1, bty="n",title=main)       
+               cex=0.7, 
+               ncol =  ceiling(length(levels(background$values)) / 10),
+               bty="n",
+               title=main)       
     }
 }
 
@@ -1062,6 +1065,7 @@ plotStarQuery <- function(labels,values,
 #' @param backgroundBreaks  Breaks to pass on to \code{\link{cut}}, to split
 #'                          numerical background values. If NULL, the length of
 #'                          backgroundColor will be used (default 100).
+#' @param backgroundSize Size of the background circles. Default 15.
 #' @param thresholds    Optional. Array containing a number for each of the 
 #'                      markers to be used as the split between high/low. 
 #'                      If provided, the percentage of positive cells is
@@ -1101,6 +1105,7 @@ PlotStars <- function(fsom,
                                                                 alpha=0.3)},
                         backgroundLim = NULL,
                         backgroundBreaks = NULL,
+                        backgroundSize = NULL,
                         thresholds=NULL,
                         legend=TRUE,
                         query=NULL,
@@ -1152,9 +1157,10 @@ PlotStars <- function(fsom,
     )
     
     # Choose background colour
-    if(!is.null(backgroundValues)){
+    if (!is.null(backgroundValues)) {
         background <- computeBackgroundColor(backgroundValues,backgroundColor,
                                              backgroundLim, backgroundBreaks)
+        if (is.null(backgroundSize)) { backgroundSize <- fsom$MST$size}
     } else {
         background <- NULL
     }
@@ -1192,17 +1198,18 @@ PlotStars <- function(fsom,
     
     # Plot the actual graph
     igraph::plot.igraph(fsom$MST$g, 
-                        vertex.shape="star", 
-                        vertex.label=NA, 
-                        vertex.size=fsom$MST$size, 
-                        vertex.data=data,
-                        vertex.cP=colorPalette(ncol(data)),
-                        vertex.scale=scale,
-                        layout=layout, 
-                        edge.lty=lty,  
-                        mark.groups=background$groups, 
-                        mark.col=background$col[background$values], 
-                        mark.border=background$col[background$values],
+                        vertex.shape = "star", 
+                        vertex.label = NA, 
+                        vertex.size = fsom$MST$size, 
+                        vertex.data = data,
+                        vertex.cP = colorPalette(ncol(data)),
+                        vertex.scale = scale,
+                        layout = layout, 
+                        edge.lty = lty,  
+                        mark.groups = background$groups, 
+                        mark.col = background$col[background$values], 
+                        mark.border = background$col[background$values],
+                        mark.expand	= backgroundSize,
                         main=main
     )
     # Reset plot window
@@ -1674,6 +1681,12 @@ FlowSOMSubset <- function(fsom,ids){
 #'
 #' @param fsom FlowSOM object
 #' @param ff   Flow frame with the data to map
+#' @param stdev_allowed A warning is generated if the distance of the new
+#'                      data points to their closest cluster center is too
+#'                      big. This is computed based on the typical distance
+#'                      of the points from the original dataset assigned to
+#'                      that cluster, the threshold being set to
+#'                      mean + stdev_allowed * sd. Default is 4.
 #'        
 #' @return A new FlowSOM object
 #' @seealso \code{\link{FlowSOMSubset}} if you want to get a subset of the
@@ -1693,7 +1706,7 @@ FlowSOMSubset <- function(fsom,ids){
 #'    fSOM2 <- NewData(flowSOM.res[[1]], ff[1001:2000,])
 #'
 #' @export
-NewData <- function(fsom, ff){
+NewData <- function(fsom, ff, stdev_allowed = 4){
     fsom_tmp <- fsom
     
     if(fsom$compensate){
@@ -1737,7 +1750,7 @@ NewData <- function(fsom, ff){
                            as.factor(fsom$map$mapping[,1]),
                            stats::sd)
     
-    thresholds <- distances_mean + 3*distances_sd
+    thresholds <- distances_mean + stdev_allowed * distances_sd
     
     maxDistance_newData <- tapply(fsom_tmp$map$mapping[,2],
                                   as.factor(fsom_tmp$map$mapping[,1]), 

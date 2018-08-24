@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.13.7 (2018/08/23)
+--------------------------------------
+o Background circles scale with the actual node size
+o Possible to choose at which level warnings for bad mappings to cluster are generated (mean + x * sd), default changed from 3 to 4
+o If more than 10 background values, split legend in multiple columns
+
 CHANGES IN VERSION 1.13.6 (2018/08/21)
 --------------------------------------
 o Transposed the metaclusterMFI result!!
