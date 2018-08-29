@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.13.8 (2018/08/29)
+--------------------------------------
+o added get_markers and get_channels functions for easier access
+o added PlotOverview2D function, which gives an overview of multiple
+  PlotCluster2D plots.
+
 CHANGES IN VERSION 1.13.7 (2018/08/23)
 --------------------------------------
 o Background circles scale with the actual node size

@@ -4,12 +4,19 @@
 \alias{NewData}
 \title{Map new data to a FlowSOM grid}
 \usage{
-NewData(fsom, ff)
+NewData(fsom, ff, stdev_allowed = 4)
 }
 \arguments{
 \item{fsom}{FlowSOM object}
 
 \item{ff}{Flow frame with the data to map}
+
+\item{stdev_allowed}{A warning is generated if the distance of the new
+data points to their closest cluster center is too
+big. This is computed based on the typical distance
+of the points from the original dataset assigned to
+that cluster, the threshold being set to
+mean + stdev_allowed * sd. Default is 4.}
 }
 \value{
 A new FlowSOM object

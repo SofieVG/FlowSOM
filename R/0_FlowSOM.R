@@ -308,3 +308,67 @@ ProcessGatingML <- function(flowFrame,gatingFile,gateIDs,
     
     list("matrix"=results,"manual"=manual)
 }
+
+
+
+lookup <- function(ff, markers, type) { 
+  sapply(markers, function(marker){
+    flowCore::getChannelMarker(ff, marker)[,type]
+  })
+}
+
+#' get_channels
+#' 
+#' Get channel names for an array of markers, given a flowframe 
+#' 
+#' @param flowFrame The flowFrame of interest
+#' @param markers   Vector with markers or channels of interest
+#'                  
+#' @return Corresponding channel names
+#'
+#' @seealso \code{\link{get_markers}}
+#'
+#' @examples
+#' 
+#'    # Read the flowFrame
+#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    ff <- flowCore::read.FCS(fileName)
+#'    get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
+#'    get_markers(ff, c("FSC-A", "CD3", "FITC-A"))
+#'
+#' @export
+get_channels <- function(ff, markers) { 
+  channelnames <- lookup(ff, markers, "name") 
+  return(channelnames)
+}
+
+#' get_markers
+#' 
+#' Get marker names, given a flowframe. As available in "desc". If this is NA,
+#' defaults to channel name.
+#' 
+#' @param flowFrame The flowFrame of interest
+#' @param markers   Vector with markers or channels of interest
+#'                  
+#' @return Corresponding marker names
+#'
+#' @seealso \code{\link{get_channels}}
+#'
+#' @examples
+#' 
+#'    # Read the flowFrame
+#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    ff <- flowCore::read.FCS(fileName)
+#'    get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
+#'    get_markers(ff, c("FSC-A", "CD3", "FITC-A"))
+#'
+#' @export
+get_markers <- function(ff, markers) { 
+  markernames <- lookup(ff, markers, "desc") 
+  if (any(is.na(markernames))) {
+    markernames[is.na(markernames)] <- lookup(ff, 
+                                              markers[is.na(markernames)], 
+                                              "name")
+  }
+  return(markernames)
+}
