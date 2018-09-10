@@ -626,10 +626,11 @@ PlotNumbers <- function(fsom, view="MST",main=NULL,nodeSize=fsom$MST$size,
         vertex.label=seq_len(nrow(fsom$map$codes)),
         vertex.label.cex = fontSize,
         edge.lty=lty,
-        mark.groups=background$groups, 
-        mark.col=background$col[background$values], 
-        mark.border=background$col[background$values])
-    
+        mark.groups=background$groups,
+        mark.col=background$col[background$values],
+        mark.border=background$col[background$values],
+        main=main)
+
 }
 
 #' Plot a label in each node
