@@ -713,10 +713,11 @@ PlotLabels <- function(fsom,
                       vertex.label=labels,
                       vertex.label.cex = fontSize,
                       edge.lty=lty,
-                      mark.groups=background$groups, 
-                      mark.col=background$col[background$values], 
-                      mark.border=background$col[background$values])
-  
+                      mark.groups=background$groups,
+                      mark.col=background$col[background$values],
+                      mark.border=background$col[background$values],
+                      main=main)
+
 }
 
 ##############
