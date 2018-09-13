@@ -1,3 +1,14 @@
+CHANGES IN VERSION 1.13.9 (2018/09/13)
+--------------------------------------
+ Added a keepOrder parameter to the AggregateFlowFrames function. If TRUE, the 
+ cells of the random subsample will be ordered in the same way as they were 
+ originally ordered in the file. Default = FALSE for backwards compatability.
+ This will be especially useful if the whole file is selected in the subsample,
+ in which case indices keep corresponding to the original ones.
+ 
+ Also included the bugfix by Stu Blair to propagate the main parameter of the
+ plotnumbers function to igraph.
+
 CHANGES IN VERSION 1.13.8 (2018/08/29)
 --------------------------------------
 o added get_markers and get_channels functions for easier access
@@ -7,7 +18,8 @@ o added PlotOverview2D function, which gives an overview of multiple
 CHANGES IN VERSION 1.13.7 (2018/08/23)
 --------------------------------------
 o Background circles scale with the actual node size
-o Possible to choose at which level warnings for bad mappings to cluster are generated (mean + x * sd), default changed from 3 to 4
+o Possible to choose at which level warnings for bad mappings to cluster are 
+generated (mean + x * sd), default changed from 3 to 4
 o If more than 10 background values, split legend in multiple columns
 
 CHANGES IN VERSION 1.13.6 (2018/08/21)

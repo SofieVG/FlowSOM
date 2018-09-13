@@ -157,6 +157,9 @@ FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
 #' @param outputFile  Full path to output file
 #' @param writeMeta   If TRUE, files with the indices of the selected cells are
 #'                    generated
+#' @param keepOrder If TRUE, the random subsample will be ordered in the same
+#'                  way as they were originally ordered in the file. Default =
+#'                  FALSE.
 #'                  
 #' @return This function does not return anything, but will write a file with
 #'         about \code{cTotal} cells to \code{outputFile}
@@ -171,8 +174,8 @@ FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
 #' 
 #' @export
 AggregateFlowFrames <- function(fileNames, cTotal,
-                            writeOutput = FALSE, outputFile="aggregate.fcs", 
-                            writeMeta=FALSE){
+                            writeOutput = FALSE, outputFile  = "aggregate.fcs", 
+                            writeMeta = FALSE, keepOrder = FALSE){
     
     nFiles <- length(fileNames)
     cFile <- ceiling(cTotal/nFiles)
@@ -182,13 +185,17 @@ AggregateFlowFrames <- function(fileNames, cTotal,
     for(i in seq_len(nFiles)){
         f <- flowCore::read.FCS(fileNames[i])
         c <- sample(seq_len(nrow(f)),min(nrow(f),cFile))
+        if(keepOrder) c <- sort(c)
         if(writeMeta){
             #<path_to_outputfile>/<filename>_selected_<outputfile>.txt
-            utils::write.table(c,paste(gsub("[^/]*$","",outputFile),
-                            gsub("\\.[^.]*$","",gsub(".*/","",fileNames[i])),
-                            "_selected_",
-                            gsub("\\.[^.]*$","",gsub(".*/","",outputFile)),
-                            ".txt",sep=""))
+            utils::write.table(c, 
+                               paste(gsub("[^/]*$", "", outputFile),
+                                     gsub("\\.[^.]*$", "", 
+                                          gsub(".*/", "", fileNames[i])),
+                                     "_selected_",
+                                     gsub("\\.[^.]*$", "", 
+                                          gsub(".*/", "", outputFile)),
+                                     ".txt", sep=""))
         }
         m <- matrix(rep(i,min(nrow(f),cFile)))
         m2 <- m + stats::rnorm(length(m),0,0.1)
