@@ -1,3 +1,7 @@
+CHANGES IN VERSION 1.13.10 (2018/09/18)
+--------------------------------------
+Add rownames to the MFI results
+
 CHANGES IN VERSION 1.13.9 (2018/09/13)
 --------------------------------------
  Added a keepOrder parameter to the AggregateFlowFrames function. If TRUE, the 

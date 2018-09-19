@@ -229,6 +229,7 @@ MetaclusterMFIs <- function(fsom){
                           2,
                           stats::median)
                   }))
+  rownames(MFIs) <- seq_len(nrow(MFIs))
   return(MFIs)
 }
 

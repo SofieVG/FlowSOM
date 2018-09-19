@@ -487,7 +487,9 @@ GetMFIs <- function(fsom){
   if (class(fsom) != "FlowSOM") {
     stop("fsom should be a FlowSOM object.")
   }
-  return(fsom$map$medianValues)
+  MFIs <- fsom$map$medianValues
+  rownames(MFIs) <- seq_len(nrow(MFIs))
+  return(MFIs)
 }
 
 #' Get CV values for all clusters
