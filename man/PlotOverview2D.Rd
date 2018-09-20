@@ -37,11 +37,13 @@ metaclusters are plotted in color.
    flowSOM.res <- FlowSOM(fileName, 
                           compensate=TRUE, transform=TRUE, scale=TRUE,
                           colsToUse=c(9,12,14:18),
-                          nClus = 10)
+                          nClus = 10,
+                          seed = 1)
                           
    # Plot cells
    markers_of_interest = list(c("FSC-A", "SSC-A"),
                               c("CD3", "CD19"),
+                              c("TCRb", "TCRyd"),
                               c("CD4", "CD8"))
    metaclusters_of_interest = 1:10
    

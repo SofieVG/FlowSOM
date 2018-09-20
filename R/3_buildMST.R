@@ -258,12 +258,17 @@ PlotMarker <- function(fsom, marker=NULL, view="MST",main=NULL,
                         backgroundBreaks = NULL,
                         backgroundLim = NULL){
     switch(view,
-            MST  = { layout <- fsom$MST$l 
-            lty <- 1},
-            grid = { layout <- as.matrix(fsom$map$grid)
-            lty <- 0},
-            tSNE = { layout <- fsom$MST$l2
-            lty <- 0}
+           MST  = { 
+             layout <- fsom$MST$l 
+             lty <- 1
+           }, grid = { 
+               layout <- as.matrix(fsom$map$grid)
+               lty <- 0
+           }, tSNE = { 
+             layout <- fsom$MST$l2
+             lty <- 0
+           }, stop("The view should be MST, grid or tSNE. tSNE will only work
+                   if you specified this when building the MST.")
     )
     
     # Choose background colour
@@ -366,7 +371,9 @@ PlotVariable <- function(fsom, variable, view="MST",main=NULL,
             grid = { layout <- as.matrix(fsom$map$grid)
             lty <- 0},
             tSNE = { layout <- fsom$MST$l2
-            lty <- 0}
+            lty <- 0}, 
+           stop("The view should be MST, grid or tSNE. tSNE will only work
+                   if you specified this when building the MST.")
     )
     
     # Choose background colour
@@ -487,7 +494,9 @@ PlotSD <- function(fsom,
          grid = { layout <- as.matrix(fsom$map$grid)
          lty <- 0},
          tSNE = { layout <- fsom$MST$l2
-         lty <- 0}
+         lty <- 0}, 
+         stop("The view should be MST, grid or tSNE. tSNE will only work
+                   if you specified this when building the MST.")
   )
   
   # Choose background colour
@@ -609,7 +618,9 @@ PlotNumbers <- function(fsom, view="MST",main=NULL,nodeSize=fsom$MST$size,
             grid = { layout <- as.matrix(fsom$map$grid)
             lty <- 0},
             tSNE = { layout <- fsom$MST$l2
-            lty <- 0}
+            lty <- 0},
+           stop("The view should be MST, grid or tSNE. tSNE will only work
+                   if you specified this when building the MST.")
     )
     
     # Choose background colour
@@ -696,7 +707,9 @@ PlotLabels <- function(fsom,
          grid = { layout <- as.matrix(fsom$map$grid)
          lty <- 0},
          tSNE = { layout <- fsom$MST$l2
-         lty <- 0}
+         lty <- 0}, 
+         stop("The view should be MST, grid or tSNE. tSNE will only work
+                   if you specified this when building the MST.")
   )
   
   # Choose background colour
@@ -816,7 +829,9 @@ PlotPies <- function(fsom,
             grid = { layout <- as.matrix(fsom$map$grid)
             lty <- 0},
             tSNE = { layout <- fsom$MST$l2
-            lty <- 0}
+            lty <- 0}, 
+           stop("The view should be MST, grid or tSNE. tSNE will only work
+                   if you specified this when building the MST.")
     )
     
     # Choose background colour
@@ -1155,7 +1170,9 @@ PlotStars <- function(fsom,
         grid = { layout <- as.matrix(fsom$map$grid)
                     lty <- 0},
         tSNE = { layout <- fsom$MST$l2
-                    lty <- 0}
+                    lty <- 0}, 
+        stop("The view should be MST, grid or tSNE. tSNE will only work
+                   if you specified this when building the MST.")
     )
     
     # Choose background colour
@@ -1757,9 +1774,10 @@ FlowSOMSubset <- function(fsom,ids){
 #'
 #' New data from a flowframe is mapped to an existing FlowSOM 
 #' object. A new FlowSOM object is created, with the same grid, but a new
-#' mapping, node sizes and mean values. We assume the data is already
-#' compensated and transformed, but not scaled yet. The same scaling parameters
-#' as from the original grid will be used.
+#' mapping, node sizes and mean values. The same preprocessing steps (compensation,
+#' tranformation and scaling) will happen to this file as was specified in the
+#' original FlowSOM call. The scaling parameters from the original grid will be 
+#' used.
 #'
 #' @param fsom FlowSOM object
 #' @param ff   Flow frame with the data to map

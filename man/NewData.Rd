@@ -24,9 +24,10 @@ A new FlowSOM object
 \description{
 New data from a flowframe is mapped to an existing FlowSOM 
 object. A new FlowSOM object is created, with the same grid, but a new
-mapping, node sizes and mean values. We assume the data is already
-compensated and transformed, but not scaled yet. The same scaling parameters
-as from the original grid will be used.
+mapping, node sizes and mean values. The same preprocessing steps (compensation,
+tranformation and scaling) will happen to this file as was specified in the
+original FlowSOM call. The scaling parameters from the original grid will be 
+used.
 }
 \examples{
  # Build FlowSom result
