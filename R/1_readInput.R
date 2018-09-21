@@ -176,18 +176,20 @@ AddFlowFrame <- function(fsom, flowFrame){
     }
     
     # Save pretty names for nicer visualisation later on
-    n <- flowFrame@parameters@data[, "name"]
-    d <- flowFrame@parameters@data[, "desc"]
-    d[is.na(d)] <- n[is.na(d)]
-    if(any(grepl("#",d))){
-        # Support for hashtag notation: 
-        # antibody#fluorochrome -> antibody (fluorochrome)
-        fsom$prettyColnames <- gsub("#(.*)$"," (\\1)",d)
-    } else {
-        fsom$prettyColnames <- paste(d, " <", n, ">", sep="")
+    if(is.null(fsom$prettyColnames)){
+        n <- flowFrame@parameters@data[, "name"]
+        d <- flowFrame@parameters@data[, "desc"]
+        d[is.na(d)] <- n[is.na(d)]
+        if(any(grepl("#",d))){
+            # Support for hashtag notation: 
+            # antibody#fluorochrome -> antibody (fluorochrome)
+            fsom$prettyColnames <- gsub("#(.*)$"," (\\1)",d)
+        } else {
+            fsom$prettyColnames <- paste(d, " <", n, ">", sep="")
+        }
+        names(fsom$prettyColnames) <- colnames(flowCore::exprs(flowFrame))
     }
-    names(fsom$prettyColnames) <- colnames(flowCore::exprs(flowFrame))
-    
+  
     # Add the data to the matrix
     f <- flowCore::exprs(flowFrame)
     attr(f, "ranges") <- NULL
