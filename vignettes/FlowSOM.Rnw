@@ -227,7 +227,7 @@ PlotMarker(fSOM,"Pacific Blue-A")
 
 If you need to refer to the nodes, it might be useful to number them.
 <<fig=TRUE>>=
-PlotNumbers(UpdateNodeSize(fSOM,reset=TRUE))
+PlotNumbers(UpdateNodeSize(fSOM,reset=TRUE, maxNodeSize = 0))
 @
 
 You can use this number for a 2D scatter plot indicating the node values.
@@ -249,11 +249,13 @@ looking for, it might be optimal to provide this number to the algorithm.
 metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
 PlotPies(fSOM,cellTypes=gatingResult$manual,
         backgroundValues = as.factor(metaClustering))
+PlotLabels(UpdateNodeSize(fSOM,reset=TRUE, maxNodeSize = 0),
+           metaClustering)
 @
 
 You can also extract the meta-clustering for each cell individually
 <<>>=
-metaClustering_perCell <- metaClustering[fSOM$map$mapping[,1]]
+metaClustering_perCell <- GetMetaclusters(fSOM, metaClustering)
 @
 
 \section{Detecting nodes with a specific pattern}
@@ -299,11 +301,13 @@ scale = TRUE, colsToUse = c(9,12,14:18), nClus = 10)
 # In practice you would not generate any new file but 
 # use your different files from your different groups
 ff <- flowCore::read.FCS(fileName)
-ff_tmp <- ff[flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] != 7),]
+selection_1 <- which(GetClusters(flowSOM.res) %in% which(flowSOM.res$metaclustering != 7))
+ff_tmp <- ff[selection_1,]
 flowCore::write.FCS(ff_tmp,file="ff_tmp.fcs")
-# Make an additional file without cluster 7 and double amount of cluster 10
-ff_tmp <- ff[c(which(flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] != 7)),
-which(flowSOM.res[[1]]$map$mapping[,1] %in% which(flowSOM.res[[2]] == 5))),]
+# Make an additional file without cluster 7 and double amount of cluster 5
+selection_2 <- c(which(GetClusters(flowSOM.res) %in% which(flowSOM.res$metaclustering != 7)),
+                 which(GetClusters(flowSOM.res) %in% which(flowSOM.res$metaclustering == 5)))
+ff_tmp <- ff[selection_2,]
 flowCore::write.FCS(ff_tmp, file="ff_tmp2.fcs")
 
 # Compare the original file with the two new files we made
@@ -314,10 +318,10 @@ groupRes <- CountGroups(flowSOM.res[[1]],
 # PlotGroups(flowSOM.res[[1]], groupRes)
 
 # Compare only the file with the double amount of cluster 10
-groupRes <- CountGroups(flowSOM.res[[1]], 
+groupRes <- CountGroups(flowSOM.res$FlowSOM, 
                         groups = list("AllCells" = c(fileName),
-                                    "Without_ydTcells" = c("ff_tmp2.fcs")))
-PlotGroups(flowSOM.res[[1]], groupRes)
+                                      "Without_ydTcells" = c("ff_tmp2.fcs")))
+PlotGroups(flowSOM.res$FlowSOM, groupRes, p_tresh = NULL, tresh = 2)
 @
 
 \section{Summary}

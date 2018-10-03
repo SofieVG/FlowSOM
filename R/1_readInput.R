@@ -74,6 +74,9 @@ ReadInput <- function(input, pattern=".fcs",
         for(i in seq_along(input)){
             fsom <- AddFlowFrame(fsom, input[[i]])    
         }
+    } else if(class(input) == "matrix"){
+      flowFrame <- flowCore::flowFrame(input)
+      fsom <- AddFlowFrame(fsom, flowFrame)
     } else if(class(input) == "character"){    
         # Replace all directories by the files they contain
         toAdd <- NULL
@@ -140,26 +143,28 @@ AddFlowFrame <- function(fsom, flowFrame){
     if(fsom$compensate){
         if(is.null(fsom$spillover)){
             if(!is.null(flowFrame@description$SPILL)){
-                fsom$spillover <- flowFrame@description$SPILL    
+                spillover <- flowFrame@description$SPILL    
             } else if (!is.null(flowFrame@description$`$SPILLOVER`)){
                 if(class(flowFrame@description$`$SPILLOVER`)=="matrix"){
-                    fsom$spillover = flowFrame@description$`$SPILLOVER`
-                    flowFrame@description$SPILL = fsom$spillover
+                    spillover <- flowFrame@description$`$SPILLOVER`
+                    flowFrame@description$SPILL <- spillover
                 } else {
                     spilloverStr <- strsplit(
                         flowFrame@description$`$SPILLOVER`,
                         ",")[[1]]
                     n <- as.numeric(spilloverStr[1])
-                    fsom$spillover <- t(matrix(as.numeric(spilloverStr[(n+2):
+                    spillover <- t(matrix(as.numeric(spilloverStr[(n+2):
                                                 length(spilloverStr)]),ncol=n))
-                    colnames(fsom$spillover) <- spilloverStr[2:(n+1)]
-                    flowFrame@description$SPILL <- fsom$spillover
+                    colnames(spillover) <- spilloverStr[2:(n+1)]
+                    flowFrame@description$SPILL <- spillover
                 }
             } else {
                 stop("No compensation matrix found")
             }
+        } else {
+          spillover <- fsom$spillover
         }
-        flowFrame <- flowCore::compensate(flowFrame, fsom$spillover)
+        flowFrame <- flowCore::compensate(flowFrame, spillover)
     }
     
     # Transform

@@ -1179,7 +1179,10 @@ PlotStars <- function(fsom,
     if (!is.null(backgroundValues)) {
         background <- computeBackgroundColor(backgroundValues,backgroundColor,
                                              backgroundLim, backgroundBreaks)
-        if (is.null(backgroundSize)) { backgroundSize <- fsom$MST$size}
+        if (is.null(backgroundSize)) { 
+          backgroundSize <- fsom$MST$size
+          backgroundSize[backgroundSize == 0] <- 3
+        }
     } else {
         background <- NULL
     }
@@ -1604,6 +1607,7 @@ PlotClusters2D <- function(fsom, marker1, marker2, nodes,
 #' @param metaclusters Metaclusters of interest
 #' @param colors       Named vector with color value for each metacluster. 
 #'                     If NULL (default) colorbrewer "paired" is interpolated
+#' @param ff           flowFrame to use as reference for the marker names
 #' @param ...     Other parameters to pass on to PlotClusters2D
 #'
 #' @return Nothing is returned, but a plot is drawn for every markerpair and
@@ -1629,22 +1633,24 @@ PlotClusters2D <- function(fsom, marker1, marker2, nodes,
 #'    
 #'    # Recommended to write to png
 #'    
-#'    # png("Markeroverview.png",
-#'    #     width = 500 * length(markers_of_interest),
-#'    #     height = 500 * length(metaclusters_of_interest))
+#'    png("Markeroverview.png",
+#'        width = 500 * length(markers_of_interest),
+#'        height = 500 * length(metaclusters_of_interest))
 #'    PlotOverview2D(flowSOM.res,
 #'                   markerlist = markers_of_interest,
 #'                   metaclusters = metaclusters_of_interest,
-#'                   pchCluster = 19)
-#'    # dev.off()
+#'                   pchCluster = 19,
+#'                   ff = flowCore::read.FCS(fileName))
+#'    dev.off()
 #'
 #' @export
 PlotOverview2D <- function(fsom, 
                            markerlist, 
                            metaclusters,
                            colors = NULL,
+                           ff,
                            ...){
-  layout(matrix(seq_len(length(markerlist) * length(metaclusters)), 
+  graphics::layout(matrix(seq_len(length(markerlist) * length(metaclusters)), 
                 nrow = length(metaclusters)))
   if(is.null(colors)){
     colors <- RColorBrewer::brewer.pal(length(metaclusters),
@@ -1664,7 +1670,7 @@ PlotOverview2D <- function(fsom,
     }
   }
   
-  layout(1)
+  graphics::layout(1)
 }
 
 #################
@@ -1772,21 +1778,44 @@ FlowSOMSubset <- function(fsom,ids){
 #############
 #' Map new data to a FlowSOM grid
 #'
-#' New data from a flowframe is mapped to an existing FlowSOM 
-#' object. A new FlowSOM object is created, with the same grid, but a new
+#' New data is mapped to an existing FlowSOM object. The input is similar to the
+#' readInput function.
+#' A new FlowSOM object is created, with the same grid, but a new
 #' mapping, node sizes and mean values. The same preprocessing steps (compensation,
 #' tranformation and scaling) will happen to this file as was specified in the
 #' original FlowSOM call. The scaling parameters from the original grid will be 
 #' used.
 #'
-#' @param fsom FlowSOM object
-#' @param ff   Flow frame with the data to map
-#' @param stdev_allowed A warning is generated if the distance of the new
+#' @param fsom          FlowSOM object
+#' @param input         A flowFrame, a flowSet or an array of paths to files 
+#'                      or directories   
+#' @param mad_allowed   A warning is generated if the distance of the new
 #'                      data points to their closest cluster center is too
 #'                      big. This is computed based on the typical distance
 #'                      of the points from the original dataset assigned to
 #'                      that cluster, the threshold being set to
-#'                      mean + stdev_allowed * sd. Default is 4.
+#'                      median + mad_allowed * MAD. Default is 4.
+#' @param compensate    logical, does the data need to be compensated. If NULL,
+#'                      the same value as in the original FlowSOM call will be 
+#'                      used.
+#' @param spillover     spillover matrix to compensate with. If NULL,
+#'                      the same value as in the original FlowSOM call will be 
+#'                      used.
+#' @param transform     logical, does the data need to be transformed. If NULL,
+#'                      the same value as in the original FlowSOM call will be 
+#'                      used.
+#' @param toTransform   column names or indices that need to be transformed.
+#'                      If NULL, the same value as in the original FlowSOM call
+#'                      will be used.
+#' @param transformFunction  If NULL, the same value as in the original FlowSOM 
+#'                           call will be used.
+#' @param scale         Logical, does the data needs to be rescaled. If NULL, 
+#'                      the same value as in the original FlowSOM call will be 
+#'                      used.
+#' @param scaled.center See \code{\link{scale}}. If NULL, the same value as in 
+#'                      the original FlowSOM call will be used.
+#' @param scaled.scale  See \code{\link{scale}}. If NULL, the same value as in 
+#'                      the original FlowSOM call will be used.
 #'        
 #' @return A new FlowSOM object
 #' @seealso \code{\link{FlowSOMSubset}} if you want to get a subset of the
@@ -1798,68 +1827,224 @@ FlowSOMSubset <- function(fsom,ids){
 #'    ff <- flowCore::compensate(ff,ff@@description$SPILL)
 #'    ff <- flowCore::transform(ff,
 #'              flowCore::transformList(colnames(ff@@description$SPILL),
-#'                                     flowCore::logicleTransform()))
-#'    flowSOM.res <- FlowSOM(ff[1:1000,],scale=TRUE,colsToUse=c(9,12,14:18),
-#'                           maxMeta=10)
+#'                                      flowCore::logicleTransform()))
+#'    flowSOM.res <- FlowSOM(ff[1:1000,], scale=TRUE, colsToUse=c(9,12,14:18),
+#'                           nClus=10)
 #'    
 #'    # Map new data
-#'    fSOM2 <- NewData(flowSOM.res[[1]], ff[1001:2000,])
+#'    fSOM2 <- NewData(flowSOM.res, ff[1001:2000,])
 #'
 #' @export
-NewData <- function(fsom, ff, stdev_allowed = 4){
-    fsom_tmp <- fsom
+NewData <- function(fsom, 
+                    input,
+                    mad_allowed = 4,
+                    compensate = NULL, 
+                    spillover = NULL,
+                    transform = NULL, 
+                    toTransform = NULL, 
+                    transformFunction = NULL,
+                    scale = NULL, 
+                    scaled.center = NULL, 
+                    scaled.scale = NULL){
+  
+  if (class(fsom) == "list" & !is.null(fsom$FlowSOM)) {
+    fsom_o <- fsom
+    fsom <- fsom$FlowSOM 
+  }
+  if (class(fsom) != "FlowSOM") {
+    stop("fsom should be a FlowSOM object.")
+  }
+  
+  if(is.null(compensate)){
+    compensate <- fsom$compensate
+  }
+  if(is.null(spillover)){
+    spillover <- fsom$spillover
+  }
+  if(is.null(transform)){
+    transform <- fsom$transform
+  }
+  if(is.null(toTransform)){
+    toTransform <- fsom$toTransform
+  }
+  if(is.null(transformFunction)){
+    transformFunction <- fsom$transformFunction
+  }
+  if(is.null(scale)){
+    scale <- fsom$scale
+  }
+  if(is.null(scaled.center)){
+    scaled.center <- fsom$scaled.center
+  }
+  if(is.null(scaled.scale)){
+    scaled.scale <- fsom$scaled.scale
+  }
     
-    if(fsom$compensate){
-        ff <- flowCore::compensate(ff, fsom$spillover)    
-    }
-    if(fsom$transform){
-        ff <- flowCore::transform(ff, flowCore::transformList(
-            BiocGenerics::colnames(ff[, fsom$toTransform]),
-            fsom$transformFunction))
-    }
+    fsom_new <- ReadInput(input, 
+                          compensate = compensate, spillover = spillover,
+                          transform = transform, toTransform = toTransform,
+                          transformFunction = transformFunction, 
+                          scale = scale, scaled.center = scaled.center,
+                          scaled.scale = scaled.scale)
     
-    if(fsom$scale){
-        newData <- scale(exprs(ff),
-                        center = fsom$scaled.center[
-                            BiocGenerics::colnames(ff)],
-                        scale = fsom$scaled.scale[
-                            BiocGenerics::colnames(ff)])
+    fsom_new$map <- fsom$map
+    fsom_new$MST <- fsom$MST
+    
+    fsom_new$map$mapping <- MapDataToCodes(fsom$map$codes,fsom_new$data)
+    fsom_new <- UpdateDerivedValues(fsom_new)
+    fsom_new <- UpdateNodeSize(fsom_new)
+    
+    test_outliers <- TestOutliers(fsom_new,
+                                  mad_allowed = mad_allowed,
+                                  fsom_reference = fsom)
+    max_outliers <- max(test_outliers$Number_of_outliers) 
+    n_outliers <- sum(test_outliers$Number_of_outliers) 
+    if(max_outliers > 100){
+      warning(n_outliers, 
+              " cells (",
+              round(n_outliers / nrow(fsom_new$data) * 100, 2),
+              "%) seem far from their cluster centers.")
+    }
+   
+    if(exists("fsom_o")){
+      return(list(FlowSOM = fsom_new,
+                  metaclustering = fsom_o$metaclustering))
     } else {
-        newData <- exprs(ff)
+      return(fsom_new)
     }
-    
-    fsom_tmp$data <- newData
-    fsom_tmp$map$mapping <- MapDataToCodes(fsom$map$codes,newData)
-    # aggr <- stats::aggregate(fsom_tmp$data,
-    #                         by=list(fsom_tmp$map$mapping[,1]),
-    #                         median)
-    # fsom_tmp$map$medianValues <- matrix(NA,nrow = nrow(fsom$map$grid),
-    #                                 ncol = ncol(fsom$map$medianValues),
-    #                                 dimnames=list(NULL,
-    #                                         colnames(fsom$map$medianValues)))
-    # fsom_tmp$map$medianValues[aggr[,1],colnames(aggr[,-1])] <- 
-    #     as.matrix(aggr[,-1])
-    fsom_tmp <- UpdateDerivedValues(fsom_tmp)
-    fsom_tmp <- UpdateNodeSize(fsom_tmp)
-    
-    distances_mean <- tapply(fsom$map$mapping[,2],
-                             as.factor(fsom$map$mapping[,1]),
-                             mean)
-    
-    distances_sd <- tapply(fsom$map$mapping[,2],
-                           as.factor(fsom$map$mapping[,1]),
-                           stats::sd)
-    
-    thresholds <- distances_mean + stdev_allowed * distances_sd
-    
-    maxDistance_newData <- tapply(fsom_tmp$map$mapping[,2],
-                                  as.factor(fsom_tmp$map$mapping[,1]), 
-                                  max)
-    if (any(maxDistance_newData > thresholds[names(maxDistance_newData)])) {
-      warning("Some new cells are far from their cluster centers!")
+}
+
+##################
+## TestOutliers ##
+##################
+#' Test if any cells are too far from their cluster centers
+#'
+#' For every cluster, the distance from the cells to the cluster centers is
+#' used to label cells which deviate too far as outliers. The threshold is
+#' chosen as the median distance + \code{mad_allowed} times the median absolute
+#' deviation of the distances. 
+#'
+#' @param fsom  FlowSOM object
+#' @param mad_allowed Number of median absolute deviations allowed. Default = 4.
+#' @param fsom_reference FlowSOM object to use as reference. If NULL (default),
+#'                       the original fsom object is used.
+#' @param plot Should a plot be generated showing the distribution of the
+#'             distances. Default is FALSE.
+#' @param img_file If plot is TRUE, the output will be written to this file.
+#'                 Default is "testOutliers.pdf"
+#'        
+#' @return A new FlowSOM object
+#' @seealso \code{\link{FlowSOMSubset}} if you want to get a subset of the
+#'          current data instead of a new dataset
+#' @examples 
+#'  # Build FlowSom result
+#'  fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'  ff <- flowCore::read.FCS(fileName)
+#'  flowSOM.res <- FlowSOM(ff,
+#'                         compensate = TRUE, transform = TRUE, scale = TRUE,
+#'                         colsToUse = c(9, 12, 14:18),
+#'                         maxMeta = 10)
+#'    
+#'  # Map new data
+#'  outlier_report <- TestOutliers(flowSOM.res)
+#'
+#' @export
+TestOutliers <- function(fsom, 
+                         mad_allowed = 4,
+                         fsom_reference = NULL,
+                         plot = FALSE,
+                         img_file = "testOutliers.pdf"){
+  
+  if (class(fsom) == "list" & !is.null(fsom$FlowSOM)) {
+    fsom <- fsom$FlowSOM 
+  }
+  if (class(fsom) != "FlowSOM") {
+    stop("fsom should be a FlowSOM object.")
+  }
+  
+  if(is.null(fsom_reference)){
+    fsom_reference <- fsom
+  } else {
+    if (class(fsom_reference) == "list" & !is.null(fsom_reference$FlowSOM)) {
+      fsom_reference <- fsom_reference$FlowSOM 
     }
-    
-    return(fsom_tmp)
+    if (class(fsom_reference) != "FlowSOM") {
+      stop("fsom should be a FlowSOM object.")
+    }
+  }
+  
+  distances_median <- sapply(seq_len(fsom_reference$map$nNodes),
+                             function(x){
+                               ids <- which(GetClusters(fsom_reference) == x)
+                               if(length(ids) > 0){
+                                 m <- stats::median(
+                                   fsom_reference$map$mapping[ids, 2])
+                               } else {
+                                 m <- 0
+                               }
+                               return(m)
+                             })
+  
+  distances_mad <- sapply(seq_len(fsom_reference$map$nNodes),
+                             function(x){
+                               ids <- which(GetClusters(fsom_reference) == x)
+                               if(length(ids) > 0){
+                                 m <- stats::mad(
+                                   fsom_reference$map$mapping[ids, 2])
+                               } else {
+                                 m <- 0
+                               }
+                               return(m)
+                             })
+  
+  thresholds <- distances_median + mad_allowed * distances_mad
+  
+  max_distances_new <- sapply(seq_len(fsom$map$nNodes),
+                          function(x){
+                            ids <- which(GetClusters(fsom) == x)
+                            if(length(ids) > 0){
+                              m <- max(fsom$map$mapping[ids, 2])
+                            } else {
+                              m <- 0
+                            }
+                            return(m)
+                          })
+  
+  outliers <- sapply(seq_len(fsom$map$nNodes),
+                     function(x){
+                       ids <- which(GetClusters(fsom) == x)
+                       distances <- fsom$map$mapping[ids, 2]
+                       return(sum(distances > thresholds[x]))
+                     })
+  if(plot){
+    grDevices::pdf(img_file, width = 20, height = 20)
+    xdim <- fsom$map$xdim
+    ydim <- fsom$map$ydim
+    graphics::layout(matrix(1:(xdim*ydim), nrow = xdim))
+    for(i in 1:(xdim*ydim)){
+      ids <- which(GetClusters(fsom) == i)
+      values <- fsom$map$mapping[ids, 2]
+        if(length(values) > 1){
+          nOutliers <- sum(values > thresholds[i])
+          graphics::hist(values, main = paste0(i," (", nOutliers,")"), xlab = "")
+          graphics::abline(v = distances_median[i], col = "black", lwd = 2)
+          graphics::abline(v = thresholds[i], col = "red", lwd = 2)
+        } else {
+          graphics::plot.new()
+        }
+    }
+    grDevices::dev.off()
+  }
+  
+  result <- data.frame("Median_distance" = distances_median, 
+                       "Median_absolute_deviation" = distances_mad, 
+                       "Threshold" = thresholds, 
+                       "Number_of_outliers" = outliers,
+                       "Maximum_outlier_distance" = max_distances_new)[outliers > 0, ]
+  
+  result <- result[order(outliers[outliers > 0], decreasing = TRUE), ]
+  
+  return(result)
 }
 
 ################

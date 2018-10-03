@@ -1,3 +1,14 @@
+CHANGES IN VERSION 1.13.11 (2018/09/26)
+--------------------------------------
+o The ReadInput function can now also take a matrix as input.
+o Made input of the NewData function more general (can now take any input of the
+ReadInput function). 
+o Included a TestOutliers function which checks the average distance of the cells
+to the cluster centers (using the median and MAD measures) and returns how many
+cells seem to be further then expected from the cluster center.
+o Fixed the bug that only the first file-specific compensation matrix was taken
+into account in the ReadInput function.
+
 CHANGES IN VERSION 1.13.10 (2018/09/18)
 --------------------------------------
 Add rownames to the MFI results

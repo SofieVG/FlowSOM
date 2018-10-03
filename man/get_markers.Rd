@@ -7,9 +7,9 @@
 get_markers(ff, markers)
 }
 \arguments{
-\item{markers}{Vector with markers or channels of interest}
+\item{ff}{The flowFrame of interest}
 
-\item{flowFrame}{The flowFrame of interest}
+\item{markers}{Vector with markers or channels of interest}
 }
 \value{
 Corresponding marker names

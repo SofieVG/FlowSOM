@@ -76,7 +76,7 @@
 #' PlotStars(flowSOM.res[[1]])
 #' 
 #' # Get metaclustering per cell
-#' flowSOM.clustering <- flowSOM.res[[2]][flowSOM.res[[1]]$map$mapping[,1]]
+#' flowSOM.clustering <- GetMetaclusters(flowSOM.res)
 #' 
 #' 
 #' 
@@ -91,6 +91,7 @@
 #' 
 #' @importFrom flowUtils read.gatingML
 #' @importFrom XML xmlToList xmlParse
+#' @importFrom RColorBrewer brewer.pal
 #' 
 #' @export
 FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL, 
@@ -328,8 +329,8 @@ lookup <- function(ff, markers, type) {
 #' 
 #' Get channel names for an array of markers, given a flowframe 
 #' 
-#' @param flowFrame The flowFrame of interest
-#' @param markers   Vector with markers or channels of interest
+#' @param ff      The flowFrame of interest
+#' @param markers Vector with markers or channels of interest
 #'                  
 #' @return Corresponding channel names
 #'
@@ -354,8 +355,8 @@ get_channels <- function(ff, markers) {
 #' Get marker names, given a flowframe. As available in "desc". If this is NA,
 #' defaults to channel name.
 #' 
-#' @param flowFrame The flowFrame of interest
-#' @param markers   Vector with markers or channels of interest
+#' @param ff      The flowFrame of interest
+#' @param markers Vector with markers or channels of interest
 #'                  
 #' @return Corresponding marker names
 #'

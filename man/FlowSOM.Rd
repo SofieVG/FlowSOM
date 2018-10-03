@@ -89,7 +89,7 @@ flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 PlotStars(flowSOM.res[[1]])
 
 # Get metaclustering per cell
-flowSOM.clustering <- flowSOM.res[[2]][flowSOM.res[[1]]$map$mapping[,1]]
+flowSOM.clustering <- GetMetaclusters(flowSOM.res)
 
 
 
