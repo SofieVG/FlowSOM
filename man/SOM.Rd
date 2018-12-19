@@ -6,8 +6,8 @@
 \usage{
 SOM(data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
   alpha = c(0.05, 0.01), radius = stats::quantile(nhbrdist, 0.67) *
-  c(1, 0), init = FALSE, distf = 2, silent = FALSE, codes = NULL,
-  importance = NULL)
+  c(1, 0), init = FALSE, initf = Initialize_KWSP, distf = 2,
+  silent = FALSE, codes = NULL, importance = NULL)
 }
 \arguments{
 \item{data}{Matrix containing the training data}
@@ -25,6 +25,9 @@ SOM(data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
 \item{radius}{Start and end radius}
 
 \item{init}{Initialize cluster centers in a non-random way}
+
+\item{initf}{Use the given initialization function if init==T
+(default: Initialize_KWSP)}
 
 \item{distf}{Distance function (1=manhattan, 2=euclidean, 3=chebyshev, 
 4=cosine)}
