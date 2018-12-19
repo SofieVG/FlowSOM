@@ -118,7 +118,7 @@ SOM <- function (data, xdim=10, ydim=10, rlen=10, mst=1, alpha=c(0.05, 0.01),
                     init=FALSE, distf=2, silent=FALSE, codes=NULL,
                     importance = NULL){
     if (!is.null(codes)){
-      if((ncol(codes) != ncol(data)) | (nrow(codes) == xdim * ydim)){
+      if((ncol(codes) != ncol(data)) | (nrow(codes) != xdim * ydim)){
         stop("If codes is not NULL, it should have the same number of columns
              as the data and the number of rows should correspond with 
              xdim*ydim")
