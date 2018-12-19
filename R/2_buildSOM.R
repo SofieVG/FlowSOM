@@ -244,12 +244,12 @@ Initialize_KWSP <- function(X, xdim, ydim){
 #' @export
 Initialize_PCA <- function(data, xdim, ydim){
     pca <- prcomp(data, rank.=2, retx=F)
-    axis_scale <- 7
-    ax1 <- t(matrix(pca$rotation[,1] * axis_scale * pca$sdev,
+    sdev_scale <- 5 # scale out to 5-times standard deviation, which should cover the data nicely
+    ax1 <- t(matrix(pca$rotation[,1] * sdev_scale * pca$sdev,
              nrow=ncol(data),
              ncol=xdim * ydim)) *
              (2 * rep(c(1:xdim) - 1, times=ydim) / (xdim - 1) - 1)
-    ax2 <- t(matrix(pca$rotation[,2] * axis_scale * pca$sdev,
+    ax2 <- t(matrix(pca$rotation[,2] * sdev_scale * pca$sdev,
              nrow=ncol(data),
              ncol=xdim * ydim)) *
              (2 * rep(c(1:ydim) - 1, each=xdim) / (ydim - 1) - 1)
