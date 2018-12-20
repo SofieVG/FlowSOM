@@ -96,6 +96,8 @@ UpdateDerivedValues <- function(fsom){
 #' @param alpha Start and end learning rate
 #' @param radius Start and end radius
 #' @param init  Initialize cluster centers in a non-random way
+#' @param initf Use the given initialization function if init==T
+#'              (default: Initialize_KWSP)
 #' @param distf Distance function (1=manhattan, 2=euclidean, 3=chebyshev, 
 #'              4=cosine)
 #' @param silent If FALSE, print status updates
@@ -115,8 +117,8 @@ UpdateDerivedValues <- function(fsom){
 
 SOM <- function (data, xdim=10, ydim=10, rlen=10, mst=1, alpha=c(0.05, 0.01),
                     radius = stats::quantile(nhbrdist, 0.67) * c(1, 0), 
-                    init=FALSE, distf=2, silent=FALSE, codes=NULL,
-                    importance = NULL){
+                    init=FALSE, initf=Initialize_KWSP, distf=2, silent=FALSE,
+                    codes=NULL, importance = NULL){
     if (!is.null(codes)){
       if((ncol(codes) != ncol(data)) | (nrow(codes) != xdim * ydim)){
         stop("If codes is not NULL, it should have the same number of columns
@@ -134,12 +136,11 @@ SOM <- function (data, xdim=10, ydim=10, rlen=10, mst=1, alpha=c(0.05, 0.01),
     nCodes <- nrow(grid)
     if(is.null(codes)){
         if(init){
-            starters <- Initialize(data, nCodes)
+            codes <- initf(data, xdim, ydim)
             message("Initialization ready\n")
         } else {
-            starters <- sample(1:nrow(data), nCodes, replace = FALSE)        
+            codes <- data[sample(1:nrow(data), nCodes, replace = FALSE), , drop = FALSE]
         }
-        codes <- data[starters, , drop = FALSE]
     }
     
     # Initialize the neighbourhood
@@ -210,11 +211,13 @@ MapDataToCodes <- function (codes, newdata, distf=2) {
 
 #' Select k well spread points from X
 #' @param   X matrix in which each row represents a point
-#' @param   k number of points to choose
+#' @param   xdim x dimension of the grid
+#' @param   xdim y dimension of the grid
 #'
-#' @return  array containing indices of selected rows
-#' 
-Initialize <- function(X, k){
+#' @return  array containing the selected selected rows
+#' @export
+Initialize_KWSP <- function(X, xdim, ydim){
+    k <- xdim * ydim
 
     # Start with a random point
     selected <- numeric(k)
@@ -229,7 +232,29 @@ Initialize <- function(X, k){
                     apply(X, 1, function(x)sum((x-X[selected[i], ])^2)))
     }
     
-    selected
+    X[selected,]
+}
+
+#' Create a grid from first 2 PCA components
+#' @param   data matrix in which each row represents a point
+#' @param   xdim x dimension of the grid
+#' @param   xdim y dimension of the grid
+#'
+#' @return  array containing the selected selected rows
+#' @export
+Initialize_PCA <- function(data, xdim, ydim){
+    pca <- prcomp(data, rank.=2, retx=F)
+    sdev_scale <- 5 # scale out to 5-times standard deviation, which should cover the data nicely
+    ax1 <- t(matrix(pca$rotation[,1] * sdev_scale * pca$sdev,
+             nrow=ncol(data),
+             ncol=xdim * ydim)) *
+             (2 * rep(c(1:xdim) - 1, times=ydim) / (xdim - 1) - 1)
+    ax2 <- t(matrix(pca$rotation[,2] * sdev_scale * pca$sdev,
+             nrow=ncol(data),
+             ncol=xdim * ydim)) *
+             (2 * rep(c(1:ydim) - 1, each=xdim) / (ydim - 1) - 1)
+
+    t(matrix(pca$center, nrow=ncol(data), ncol=xdim * ydim)) + ax1 + ax2
 }
 
 #' Calculate mean weighted cluster purity
