@@ -906,12 +906,13 @@ mystar <- function(coords, v=NULL, params) {
     data <- params("vertex", "data")
     cP <- params("vertex","cP")
     scale <- params("vertex","scale")
+    bg <- params("vertex","bg")
+    graphics::symbols(coords[, 1], coords[, 2], circles = vertex.size, 
+                      inches = FALSE, bg = bg, bty='n', add=TRUE) 
     graphics::stars(data, locations = coords, labels = NULL,scale=scale, 
             len = vertex.size, col.segments = cP, 
             draw.segments = TRUE, mar = c(0, 0, 0, 0), add=TRUE, 
             inches=FALSE)
-    graphics::symbols(coords[, 1], coords[, 2], circles = vertex.size, 
-            inches = FALSE, bg = "transparent", bty='n', add=TRUE) 
     
 }
 
@@ -1071,6 +1072,9 @@ plotStarQuery <- function(labels,values,
 #' @param view     Preferred view, options: "MST", "grid" or "tSNE" (if this
 #'                 option was selected while building the MST)
 #' @param colorPalette      Colorpalette to be used for the markers
+#' @param starBg Background color inside the star circle. Default is "white".
+#'               Can also be put to  "transparent" (as was the case for older 
+#'               versions).
 #' @param backgroundValues  Values to be used for background coloring, either
 #'                          numerical values or something that can be made into
 #'                          a factor (e.g. a clustering)
@@ -1112,25 +1116,26 @@ plotStarQuery <- function(labels,values,
 #'
 #' @export
 PlotStars <- function(fsom, 
-                        markers=fsom$map$colsUsed, 
-                        view="MST", #"grid","tSNE"
-                        colorPalette=grDevices::colorRampPalette(
-                            c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", 
-                                "yellow", "#FF7F00", "red", "#7F0000")),
-                        backgroundValues = NULL,
-                        backgroundColor = function(n){grDevices::rainbow(n,
-                                                                alpha=0.3)},
-                        backgroundLim = NULL,
-                        backgroundBreaks = NULL,
-                        backgroundSize = NULL,
-                        thresholds=NULL,
-                        legend=TRUE,
-                        query=NULL,
-                        main=""){
+                      markers=fsom$map$colsUsed, 
+                      view="MST", #"grid","tSNE"
+                      colorPalette=grDevices::colorRampPalette(
+                        c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", 
+                          "yellow", "#FF7F00", "red", "#7F0000")),
+                      starBg = "white",
+                      backgroundValues = NULL,
+                      backgroundColor = function(n){
+                        grDevices::rainbow(n, alpha=0.3)},
+                      backgroundLim = NULL,
+                      backgroundBreaks = NULL,
+                      backgroundSize = NULL,
+                      thresholds=NULL,
+                      legend=TRUE,
+                      query=NULL,
+                      main=""){
     # Add star chart option to iGraph
     add.vertex.shape("star", clip=igraph.shape.noclip, plot=mystar, 
                     parameters=list(vertex.data=NULL,vertex.cP = colorPalette,
-                                    vertex.scale=TRUE))
+                                    vertex.scale=TRUE, vertex.bg = starBg))
     
     if(is.null(thresholds)){
         # Use MFIs
