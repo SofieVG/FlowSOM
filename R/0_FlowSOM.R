@@ -163,6 +163,8 @@ FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
 #' @param keepOrder If TRUE, the random subsample will be ordered in the same
 #'                  way as they were originally ordered in the file. Default =
 #'                  FALSE.
+#' @param verbose If TRUE, prints an update every time it starts processing a
+#'                new file. Default = FALSE. 
 #'                  
 #' @return This function does not return anything, but will write a file with
 #'         about \code{cTotal} cells to \code{outputFile}
@@ -178,7 +180,8 @@ FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
 #' @export
 AggregateFlowFrames <- function(fileNames, cTotal,
                             writeOutput = FALSE, outputFile  = "aggregate.fcs", 
-                            writeMeta = FALSE, keepOrder = FALSE){
+                            writeMeta = FALSE, keepOrder = FALSE, 
+                            verbose = FALSE){
     
     nFiles <- length(fileNames)
     cFile <- ceiling(cTotal/nFiles)
@@ -186,6 +189,7 @@ AggregateFlowFrames <- function(fileNames, cTotal,
     flowFrame <- NULL
     
     for(i in seq_len(nFiles)){
+        if(verbose) {message("Reading ", fileNames[i])}
         f <- flowCore::read.FCS(fileNames[i])
         c <- sample(seq_len(nrow(f)),min(nrow(f),cFile))
         if(keepOrder) c <- sort(c)
@@ -206,7 +210,7 @@ AggregateFlowFrames <- function(fileNames, cTotal,
         colnames(m) <- c("File","File_scattered")
         prev_agg <- length(grep("File[0-9]*$", colnames(f)))
         if(prev_agg > 0){
-          colnames(m) <- paste(colnames(m), prev_agg+1)
+          colnames(m) <- paste0(colnames(m), prev_agg+1)
         }
         f <- flowCore::cbind2(f[c,],m)
         if(is.null(flowFrame)){

@@ -5,7 +5,8 @@
 \title{Aggregate multiple fcs files together}
 \usage{
 AggregateFlowFrames(fileNames, cTotal, writeOutput = FALSE,
-  outputFile = "aggregate.fcs", writeMeta = FALSE, keepOrder = FALSE)
+  outputFile = "aggregate.fcs", writeMeta = FALSE, keepOrder = FALSE,
+  verbose = FALSE)
 }
 \arguments{
 \item{fileNames}{Character vector containing full paths to the fcs files
@@ -23,6 +24,9 @@ generated}
 \item{keepOrder}{If TRUE, the random subsample will be ordered in the same
 way as they were originally ordered in the file. Default =
 FALSE.}
+
+\item{verbose}{If TRUE, prints an update every time it starts processing a
+new file. Default = FALSE.}
 }
 \value{
 This function does not return anything, but will write a file with
