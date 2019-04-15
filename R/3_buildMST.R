@@ -1769,13 +1769,9 @@ FlowSOMSubset <- function(fsom,ids){
     fsom_tmp <- fsom
     fsom_tmp$data <- fsom$data[ids,]
     fsom_tmp$map$mapping <- fsom$map$mapping[ids,]
-    aggr <- stats::aggregate(fsom_tmp$data,
-                            by=list(fsom_tmp$map$mapping[,1]),mean)
-    fsom_tmp$map$medianValues <- matrix(0,nrow = nrow(fsom$map$grid),
-                                    ncol = ncol(fsom$map$medianValues))
-    fsom_tmp$map$medianValues[aggr[,1],] <- as.matrix(aggr[,-1])
-    colnames(fsom_tmp$map$medianValues) <- colnames(fsom$map$medianValues)
+    fsom_tmp <- UpdateDerivedValues(fsom_tmp)
     UpdateNodeSize(fsom_tmp)
+    return(fsom_tmp)
 }
 
 #############

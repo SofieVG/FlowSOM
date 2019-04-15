@@ -212,7 +212,7 @@ MapDataToCodes <- function (codes, newdata, distf=2) {
 #' Select k well spread points from X
 #' @param   X matrix in which each row represents a point
 #' @param   xdim x dimension of the grid
-#' @param   xdim y dimension of the grid
+#' @param   ydim y dimension of the grid
 #'
 #' @return  array containing the selected selected rows
 #' @export
@@ -238,13 +238,15 @@ Initialize_KWSP <- function(X, xdim, ydim){
 #' Create a grid from first 2 PCA components
 #' @param   data matrix in which each row represents a point
 #' @param   xdim x dimension of the grid
-#' @param   xdim y dimension of the grid
+#' @param   ydim y dimension of the grid
 #'
 #' @return  array containing the selected selected rows
 #' @export
 Initialize_PCA <- function(data, xdim, ydim){
-    pca <- prcomp(data, rank.=2, retx=F)
-    sdev_scale <- 5 # scale out to 5-times standard deviation, which should cover the data nicely
+    pca <- stats::prcomp(data, rank.=2, retx=F)
+    # scale out to 5-times standard deviation, 
+    # which should cover the data nicely
+    sdev_scale <- 5 
     ax1 <- t(matrix(pca$rotation[,1] * sdev_scale * pca$sdev,
              nrow=ncol(data),
              ncol=xdim * ydim)) *

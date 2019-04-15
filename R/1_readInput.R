@@ -120,7 +120,19 @@ ReadInput <- function(input, pattern=".fcs",
     
     if(scale){
         if(!silent) message("Scaling the data\n")
-        fsom$data <- scale(fsom$data, scaled.center, scaled.scale)
+        if(!all(is.null(names(scaled.center)))){
+          cols_to_scale <- intersect(colnames(fsom$data), names(scaled.center))
+          fsom$data[, cols_to_scale] <- scale(x = fsom$data[, cols_to_scale], 
+                                              center = scaled.center[cols_to_scale], 
+                                              scale = scaled.scale[cols_to_scale])
+        } else {
+          cols_to_scale <- colnames(fsom$data)
+          fsom$data[, cols_to_scale] <- scale(x = fsom$data[, cols_to_scale], 
+                                              center = TRUE, 
+                                              scale = TRUE)
+        }
+
+        
         fsom$scaled.center <- attr(fsom$data, "scaled:center")
         attr(fsom$data, "scaled:center") <- NULL
         fsom$scaled.scale <- attr(fsom$data, "scaled:scale") 

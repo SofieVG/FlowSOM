@@ -11,7 +11,7 @@ Initialize_KWSP(X, xdim, ydim)
 
 \item{xdim}{x dimension of the grid}
 
-\item{xdim}{y dimension of the grid}
+\item{ydim}{y dimension of the grid}
 }
 \value{
 array containing the selected selected rows

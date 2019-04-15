@@ -1,3 +1,10 @@
+
+CHANGES IN VERSION 1.15.3 (2019/04/08)
+--------------------------------------
+o Fix bug when mapping an fcs file with different columns (eg. no "File" columns
+  as in the aggregated file used for training)
+o Allow multiple repeated aggregations with the AggregateFlowframe function
+
 CHANGES IN VERSION 1.13.11 (2018/09/26)
 --------------------------------------
 o The ReadInput function can now also take a matrix as input.

@@ -92,6 +92,8 @@
 #' @importFrom flowUtils read.gatingML
 #' @importFrom XML xmlToList xmlParse
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom stats prcomp
+#' 
 #' 
 #' @export
 FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL, 
@@ -202,6 +204,10 @@ AggregateFlowFrames <- function(fileNames, cTotal,
         m2 <- m + stats::rnorm(length(m),0,0.1)
         m <- cbind(m,m2)
         colnames(m) <- c("File","File_scattered")
+        prev_agg <- length(grep("File[0-9]*$", colnames(f)))
+        if(prev_agg > 0){
+          colnames(m) <- paste(colnames(m), prev_agg+1)
+        }
         f <- flowCore::cbind2(f[c,],m)
         if(is.null(flowFrame)){
             flowFrame <- f
