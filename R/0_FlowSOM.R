@@ -220,7 +220,7 @@ AggregateFlowFrames <- function(fileNames, cTotal,
         }
         else {
             flowCore::exprs(flowFrame) <- rbind(flowCore::exprs(flowFrame), 
-                                        flowCore::exprs(f))
+                                                flowCore::exprs(f)[,flowCore::colnames(flowCore::exprs(flowFrame))])
         }
     }
     

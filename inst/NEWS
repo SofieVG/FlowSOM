@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.15.4 (2019/05/17)
+--------------------------------------
+o Fix bug when aggregating files with different column orders
+o Fix bug in PlotNode which failed when there were any clusters with no cells 
+  assigned.
 
 CHANGES IN VERSION 1.15.3 (2019/04/08)
 --------------------------------------

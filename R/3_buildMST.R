@@ -1294,9 +1294,9 @@ PlotNode <- function(fsom, id,
     n <- length(markers)
     
     if(is.function(colorPalette)){colorPalette <- colorPalette(n)}
-    data <- rbind(apply(fsom$map$medianValues[, markers,drop=FALSE],2,min),
+    data <- rbind(apply(fsom$map$medianValues[, markers,drop=FALSE],2,min, na.rm = TRUE),
                   fsom$map$medianValues[id, markers,drop=FALSE],
-                  apply(fsom$map$medianValues[, markers,drop=FALSE],2,max))
+                  apply(fsom$map$medianValues[, markers,drop=FALSE],2,max, na.rm = TRUE))
     coords <- matrix(c(100,0,100,100,0,100),nrow=3)
     
     print(data)
