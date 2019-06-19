@@ -16,3 +16,11 @@ vector label for every cell
 \description{
 Get cluster label for all individual cells
 }
+\examples{
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
+                      scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
+cluster_labels <- GetClusters(flowSOM.res)
+cluster_labels <- GetClusters(flowSOM.res$FlowSOM)
+
+}

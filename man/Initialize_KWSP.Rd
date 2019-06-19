@@ -19,3 +19,9 @@ array containing the selected selected rows
 \description{
 Select k well spread points from X
 }
+\examples{
+
+points <- matrix(1:1000, ncol = 10)
+selection <- Initialize_KWSP(points, 3, 3)
+
+}

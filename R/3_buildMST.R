@@ -1299,9 +1299,11 @@ PlotNode <- function(fsom, id,
     n <- length(markers)
     
     if(is.function(colorPalette)){colorPalette <- colorPalette(n)}
-    data <- rbind(apply(fsom$map$medianValues[, markers,drop=FALSE],2,min, na.rm = TRUE),
+    data <- rbind(apply(fsom$map$medianValues[, markers,drop=FALSE],2,min, 
+                        na.rm = TRUE),
                   fsom$map$medianValues[id, markers,drop=FALSE],
-                  apply(fsom$map$medianValues[, markers,drop=FALSE],2,max, na.rm = TRUE))
+                  apply(fsom$map$medianValues[, markers,drop=FALSE],2,max, 
+                        na.rm = TRUE))
     coords <- matrix(c(100,0,100,100,0,100),nrow=3)
     
     print(data)
@@ -1354,11 +1356,11 @@ PlotNode <- function(fsom, id,
 # #'                 option was selected while building the MST)
 # #' @param colorPalette      Colorpalette to be used for the markers
 # #' @param backgroundValues  Values to be used for background coloring, either
-# #'                          numerical values or something that can be made into
-# #'                          a factor (e.g. a clustering)
-# #' @param backgroundColor   Colorpalette to be used for the background coloring
-# #'                          . Can be either a function or an array specifying
-# #'                          colors
+# #'                          numerical values or something that can be made 
+# #'                          into a factor (e.g. a clustering)
+# #' @param backgroundColor   Colorpalette to be used for the background 
+# #'                          coloring. Can be either a function or an array 
+# #'                          specifying colors
 # #' @param backgroundLim     Only used when backgroundValues are numerical. 
 # #'                          Defaults to min and max of the backgroundValues.
 # #' @param legend   Logical, if TRUE add a legend
@@ -1396,7 +1398,7 @@ PlotNode <- function(fsom, id,
 #                         backgroundColor = function(n){grDevices::rainbow(n,
 #                                                                 alpha=0.3)},
 #                         backgroundLim = NULL,
-#                         # colorRampPalette(c("#FFFFFF","#FF000077"),alpha=TRUE)
+#                         #colorRampPalette(c("#FFFFFF","#FF000077"),alpha=TRUE)
 #                         legend=TRUE,
 #                         query=NULL,
 #                         main=""){
@@ -1787,10 +1789,10 @@ FlowSOMSubset <- function(fsom,ids){
 #' New data is mapped to an existing FlowSOM object. The input is similar to the
 #' readInput function.
 #' A new FlowSOM object is created, with the same grid, but a new
-#' mapping, node sizes and mean values. The same preprocessing steps (compensation,
-#' tranformation and scaling) will happen to this file as was specified in the
-#' original FlowSOM call. The scaling parameters from the original grid will be 
-#' used.
+#' mapping, node sizes and mean values. The same preprocessing steps
+#' (compensation, tranformation and scaling) will happen to this file as was 
+#' specified in the original FlowSOM call. The scaling parameters from the 
+#' original grid will be used.
 #'
 #' @param fsom          FlowSOM object
 #' @param input         A flowFrame, a flowSet or an array of paths to files 
@@ -2032,7 +2034,8 @@ TestOutliers <- function(fsom,
       values <- fsom$map$mapping[ids, 2]
         if(length(values) > 1){
           nOutliers <- sum(values > thresholds[i])
-          graphics::hist(values, main = paste0(i," (", nOutliers,")"), xlab = "")
+          graphics::hist(values, main = paste0(i," (", nOutliers,")"), 
+                         xlab = "")
           graphics::abline(v = distances_median[i], col = "black", lwd = 2)
           graphics::abline(v = thresholds[i], col = "red", lwd = 2)
         } else {
@@ -2042,11 +2045,12 @@ TestOutliers <- function(fsom,
     grDevices::dev.off()
   }
   
-  result <- data.frame("Median_distance" = distances_median, 
-                       "Median_absolute_deviation" = distances_mad, 
-                       "Threshold" = thresholds, 
-                       "Number_of_outliers" = outliers,
-                       "Maximum_outlier_distance" = max_distances_new)[outliers > 0, ]
+  result <- data.frame(
+    "Median_distance" = distances_median, 
+    "Median_absolute_deviation" = distances_mad, 
+    "Threshold" = thresholds, 
+    "Number_of_outliers" = outliers,
+    "Maximum_outlier_distance" = max_distances_new)[outliers > 0, ]
   
   result <- result[order(outliers[outliers > 0], decreasing = TRUE), ]
   

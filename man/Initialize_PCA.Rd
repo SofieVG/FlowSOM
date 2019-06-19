@@ -19,3 +19,9 @@ array containing the selected selected rows
 \description{
 Create a grid from first 2 PCA components
 }
+\examples{
+
+points <- matrix(1:1000, ncol = 10)
+selection <- Initialize_PCA(points, 3, 3)
+
+}

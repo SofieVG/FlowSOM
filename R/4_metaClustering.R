@@ -225,7 +225,8 @@ MetaclusterMFIs <- function(fsom){
   MFIs <- t(sapply(seq_along(levels(fsom$metaclustering)), 
                   function(i) {
                     apply(subset(fsom$FlowSOM$data, 
-                                 fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]] == i),
+                                 fsom$metaclustering[
+                                   fsom$FlowSOM$map$mapping[,1]] == i),
                           2,
                           stats::median)
                   }))
@@ -253,7 +254,8 @@ MetaclusterCVs <- function(fsom){
   CVs <- t(sapply(seq_along(levels(fsom$metaclustering)), 
                   function(i) {
                     apply(subset(fsom$FlowSOM$data, 
-                                 fsom$metaclustering[fsom$FlowSOM$map$mapping[,1]] == i),
+                                 fsom$metaclustering[
+                                   fsom$FlowSOM$map$mapping[,1]] == i),
                           2,
                           function(y){
                             if(length(y) > 0 && mean(y) != 0){

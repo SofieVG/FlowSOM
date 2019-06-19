@@ -12,6 +12,12 @@ or the BuildSOM function}
 }
 \value{
 Matrix with coefficient of variation values for each marker
+
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
+                      scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
+cvs <- GetCVs(flowSOM.res)
+cvs <- GetCVs(flowSOM.res$FlowSOM)
 }
 \description{
 Get CV values for all clusters

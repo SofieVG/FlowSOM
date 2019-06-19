@@ -22,7 +22,6 @@ Distance matrix
 Calculate differences in cell counts between groups
 }
 \examples{
-   library(FlowSOM)
    set.seed(1)
    
    # Build the FlowSOM tree on the example file

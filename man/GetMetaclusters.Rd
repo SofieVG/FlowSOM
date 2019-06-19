@@ -21,3 +21,12 @@ vector label for every cell
 \description{
 Get metacluster label for all individual cells
 }
+\examples{
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
+                      scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
+metacluster_labels <- GetMetaclusters(flowSOM.res)
+metacluster_labels <- GetMetaclusters(flowSOM.res$FlowSOM,
+                                      meta = flowSOM.res$metaclustering)
+
+}

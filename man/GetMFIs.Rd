@@ -11,14 +11,21 @@ GetMFIs(fsom, colsUsed = FALSE, prettyColnames = FALSE)
 or the BuildSOM function}
 
 \item{colsUsed}{logical. Should report only the columns used to 
-build the SOM}
+build the SOM. Default = FALSE.}
 
 \item{prettyColnames}{logical. Should report pretty column names instead
-of standard column names}
+of standard column names. Default = FALSE.}
 }
 \value{
 Matrix with median values for each marker
 }
 \description{
 Get MFI values for all clusters
+}
+\examples{
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
+                      scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
+mfis <- GetMFIs(flowSOM.res)
+mfis <- GetMFIs(flowSOM.res$FlowSOM)
 }

@@ -220,8 +220,10 @@ AggregateFlowFrames <- function(fileNames, cTotal,
             flowFrame@description$`FILENAME` <- gsub(".*/","",outputFile)
         }
         else {
-            flowCore::exprs(flowFrame) <- rbind(flowCore::exprs(flowFrame), 
-                                                flowCore::exprs(f)[,flowCore::colnames(flowCore::exprs(flowFrame))])
+            flowCore::exprs(flowFrame) <- 
+              rbind(flowCore::exprs(flowFrame), 
+                    flowCore::exprs(f)[,
+                              flowCore::colnames(flowCore::exprs(flowFrame))])
         }
     }
     
@@ -250,8 +252,8 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 # #' Process a gatingML file
 # #' 
 # #' Reads a gatingML file using the \code{\link{flowUtils}} library and
-# #' returns a list with a matrix containing filtering results for each specified
-# #' gate and a vector with a label for each cell
+# #' returns a list with a matrix containing filtering results for each 
+# #' specified gate and a vector with a label for each cell
 # #' 
 # #' @param flowFrame     The flowFrame to apply the gating on
 # #' @param gatingFile    The gatingML file to read

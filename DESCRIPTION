@@ -14,6 +14,8 @@ Depends:
     R (>= 3.2),
     igraph
 Imports:
+    stats,
+    utils,
     flowCore,
     ConsensusClusterPlus,
     BiocGenerics,
