@@ -20,7 +20,7 @@ Get channel names for an array of markers, given a flowframe
 \examples{
 
    # Read the flowFrame
-   fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+   fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
    ff <- flowCore::read.FCS(fileName)
    get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
    get_markers(ff, c("FSC-A", "CD3", "FITC-A"))

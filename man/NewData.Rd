@@ -65,7 +65,7 @@ used.
 }
 \examples{
  # Build FlowSom result
- fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+ fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
    ff <- flowCore::read.FCS(fileName)
    ff <- flowCore::compensate(ff,ff@description$SPILL)
    ff <- flowCore::transform(ff,

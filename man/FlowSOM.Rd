@@ -74,7 +74,7 @@ Will scale the data and uses consensus meta-clustering by default.
 }
 \examples{
 # Read from file
-fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
                       scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 # Or read from flowFrame object

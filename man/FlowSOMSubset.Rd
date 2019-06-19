@@ -20,7 +20,7 @@ Take a subset from a FlowSOM object
 }
 \examples{
    # Read two files (Artificially, as we just split 1 file in 2 subsets)
-   fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+   fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
    ff1 <- flowCore::read.FCS(fileName)[1:1000,]
    ff1@description$FIL <- "File1"
    ff2 <- flowCore::read.FCS(fileName)[1001:2000,]

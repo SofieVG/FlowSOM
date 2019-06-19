@@ -32,7 +32,7 @@ deviation of the distances.
 }
 \examples{
  # Build FlowSom result
- fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+ fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
  ff <- flowCore::read.FCS(fileName)
  flowSOM.res <- FlowSOM(ff,
                         compensate = TRUE, transform = TRUE, scale = TRUE,

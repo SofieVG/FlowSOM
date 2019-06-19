@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.15.5 (2019/06/11)
+--------------------------------------
+o Removed dependency on flowUtils, replaced by flowWorkspace. 
+  This also included a filename change of lymphocytes.fcs to 68983.fcs
+o Included 
+
 CHANGES IN VERSION 1.15.4 (2019/05/17)
 --------------------------------------
 o Fix bug when aggregating files with different column orders

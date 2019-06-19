@@ -67,11 +67,10 @@ package) and the second item is the result of the metaclustering.
 set.seed(42)
 library(FlowSOM)
 
-fileName <- system.file("extdata","lymphocytes.fcs",
-                        package="FlowSOM")
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 fSOM <- FlowSOM(fileName,
                 # Input options:
-                compensate = TRUE,transform = TRUE,toTransform=c(8:18),
+                compensate = TRUE, transform = TRUE, toTransform=c(8:18),
                 scale = TRUE,
                 # SOM options:
                 colsToUse = c(9,12,14:18), xdim = 7, ydim = 7,
@@ -117,13 +116,12 @@ set.seed(42)
 library(flowCore)
 library(FlowSOM)
 
-fileName <- system.file("extdata","lymphocytes.fcs",
-                        package="FlowSOM")
-fSOM <- ReadInput(fileName,compensate = TRUE,transform = TRUE, 
-                    toTransform=c(8:18),scale = TRUE)
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+fSOM <- ReadInput(fileName, compensate = TRUE, transform = TRUE, 
+                    toTransform=c(8:18), scale = TRUE)
 
 ff <- suppressWarnings(flowCore::read.FCS(fileName))
-fSOM <- ReadInput(ff,compensate = TRUE,transform = TRUE, scale = TRUE)
+fSOM <- ReadInput(ff, compensate = TRUE, transform = TRUE, scale = TRUE)
 @
 
 \noindent \medskip{}
@@ -135,7 +133,7 @@ The begin and end indices of the subsets from the different files can be
 found in \Rcode{\$metadata}.
 
 <<>>=
-str(fSOM,max.level = 2)
+str(fSOM, max.level = 2)
 @
 
 \section{Building the self-organizing map}
@@ -154,8 +152,8 @@ return a FlowSOM object with all information about the self organizing map
 added in the \Rcode{\$map} parameter of the FlowSOM object.
 \medskip{}
 <<>>=
-fSOM <- BuildSOM(fSOM,colsToUse = c(9,12,14:18))
-str(fSOM$map,max.level = 2)
+fSOM <- BuildSOM(fSOM, colsToUse = c(9,12,14:18))
+str(fSOM$map, max.level = 2)
 @
 
 \section{Building the minimal spanning tree}
@@ -166,7 +164,7 @@ the \Rcode{\$MST} parameter.
 
 \medskip{}
 <<>>=
-fSOM <- BuildMST(fSOM,tSNE=TRUE)
+fSOM <- BuildMST(fSOM, tSNE=TRUE)
 str(fSOM$MST)
 @
 
@@ -179,18 +177,17 @@ tSNE was TRUE in \Rcode{BuildMST})
 PlotStars(fSOM)
 @
 <<fig=TRUE>>=
-PlotStars(fSOM,view="grid")
+PlotStars(fSOM, view="grid")
 @
 <<fig=TRUE>>=
-PlotStars(fSOM,view="tSNE")
+PlotStars(fSOM, view="tSNE")
 @
 
 If you do not want the size to depend on the number of cells assigned to a 
 node, you can reset the node size. This can be used in combination with any of
 the plotting functions.
 <<fig=TRUE>>=
-fSOM <- UpdateNodeSize(fSOM, reset=TRUE)
-fSOM$MST$size <- fSOM$MST$size/2
+fSOM <- UpdateNodeSize(fSOM, maxNodeSize = 8, reset=TRUE)
 PlotStars(fSOM)
 fSOM <- UpdateNodeSize(fSOM)
 @
@@ -200,21 +197,20 @@ It might also be interesting to compare with a manual gating. The
 \Rcode{cellTypes} can be any factor which has a value for each individual
 cell, so you can also map other clustering results.
 <<fig=TRUE>>=
-library(flowUtils)
-flowEnv <- new.env()
-ff_c <- compensate(ff,description(ff)$SPILL)
-colnames(ff_c)[8:18] <- paste("Comp-",colnames(ff_c)[8:18],sep="")
-gatingFile <- system.file("extdata","manualGating.xml", 
-                        package="FlowSOM")
-gateIDs <- c( "B cells"=8,
-                "ab T cells"=10,
-                "yd T cells"=15,
-                "NK cells"=5,
-                "NKT cells"=6)
-cellTypes <- names(gateIDs)
-gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
+wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
 
-PlotPies(fSOM,cellTypes=gatingResult$manual)
+# Specify the cell types of interest for assigning one label per cell
+cell_types <- c("B cells",
+                "gd T cells", "CD4 T cells", "CD8 T cells",
+                "NK cells","NK T cells")
+
+# Parse the FlowJo workspace
+gatingResult <- GetFlowJoLabels(fileName, 
+                                wsp_file,
+                                cell_types = cell_types)
+
+
+PlotPies(fSOM, cellTypes=gatingResult$manual)
 @
 
 If you are interested in one specific marker, you can use the 
@@ -289,7 +285,7 @@ library(FlowSOM)
 set.seed(1)
 
 # Build the FlowSOM tree on the example file
-fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+fileName <-  system.file("extdata", "68983.fcs", package="FlowSOM")
 flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
 scale = TRUE, colsToUse = c(9,12,14:18), nClus = 10)
 

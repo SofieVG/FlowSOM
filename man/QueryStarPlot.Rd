@@ -32,7 +32,7 @@ Identify nodes in the tree which resemble a certain profile of "high"
 or "low" marker expressions.
 }
 \examples{
-   file <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+   file <- system.file("extdata", "68983.fcs", package="FlowSOM")
    # Use the wrapper function to build a flowSOM object (saved in fsom[[1]])
    # and a metaclustering (saved in fsom[[2]])
    fsom <- FlowSOM(file,compensate = TRUE, transform = TRUE,scale = TRUE,

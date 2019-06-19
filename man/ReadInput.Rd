@@ -48,7 +48,7 @@ the preprocessed data (compensated, transformed, scaled)
 }
 \examples{
 # Read from file
-fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
                          scale=TRUE)
 

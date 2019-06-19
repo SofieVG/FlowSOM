@@ -46,7 +46,7 @@ Plot FlowSOM grid or tree, with in each node a number indicating its index
 }
 \examples{
 # Read from file, build self-organizing map and minimal spanning tree
-fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
                          scale=TRUE)
 flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))

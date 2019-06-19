@@ -26,7 +26,7 @@ Calculate differences in cell counts between groups
    set.seed(1)
    
    # Build the FlowSOM tree on the example file
-   fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+   fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
    flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
                     scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10)
    

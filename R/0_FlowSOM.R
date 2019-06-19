@@ -61,7 +61,7 @@
 #'          \code{\link{BuildMST}},\code{\link{MetaClustering}}
 #' @examples
 #' # Read from file
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
 #'                       scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 #' # Or read from flowFrame object
@@ -80,19 +80,20 @@
 #' 
 #' 
 #' 
+#' @importFrom BiocGenerics colnames
+#' @importFrom ConsensusClusterPlus ConsensusClusterPlus
 #' @importFrom flowCore read.FCS compensate transform logicleTransform exprs 
-#'             transformList write.FCS 'exprs<-'
+#'             transformList write.FCS 'exprs<-' keyword
+#' @importFrom flowWorkspace openWorkspace parseWorkspace getNodes getIndiceMat
+#'             keyword
 #' @importFrom igraph graph.adjacency minimum.spanning.tree layout.kamada.kawai
 #'             plot.igraph add.vertex.shape get.edges shortest.paths E V 'V<-'
 #'             igraph.shape.noclip
-#' @importFrom tsne tsne
-#' @importFrom ConsensusClusterPlus ConsensusClusterPlus
-#' @importFrom BiocGenerics colnames
-#' 
-#' @importFrom flowUtils read.gatingML
-#' @importFrom XML xmlToList xmlParse
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom stats prcomp
+#' @importFrom tsne tsne
+#' @importFrom utils capture.output
+#' @importFrom XML xmlToList xmlParse
 #' 
 #' 
 #' @export
@@ -173,7 +174,7 @@ FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
 #'
 #' @examples
 #' # Define filename
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' # This example will sample 2 times 500 cells.
 #' ff_new <- AggregateFlowFrames(c(fileName,fileName),1000)
 #' 
@@ -246,88 +247,182 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 }
 
 
-#' Process a gatingML file
-#' 
-#' Reads a gatingML file using the \code{\link{flowUtils}} library and
-#' returns a list with a matrix containing filtering results for each specified
-#' gate and a vector with a label for each cell
-#' 
-#' @param flowFrame     The flowFrame to apply the gating on
-#' @param gatingFile    The gatingML file to read
-#' @param gateIDs       Named vector containing ids to extract from the 
-#'                      gatingML file to use in the matrix
-#' @param cellTypes     Cell types to use for labeling the cells. Should be a
-#'                      subset of the names of the gateIDs
-#' @param silent        If FALSE, show messages of which gates are being
-#'                      processed
-#'                  
-#' @return This function returns a list in which the first element ("matrix") 
-#' is a matrix containing filtering results for each specified gate and the 
-#' second element ("manual") is a vector which assigns a label to each cell
+# #' Process a gatingML file
+# #' 
+# #' Reads a gatingML file using the \code{\link{flowUtils}} library and
+# #' returns a list with a matrix containing filtering results for each specified
+# #' gate and a vector with a label for each cell
+# #' 
+# #' @param flowFrame     The flowFrame to apply the gating on
+# #' @param gatingFile    The gatingML file to read
+# #' @param gateIDs       Named vector containing ids to extract from the 
+# #'                      gatingML file to use in the matrix
+# #' @param cellTypes     Cell types to use for labeling the cells. Should be a
+# #'                      subset of the names of the gateIDs
+# #' @param silent        If FALSE, show messages of which gates are being
+# #'                      processed
+# #'                  
+# #' @return This function returns a list in which the first element ("matrix") 
+# #' is a matrix containing filtering results for each specified gate and the 
+# #' second element ("manual") is a vector which assigns a label to each cell
+# #'
+# #' @seealso \code{\link{PlotPies}}
+# #'
+# #' @examples
+# #' 
+# #'    # Read the flowFrame
+# #'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+# #'    ff <- flowCore::read.FCS(fileName)
+# #'    ff_c <- flowCore::compensate(ff,flowCore::description(ff)$SPILL)
+# #'    flowCore::colnames(ff_c)[8:18] <- paste("Comp-",
+# #'                                      flowCore::colnames(ff_c)[8:18],
+# #'                                      sep="")
+# #'        
+# #'    # Specify the gating file and the gates of interest
+# #'    gatingFile <- system.file("extdata","manualGating.xml", 
+# #'                              package="FlowSOM")
+# #'    gateIDs <- c( "B cells"=8,
+# #'                  "ab T cells"=10,
+# #'                  "yd T cells"=15,
+# #'                  "NK cells"=5,
+# #'                  "NKT cells"=6)
+# #'    cellTypes <- c("B cells","ab T cells","yd T cells",
+# #'                  "NK cells","NKT cells")
+# #'    gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
+# #'    
+# #'    
+# #'    # Build a FlowSOM tree
+# #'    flowSOM.res <- FlowSOM(ff_c,compensate=FALSE,transform=TRUE,
+# #'                          toTransform=8:18,colsToUse=c(9,12,14:18),nClus=10)
+# #'    # Plot pies indicating the percentage of cell types present in the nodes
+# #'    PlotPies(flowSOM.res[[1]],gatingResult$manual)
+# #'
+# #' @export
+# ProcessGatingML <- function(flowFrame,gatingFile,gateIDs,
+#                             cellTypes,silent=FALSE){
+#     gating_xml <- XML::xmlToList(XML::xmlParse(gatingFile))
+#     flowEnv <- new.env()
+#     flowUtils::read.gatingML(gatingFile, flowEnv)
+#     #  A. Read the gates from xml
+#     filterList <- list()
+#     for(cellType in names(gateIDs)){
+#         filterList[[cellType]] <-  flowEnv[[
+#             as.character(gating_xml[[gateIDs[cellType]]]$.attrs["id"])
+#             ]]
+#     }
+#     #  B. Process the fcs file for all specified gates
+#     results <- matrix(NA,nrow=nrow(flowFrame),ncol=length(gateIDs),
+#                         dimnames = list(NULL,names(gateIDs)))
+#     for(cellType in names(gateIDs)){
+#         if(!silent){message(paste0("Processing ",cellType))}
+#         results[,cellType] <- flowCore::filter(flowFrame,
+#                                                 filterList[[cellType]])@subSet
+#     }
+#     #  C. Assign one celltype to each cell
+#     manual <- rep("Unknown",nrow(flowFrame))
+#     for(celltype in cellTypes){
+#         manual[results[,celltype]] <- celltype
+#     }
+#     manual <- factor(manual,levels = c("Unknown",cellTypes))
+#     
+#     list("matrix"=results,"manual"=manual)
+# }
+
+
+#' Process a flowjo workspace file
+#'
+#' Reads a flowjo workspace file using the \code{\link{flowWorkspace}} library 
+#' and returns a list with a matrix containing gating results and a vector with 
+#' a label for each cell from a set of specified gates
+#'
+#' @param files       The fcs files of interest
+#' @param wsp_file    The FlowJo wsp file to read
+#' @param group       The FlowJo group to parse. Default "All Samples".
+#' @param cell_types  Cell types to use for final labeling the cells. Should
+#'                    correspond with a subset of the gate names in FlowJo.
+#'
+#' @return This function returns a list, which for every file contains a list
+#' in which the first element ("matrix") is a matrix containing filtering 
+#' results for each specified gate and the second element ("manual") is a vector
+#' which assigns one label to each cell. If only one file is given, only one
+#' list is returned instead of a list of lists.
 #'
 #' @seealso \code{\link{PlotPies}}
 #'
 #' @examples
+#'
+#' # Identify the files
+#' fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
 #' 
-#'    # Read the flowFrame
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
-#'    ff <- flowCore::read.FCS(fileName)
-#'    ff_c <- flowCore::compensate(ff,flowCore::description(ff)$SPILL)
-#'    flowCore::colnames(ff_c)[8:18] <- paste("Comp-",
-#'                                      flowCore::colnames(ff_c)[8:18],
-#'                                      sep="")
-#'        
-#'    # Specify the gating file and the gates of interest
-#'    gatingFile <- system.file("extdata","manualGating.xml", 
-#'                              package="FlowSOM")
-#'    gateIDs <- c( "B cells"=8,
-#'                  "ab T cells"=10,
-#'                  "yd T cells"=15,
-#'                  "NK cells"=5,
-#'                  "NKT cells"=6)
-#'    cellTypes <- c("B cells","ab T cells","yd T cells",
-#'                  "NK cells","NKT cells")
-#'    gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
+#' # Specify the cell types of interest for assigning one label per cell
+#' cell_types <- c("B cells",
+#'                 "gd T cells", "CD4 T cells", "CD8 T cells",
+#'                 "NK cells","NK T cells")
+#'
+#' # Parse the FlowJo workspace   
+#' library(flowWorkspace)             
+#' gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
+#'                                 cell_types = cell_types)
+#'
+#' # Check the number of cells assigned to each gate
+#' colSums(gatingResult$matrix)
+#' 
+#' # Build a FlowSOM tree
+#' flowSOM.res <- FlowSOM(fcs_file, 
+#'                        compensate = TRUE, 
+#'                        transform = TRUE,
+#'                        toTransform = 8:18, 
+#'                        colsToUse = c(9,12,14:18),
+#'                        nClus = 10,
+#'                        seed = 1)
 #'    
-#'    
-#'    # Build a FlowSOM tree
-#'    flowSOM.res <- FlowSOM(ff_c,compensate=FALSE,transform=TRUE,
-#'                          toTransform=8:18,colsToUse=c(9,12,14:18),nClus=10)
-#'    # Plot pies indicating the percentage of cell types present in the nodes
-#'    PlotPies(flowSOM.res[[1]],gatingResult$manual)
+#'  # Plot pies indicating the percentage of cell types present in the nodes
+#'  PlotPies(flowSOM.res$FlowSOM,
+#'           gatingResult$manual,
+#'           backgroundValues = flowSOM.res$metaclustering)
 #'
 #' @export
-ProcessGatingML <- function(flowFrame,gatingFile,gateIDs,
-                            cellTypes,silent=FALSE){
-    gating_xml <- XML::xmlToList(XML::xmlParse(gatingFile))
-    flowEnv <- new.env()
-    flowUtils::read.gatingML(gatingFile, flowEnv)
-    #  A. Read the gates from xml
-    filterList <- list()
-    for(cellType in names(gateIDs)){
-        filterList[[cellType]] <-  flowEnv[[
-            as.character(gating_xml[[gateIDs[cellType]]]$.attrs["id"])
-            ]]
-    }
-    #  B. Process the fcs file for all specified gates
-    results <- matrix(NA,nrow=nrow(flowFrame),ncol=length(gateIDs),
-                        dimnames = list(NULL,names(gateIDs)))
-    for(cellType in names(gateIDs)){
-        if(!silent){message(paste0("Processing ",cellType))}
-        results[,cellType] <- flowCore::filter(flowFrame,
-                                                filterList[[cellType]])@subSet
-    }
-    #  C. Assign one celltype to each cell
-    manual <- rep("Unknown",nrow(flowFrame))
-    for(celltype in cellTypes){
-        manual[results[,celltype]] <- celltype
-    }
-    manual <- factor(manual,levels = c("Unknown",cellTypes))
+GetFlowJoLabels <- function(files,
+                            wsp_file,
+                            group = "All Samples",
+                            cell_types = NULL) {
+  
+  wsp <- flowWorkspace::openWorkspace(wsp_file)
+  o <- utils::capture.output(
+    gates <- suppressMessages(flowWorkspace::parseWorkspace(wsp, group))
+  )
+  files_in_wsp <- gates@data@origSampleVector
+  counts <- as.numeric(gsub(".*_([0-9]*)$", "\\1", files_in_wsp))
+  result <- list()
+  for(file in files){
+    print(paste0("Processing ", file))
+    file_id <- grep(gsub(".*/", "", file), 
+                    files_in_wsp)
+    if(length(file_id) == 0) {stop("File not found. Files available: ",
+                                   gsub("_[0-9]*$", "\n", files_in_wsp))}
+    gate_names <- flowWorkspace::getNodes(gates[[file_id]], path = "auto")
     
-    list("matrix"=results,"manual"=manual)
+    gatingMatrix <- flowWorkspace::getIndiceMat(gates[[file_id]],
+                                                paste(gate_names, 
+                                                      collapse = "|"))
+    if(is.null(cell_types)) cell_types <- gate_names
+    manual <- rep("Unknown", nrow(gatingMatrix))
+    for(cellType in cell_types){
+      manual[gatingMatrix[, cellType]] <- cellType
+    }
+    manual <- factor(manual, levels=c("Unknown", cell_types))
+    
+    result[[file]] <- list("matrix" = gatingMatrix,
+                           "manual" = manual)
+  }
+  
+  if (length(files) == 1){
+    result <- result[[1]]
+  }
+  
+  return(result)
 }
-
-
 
 lookup <- function(ff, markers, type) { 
   sapply(markers, function(marker){
@@ -349,7 +444,7 @@ lookup <- function(ff, markers, type) {
 #' @examples
 #' 
 #'    # Read the flowFrame
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    ff <- flowCore::read.FCS(fileName)
 #'    get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
 #'    get_markers(ff, c("FSC-A", "CD3", "FITC-A"))
@@ -375,7 +470,7 @@ get_channels <- function(ff, markers) {
 #' @examples
 #' 
 #'    # Read the flowFrame
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    ff <- flowCore::read.FCS(fileName)
 #'    get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
 #'    get_markers(ff, c("FSC-A", "CD3", "FITC-A"))

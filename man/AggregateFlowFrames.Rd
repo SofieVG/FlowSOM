@@ -42,7 +42,7 @@ value between 0 and 0.1).
 }
 \examples{
 # Define filename
-fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 # This example will sample 2 times 500 cells.
 ff_new <- AggregateFlowFrames(c(fileName,fileName),1000)
 

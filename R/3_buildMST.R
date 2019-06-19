@@ -12,7 +12,7 @@
 #' 
 #' @examples 
 #' # Read from file, build self-organizing map
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                          scale=TRUE)
 #' flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -66,7 +66,7 @@ BuildMST <- function(fsom, silent=FALSE, tSNE=FALSE){
 #' 
 #' @examples 
 #' # Read from file, build self-organizing map and minimal spanning tree
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                         scale=TRUE)
 #' flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -238,7 +238,7 @@ PlotBackgroundLegend <- function(backgroundValues, background,
 #' 
 #' @examples 
 #' # Read from file, build self-organizing map and minimal spanning tree
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                          scale=TRUE)
 #' flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -344,7 +344,7 @@ PlotMarker <- function(fsom, marker=NULL, view="MST",main=NULL,
 #' 
 #' @examples 
 #' # Read from file, build self-organizing map and minimal spanning tree
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                          scale=TRUE)
 #' flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -467,7 +467,7 @@ PlotVariable <- function(fsom, variable, view="MST",main=NULL,
 #' 
 #' @examples 
 #' # Read from file, build self-organizing map and minimal spanning tree
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                          scale=TRUE)
 #' flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -592,7 +592,7 @@ PlotSD <- function(fsom,
 #' 
 #' @examples 
 #' # Read from file, build self-organizing map and minimal spanning tree
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                          scale=TRUE)
 #' flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -675,7 +675,7 @@ PlotNumbers <- function(fsom, view="MST",main=NULL,nodeSize=fsom$MST$size,
 #' 
 #' @examples 
 #' # Read from file, build self-organizing map and minimal spanning tree
-#' fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' ff <- flowCore::read.FCS(fileName)
 #' ff <- flowCore::compensate(ff, ff@description$SPILL)
 #' ff <- flowCore::transform(ff, flowCore::estimateLogicle(ff,
@@ -768,31 +768,36 @@ PlotLabels <- function(fsom,
 #' \code{\link{PlotCenters}},\code{\link{BuildMST}}
 #'
 #' @examples 
-#'    # Read from file, build self-organizing map and minimal spanning tree
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
-#'    flowSOM_res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-#'                             scale=TRUE,colsToUse=c(9,12,14:18),nClus=7)
-#'    ff <- flowCore::read.FCS(fileName)
-#'    ff_c <- flowCore::compensate(ff,flowCore::description(ff)$SPILL)
-#'    flowCore::colnames(ff_c)[8:18] <- paste("Comp-",
-#'                                      flowCore::colnames(ff_c)[8:18],
-#'                                      sep="")
+#'#' # Identify the files
+#' fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
+#' 
+#' # Specify the cell types of interest for assigning one label per cell
+#' cell_types <- c("B cells",
+#'                 "gd T cells", "CD4 T cells", "CD8 T cells",
+#'                 "NK cells","NK T cells")
+#'
+#' # Parse the FlowJo workspace   
+#' library(flowWorkspace)             
+#' gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
+#'                                 cell_types = cell_types)
+#'
+#' # Check the number of cells assigned to each gate
+#' colSums(gatingResult$matrix)
+#' 
+#' # Build a FlowSOM tree
+#' flowSOM.res <- FlowSOM(fcs_file, 
+#'                        compensate = TRUE, 
+#'                        transform = TRUE,
+#'                        toTransform = 8:18, 
+#'                        colsToUse = c(9,12,14:18),
+#'                        nClus = 10,
+#'                        seed = 1)
 #'    
-#'    # Get the manually gated labels using a gatingML file 
-#'    gatingFile <- system.file("extdata","manualGating.xml", 
-#'                              package="FlowSOM")
-#'    gateIDs <- c( "B cells"=8,
-#'                  "ab T cells"=10,
-#'                  "yd T cells"=15,
-#'                  "NK cells"=5,
-#'                  "NKT cells"=6)
-#'    cellTypes <- c("B cells","ab T cells","yd T cells",
-#'                  "NK cells","NKT cells")
-#'    gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
-#'        
-#'    
-#'    # Plot pies indicating the percentage of cell types present in the nodes
-#'    PlotPies(flowSOM_res[[1]],gatingResult$manual)
+#'  # Plot pies indicating the percentage of cell types present in the nodes
+#'  PlotPies(flowSOM.res$FlowSOM,
+#'           gatingResult$manual,
+#'           backgroundValues = flowSOM.res$metaclustering)
 #'
 #' @export
 PlotPies <- function(fsom, 
@@ -1105,7 +1110,7 @@ plotStarQuery <- function(labels,values,
 #' 
 #' @examples
 #'    # Read from file, build self-organizing map and minimal spanning tree
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                             scale=TRUE)
 #'    flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -1271,7 +1276,7 @@ PlotStars <- function(fsom,
 #' 
 #' @examples
 #'    # Read from file, build self-organizing map and minimal spanning tree
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
 #'                             scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 #'    
@@ -1369,7 +1374,7 @@ PlotNode <- function(fsom, id,
 # #' 
 # #' @examples
 # #'    # Read from file, build self-organizing map and minimal spanning tree
-# #'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+# #'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 # #'    flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 # #'                             scale=TRUE)
 # #'    flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -1552,7 +1557,7 @@ PlotNode <- function(fsom, id,
 #' 
 #' @examples
 #'    # Read from file, build self-organizing map and minimal spanning tree
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                             scale=TRUE)
 #'    flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -1622,7 +1627,7 @@ PlotClusters2D <- function(fsom, marker1, marker2, nodes,
 #' 
 #' @examples
 #'    # Read from file, build self-organizing map and minimal spanning tree
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    flowSOM.res <- FlowSOM(fileName, 
 #'                           compensate=TRUE, transform=TRUE, scale=TRUE,
 #'                           colsToUse=c(9,12,14:18),
@@ -1697,7 +1702,7 @@ PlotOverview2D <- function(fsom,
 #'          
 #' @examples
 #'    # Read from file, build self-organizing map and minimal spanning tree
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
 #'                             scale=TRUE)
 #'    flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
@@ -1746,7 +1751,7 @@ PlotCenters <- function(fsom, marker1, marker2, MST=TRUE){
 #' 
 #' @examples
 #'    # Read two files (Artificially, as we just split 1 file in 2 subsets)
-#'    fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    ff1 <- flowCore::read.FCS(fileName)[1:1000,]
 #'    ff1@@description$FIL <- "File1"
 #'    ff2 <- flowCore::read.FCS(fileName)[1001:2000,]
@@ -1823,7 +1828,7 @@ FlowSOMSubset <- function(fsom,ids){
 #'          current data instead of a new dataset
 #' @examples 
 #'  # Build FlowSom result
-#'  fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'  fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    ff <- flowCore::read.FCS(fileName)
 #'    ff <- flowCore::compensate(ff,ff@@description$SPILL)
 #'    ff <- flowCore::transform(ff,
@@ -1939,7 +1944,7 @@ NewData <- function(fsom,
 #'          current data instead of a new dataset
 #' @examples 
 #'  # Build FlowSom result
-#'  fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'  fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'  ff <- flowCore::read.FCS(fileName)
 #'  flowSOM.res <- FlowSOM(ff,
 #'                         compensate = TRUE, transform = TRUE, scale = TRUE,
@@ -2188,7 +2193,7 @@ PlotGroups <- function(fsom, groups,
 #' @return A list, containing the ids of the selected nodes, the individual
 #'         scores for all nodes and the scores for each marker for each node
 #' @examples
-#'    file <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
+#'    file <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    # Use the wrapper function to build a flowSOM object (saved in fsom[[1]])
 #'    # and a metaclustering (saved in fsom[[2]])
 #'    fsom <- FlowSOM(file,compensate = TRUE, transform = TRUE,scale = TRUE,

@@ -50,31 +50,36 @@ Plot FlowSOM grid or tree, with pies indicating another clustering
    or manual gating result
 }
 \examples{
-   # Read from file, build self-organizing map and minimal spanning tree
-   fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
-   flowSOM_res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-                            scale=TRUE,colsToUse=c(9,12,14:18),nClus=7)
-   ff <- flowCore::read.FCS(fileName)
-   ff_c <- flowCore::compensate(ff,flowCore::description(ff)$SPILL)
-   flowCore::colnames(ff_c)[8:18] <- paste("Comp-",
-                                     flowCore::colnames(ff_c)[8:18],
-                                     sep="")
+#' # Identify the files
+fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
+
+# Specify the cell types of interest for assigning one label per cell
+cell_types <- c("B cells",
+                "gd T cells", "CD4 T cells", "CD8 T cells",
+                "NK cells","NK T cells")
+
+# Parse the FlowJo workspace   
+library(flowWorkspace)             
+gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
+                                cell_types = cell_types)
+
+# Check the number of cells assigned to each gate
+colSums(gatingResult$matrix)
+
+# Build a FlowSOM tree
+flowSOM.res <- FlowSOM(fcs_file, 
+                       compensate = TRUE, 
+                       transform = TRUE,
+                       toTransform = 8:18, 
+                       colsToUse = c(9,12,14:18),
+                       nClus = 10,
+                       seed = 1)
    
-   # Get the manually gated labels using a gatingML file 
-   gatingFile <- system.file("extdata","manualGating.xml", 
-                             package="FlowSOM")
-   gateIDs <- c( "B cells"=8,
-                 "ab T cells"=10,
-                 "yd T cells"=15,
-                 "NK cells"=5,
-                 "NKT cells"=6)
-   cellTypes <- c("B cells","ab T cells","yd T cells",
-                 "NK cells","NKT cells")
-   gatingResult <- ProcessGatingML(ff_c, gatingFile, gateIDs, cellTypes)
-       
-   
-   # Plot pies indicating the percentage of cell types present in the nodes
-   PlotPies(flowSOM_res[[1]],gatingResult$manual)
+ # Plot pies indicating the percentage of cell types present in the nodes
+ PlotPies(flowSOM.res$FlowSOM,
+          gatingResult$manual,
+          backgroundValues = flowSOM.res$metaclustering)
 
 }
 \seealso{

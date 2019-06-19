@@ -27,20 +27,20 @@ Build a SOM based on the data contained in the FlowSOM object
 \examples{
 
 # Read from file
-fileName <- system.file("extdata","lymphocytes.fcs",package="FlowSOM")
-flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+flowSOM.res <- ReadInput(fileName, compensate=TRUE, transform=TRUE,
                          scale=TRUE)
 
 # Build the Self-Organizing Map
 # E.g. with gridsize 5x5, presenting the dataset 20 times, 
 # no use of MST in neighbourhood calculations in between
-flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18),
-                        xdim=5,ydim=5,rlen=20)
+flowSOM.res <- BuildSOM(flowSOM.res, colsToUse=c(9,12,14:18),
+                        xdim=5, ydim=5, rlen=20)
 
 # Build the minimal spanning tree and apply metaclustering
 flowSOM.res <- BuildMST(flowSOM.res)
 metacl <- MetaClustering(flowSOM.res$map$codes,
-                         "metaClustering_consensus",max=10)
+                         "metaClustering_consensus", max=10)
 
 }
 \references{
