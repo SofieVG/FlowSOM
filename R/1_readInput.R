@@ -68,16 +68,16 @@ ReadInput <- function(input, pattern=".fcs",
                 transformFunction = transformFunction, scale=scale)
     class(fsom) <- "FlowSOM"
     
-    if(class(input) == "flowFrame"){
+    if(is(input, "flowFrame")){
         fsom <- AddFlowFrame(fsom, input)        
-    } else if(class(input) == "flowSet"){
+    } else if(is(input, "flowSet")){
         for(i in seq_along(input)){
             fsom <- AddFlowFrame(fsom, input[[i]])    
         }
-    } else if(class(input) == "matrix"){
+    } else if(is(input, "matrix")){
       flowFrame <- flowCore::flowFrame(input)
       fsom <- AddFlowFrame(fsom, flowFrame)
-    } else if(class(input) == "character"){    
+    } else if(is(input, "character")){    
         # Replace all directories by the files they contain
         toAdd <- NULL
         toRemove <- NULL
@@ -157,7 +157,7 @@ AddFlowFrame <- function(fsom, flowFrame){
             if(!is.null(flowFrame@description$SPILL)){
                 spillover <- flowFrame@description$SPILL    
             } else if (!is.null(flowFrame@description$`$SPILLOVER`)){
-                if(class(flowFrame@description$`$SPILLOVER`)=="matrix"){
+                if(is(flowFrame@description$`$SPILLOVER`, "matrix")){
                     spillover <- flowFrame@description$`$SPILLOVER`
                     flowFrame@description$SPILL <- spillover
                 } else {

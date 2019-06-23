@@ -84,8 +84,9 @@
 #' @importFrom ConsensusClusterPlus ConsensusClusterPlus
 #' @importFrom flowCore read.FCS compensate transform logicleTransform exprs 
 #'             transformList write.FCS 'exprs<-' keyword
-#' @importFrom flowWorkspace openWorkspace parseWorkspace getNodes getIndiceMat
-#'             keyword
+#' @importFrom flowWorkspace gs_get_pop_paths gh_pop_get_indices 
+#'             gs_get_leaf_nodes
+#' @importFrom CytoML open_flowjo_xml flowjo_to_gatingset
 #' @importFrom igraph graph.adjacency minimum.spanning.tree layout.kamada.kawai
 #'             plot.igraph add.vertex.shape get.edges shortest.paths E V 'V<-'
 #'             igraph.shape.noclip
@@ -363,7 +364,6 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #'                 "NK cells","NK T cells")
 #'
 #' # Parse the FlowJo workspace   
-#' library(flowWorkspace)             
 #' gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
 #'                                 cell_types = cell_types)
 #'
@@ -390,10 +390,10 @@ GetFlowJoLabels <- function(files,
                             group = "All Samples",
                             cell_types = NULL) {
   
-  wsp <- flowWorkspace::openWorkspace(wsp_file)
-  o <- utils::capture.output(
-    gates <- suppressMessages(flowWorkspace::parseWorkspace(wsp, group))
-  )
+  ws <- CytoML::open_flowjo_xml(wsp_file)
+  gates <- CytoML::flowjo_to_gatingset(ws,name = 1)
+  
+  
   files_in_wsp <- gates@data@origSampleVector
   counts <- as.numeric(gsub(".*_([0-9]*)$", "\\1", files_in_wsp))
   result <- list()
@@ -403,12 +403,22 @@ GetFlowJoLabels <- function(files,
                     files_in_wsp)
     if(length(file_id) == 0) {stop("File not found. Files available: ",
                                    gsub("_[0-9]*$", "\n", files_in_wsp))}
-    gate_names <- flowWorkspace::getNodes(gates[[file_id]], path = "auto")
+    gate_names <- flowWorkspace::gs_get_pop_paths(gates, path = "auto")
     
-    gatingMatrix <- flowWorkspace::getIndiceMat(gates[[file_id]],
-                                                paste(gate_names, 
-                                                      collapse = "|"))
-    if(is.null(cell_types)) cell_types <- gate_names
+    gatingMatrix <- matrix(NA,
+                           nrow = counts[file_id],
+                           ncol = length(gate_names),
+                           dimnames = list(NULL,
+                                           gate_names))
+    for(gate in gate_names){
+      gatingMatrix[,gate] <- flowWorkspace::gh_pop_get_indices(gates[[file_id]], 
+                                                               gate)
+    }
+    
+    if(is.null(cell_types)){
+      cell_types <- flowWorkspace::gs_get_leaf_nodes(gates,
+                                                     path = "auto")
+    } 
     manual <- rep("Unknown", nrow(gatingMatrix))
     for(cellType in cell_types){
       manual[gatingMatrix[, cellType]] <- cellType
@@ -422,6 +432,8 @@ GetFlowJoLabels <- function(files,
   if (length(files) == 1){
     result <- result[[1]]
   }
+  
+  CytoML::flowjo_ws_close(ws)
   
   return(result)
 }
