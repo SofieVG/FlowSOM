@@ -84,11 +84,13 @@
 #' @importFrom ConsensusClusterPlus ConsensusClusterPlus
 #' @importFrom flowCore read.FCS compensate transform logicleTransform exprs 
 #'             transformList write.FCS 'exprs<-' keyword
-#' @importFrom flowWorkspace openWorkspace parseWorkspace getNodes getIndiceMat
+#' @importFrom flowWorkspace openWorkspace getNodes getIndiceMat
 #'             keyword
+#' @importFrom CytoML parseWorkspace
 #' @importFrom igraph graph.adjacency minimum.spanning.tree layout.kamada.kawai
 #'             plot.igraph add.vertex.shape get.edges shortest.paths E V 'V<-'
 #'             igraph.shape.noclip
+#' @importFrom methods is
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom stats prcomp
 #' @importFrom tsne tsne
@@ -392,7 +394,7 @@ GetFlowJoLabels <- function(files,
   
   wsp <- flowWorkspace::openWorkspace(wsp_file)
   o <- utils::capture.output(
-    gates <- suppressMessages(flowWorkspace::parseWorkspace(wsp, group))
+    gates <- suppressMessages(CytoML::parseWorkspace(wsp, group))
   )
   files_in_wsp <- gates@data@origSampleVector
   counts <- as.numeric(gsub(".*_([0-9]*)$", "\\1", files_in_wsp))
