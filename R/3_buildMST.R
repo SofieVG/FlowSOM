@@ -2171,7 +2171,8 @@ PlotGroups <- function(fsom, groups,
     fsom$MST$size <- fsom$MST$size * groups$means_norm[[group]]
     PlotStars(fsom, backgroundValues = annotation[[group]],
               main = group,
-              backgroundColor = backgroundColors)
+              backgroundColor = backgroundColors,
+              ...)
   }
   
   annotation
