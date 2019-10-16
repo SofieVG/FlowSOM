@@ -26,12 +26,19 @@ BuildMST <- function(fsom, silent=FALSE, tSNE=FALSE){
     fsom$MST <- list()
     if(!silent) message("Building MST\n")
     
-    adjacency <- stats::dist(fsom$map$codes, method = "euclidean")
-    fullGraph <- igraph::graph.adjacency(as.matrix(adjacency), 
-                                mode = "undirected", 
-                                weighted = TRUE)
+    adjacency <- as.matrix(stats::dist(fsom$map$codes, method = "euclidean"))
+    fullGraph <- igraph::graph.adjacency(adjacency,
+                                         mode = "undirected",
+                                         weighted = TRUE)
     fsom$MST$graph <- igraph::minimum.spanning.tree(fullGraph)
-    fsom$MST$l <- igraph::layout.kamada.kawai(fsom$MST$graph)    
+    ws <- igraph::edge.attributes(fsom$MST$graph)$weight
+    #normalize edge weights to match the grid size in coords (see below)
+    ws <- ws / mean(ws)
+    igraph::edge.attributes(fsom$MST$graph)$weight <- ws
+    fsom$MST$l <- igraph::layout.kamada.kawai(
+      coords=as.matrix(fsom$map$grid),
+      fsom$MST$graph)
+
     
     if(tSNE){
         fsom$MST$l2 <- tsne(fsom$map$codes)   
