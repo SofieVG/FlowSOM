@@ -87,7 +87,10 @@ UpdateNodeSize <- function(fsom, count = NULL, reset=FALSE, transform=sqrt,
     if(reset){
         fsom$MST$size <- rep(maxNodeSize, nrow(fsom$map$grid))
     } else {
-        t <- table(fsom$map$mapping[, 1])
+        t <- rep(0, fsom$map$nNodes)
+        names(t) <- as.character(seq_len(fsom$map$nNodes))
+        t_tmp <- table(fsom$map$mapping[, 1]) / nrow(fsom$map$mapping)
+        t[names(t_tmp)] <- t_tmp
         
         if(!is.null(count)){
             t <- (t/sum(t)) * count
@@ -100,9 +103,8 @@ UpdateNodeSize <- function(fsom, count = NULL, reset=FALSE, transform=sqrt,
         if(is.null(shift)) shift <- min(t)
         if(is.null(scale)) scale <- max(t - shift)
         rescaled <- maxNodeSize * (t - shift)/scale
-        
-        fsom$MST$size <- numeric(nrow(fsom$map$grid))
-        fsom$MST$size[as.numeric(names(t))] <- rescaled   
+        rescaled[rescaled == 0] <- 0.0001
+        fsom$MST$size <- rescaled   
     }
     fsom
 }
@@ -1145,7 +1147,8 @@ PlotStars <- function(fsom,
     if(is.null(thresholds)){
         # Use MFIs
         data <- fsom$map$medianValues[, markers,drop=FALSE]
-        scale <- TRUE
+        data <- data / max(data, na.rm = TRUE)
+        #scale <- TRUE
     } else {
         # scale thresholds same as data
         if(fsom$transform){
@@ -1235,7 +1238,7 @@ PlotStars <- function(fsom,
                         vertex.size = fsom$MST$size, 
                         vertex.data = data,
                         vertex.cP = colorPalette(ncol(data)),
-                        vertex.scale = scale,
+                        vertex.scale = FALSE, #scale
                         layout = layout, 
                         edge.lty = lty,  
                         mark.groups = background$groups, 
@@ -1777,7 +1780,7 @@ FlowSOMSubset <- function(fsom,ids){
     fsom_tmp$data <- fsom$data[ids,]
     fsom_tmp$map$mapping <- fsom$map$mapping[ids,]
     fsom_tmp <- UpdateDerivedValues(fsom_tmp)
-    UpdateNodeSize(fsom_tmp)
+    fsom_tmp <- UpdateNodeSize(fsom_tmp)
     return(fsom_tmp)
 }
 
