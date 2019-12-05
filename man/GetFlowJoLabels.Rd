@@ -41,7 +41,6 @@ cell_types <- c("B cells",
                 "NK cells","NK T cells")
 
 # Parse the FlowJo workspace   
-library(flowWorkspace)             
 gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
                                 cell_types = cell_types)
 

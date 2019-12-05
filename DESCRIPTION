@@ -20,6 +20,7 @@ Imports:
     ConsensusClusterPlus,
     BiocGenerics,
     tsne,
+    CytoML,
     flowWorkspace,
     XML,
     RColorBrewer
