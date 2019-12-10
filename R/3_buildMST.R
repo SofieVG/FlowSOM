@@ -1688,8 +1688,9 @@ PlotOverview2D <- function(fsom,
   graphics::layout(matrix(seq_len(length(markerlist) * length(metaclusters)), 
                 nrow = length(metaclusters)))
   if(is.null(colors)){
-    colors <- RColorBrewer::brewer.pal(length(metaclusters),
+    colors <- RColorBrewer::brewer.pal(12,
                                        "Paired")
+    colors <- rep(colors, length.out = length(metaclusters))
     names(colors) <- as.character(metaclusters)
   }
   
