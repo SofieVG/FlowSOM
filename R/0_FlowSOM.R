@@ -394,15 +394,15 @@ GetFlowJoLabels <- function(files,
   gates <- CytoML::flowjo_to_gatingset(ws,name = 1)
   
   
-  files_in_wsp <- gates@data@origSampleVector
-  counts <- as.numeric(gsub(".*_([0-9]*)$", "\\1", files_in_wsp))
+  files_in_wsp <- CytoML::fj_ws_get_samples(ws)$name
+  counts <- CytoML::fj_ws_get_samples(ws)$count
   result <- list()
   for(file in files){
     print(paste0("Processing ", file))
     file_id <- grep(gsub(".*/", "", file), 
                     files_in_wsp)
-    if(length(file_id) == 0) {stop("File not found. Files available: ",
-                                   gsub("_[0-9]*$", "\n", files_in_wsp))}
+    if(length(file_id) == 0) {stop("File not found. Files available: \n",
+                                   paste0(files_in_wsp, "\n"))}
     gate_names <- flowWorkspace::gs_get_pop_paths(gates, path = "auto")
     
     gatingMatrix <- matrix(NA,
@@ -432,8 +432,6 @@ GetFlowJoLabels <- function(files,
   if (length(files) == 1){
     result <- result[[1]]
   }
-  
-  CytoML::flowjo_ws_close(ws)
   
   return(result)
 }
