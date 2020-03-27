@@ -4,12 +4,25 @@
 \alias{FlowSOM}
 \title{Run the FlowSOM algorithm}
 \usage{
-FlowSOM(input, pattern = ".fcs", compensate = FALSE,
-  spillover = NULL, transform = FALSE, toTransform = NULL,
-  transformFunction = flowCore::logicleTransform(), scale = TRUE,
-  scaled.center = TRUE, scaled.scale = TRUE, silent = TRUE,
-  colsToUse, nClus = NULL, maxMeta, importance = NULL, seed = NULL,
-  ...)
+FlowSOM(
+  input,
+  pattern = ".fcs",
+  compensate = FALSE,
+  spillover = NULL,
+  transform = FALSE,
+  toTransform = NULL,
+  transformFunction = flowCore::logicleTransform(),
+  scale = TRUE,
+  scaled.center = TRUE,
+  scaled.scale = TRUE,
+  silent = TRUE,
+  colsToUse,
+  nClus = NULL,
+  maxMeta,
+  importance = NULL,
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{input}{a flowFrame, a flowSet or an array of paths to files or 
@@ -86,7 +99,8 @@ ff <- flowCore::transform(ff,
 flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 
 # Plot results
-PlotStars(flowSOM.res[[1]])
+PlotStars(flowSOM.res$FlowSOM,
+          backgroundValues = flowSOM.res$metaclustering)
 
 # Get metaclustering per cell
 flowSOM.clustering <- GetMetaclusters(flowSOM.res)

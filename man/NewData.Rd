@@ -4,10 +4,19 @@
 \alias{NewData}
 \title{Map new data to a FlowSOM grid}
 \usage{
-NewData(fsom, input, mad_allowed = 4, compensate = NULL,
-  spillover = NULL, transform = NULL, toTransform = NULL,
-  transformFunction = NULL, scale = NULL, scaled.center = NULL,
-  scaled.scale = NULL)
+NewData(
+  fsom,
+  input,
+  mad_allowed = 4,
+  compensate = NULL,
+  spillover = NULL,
+  transform = NULL,
+  toTransform = NULL,
+  transformFunction = NULL,
+  scale = NULL,
+  scaled.center = NULL,
+  scaled.scale = NULL
+)
 }
 \arguments{
 \item{fsom}{FlowSOM object}

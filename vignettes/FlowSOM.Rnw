@@ -196,7 +196,8 @@ fSOM <- UpdateNodeSize(fSOM)
 It might also be interesting to compare with a manual gating. The 
 \Rcode{cellTypes} can be any factor which has a value for each individual
 cell, so you can also map other clustering results.
-<<fig=TRUE>>=
+<<>>=
+#fig=TRUE
 wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
 
 # Specify the cell types of interest for assigning one label per cell
@@ -205,12 +206,12 @@ cell_types <- c("B cells",
                 "NK cells","NK T cells")
 
 # Parse the FlowJo workspace
-gatingResult <- GetFlowJoLabels(fileName, 
-                                wsp_file,
-                                cell_types = cell_types)
+#gatingResult <- GetFlowJoLabels(fileName, 
+#                                wsp_file,
+#                                cell_types = cell_types)
 
 
-PlotPies(fSOM, cellTypes=gatingResult$manual)
+#PlotPies(fSOM, cellTypes=gatingResult$manual)
 @
 
 If you are interested in one specific marker, you can use the 
@@ -243,8 +244,8 @@ looking for, it might be optimal to provide this number to the algorithm.
 
 <<fig=TRUE>>=
 metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
-PlotPies(fSOM,cellTypes=gatingResult$manual,
-        backgroundValues = as.factor(metaClustering))
+#PlotPies(fSOM,cellTypes=gatingResult$manual,
+#        backgroundValues = as.factor(metaClustering))
 PlotLabels(UpdateNodeSize(fSOM,reset=TRUE, maxNodeSize = 0),
            metaClustering)
 @

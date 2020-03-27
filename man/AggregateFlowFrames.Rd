@@ -4,9 +4,16 @@
 \alias{AggregateFlowFrames}
 \title{Aggregate multiple fcs files together}
 \usage{
-AggregateFlowFrames(fileNames, cTotal, writeOutput = FALSE,
-  outputFile = "aggregate.fcs", writeMeta = FALSE, keepOrder = FALSE,
-  verbose = FALSE)
+AggregateFlowFrames(
+  fileNames,
+  cTotal,
+  writeOutput = FALSE,
+  outputFile = "aggregate.fcs",
+  writeMeta = FALSE,
+  keepOrder = FALSE,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{fileNames}{Character vector containing full paths to the fcs files
@@ -27,6 +34,8 @@ FALSE.}
 
 \item{verbose}{If TRUE, prints an update every time it starts processing a
 new file. Default = FALSE.}
+
+\item{...}{Additional arguments to pass to read.FCS}
 }
 \value{
 This function does not return anything, but will write a file with

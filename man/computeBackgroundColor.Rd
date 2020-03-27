@@ -4,8 +4,12 @@
 \alias{computeBackgroundColor}
 \title{Internal function for computing background nodes}
 \usage{
-computeBackgroundColor(backgroundValues, backgroundColor,
-  backgroundLim = NULL, backgroundBreaks = NULL)
+computeBackgroundColor(
+  backgroundValues,
+  backgroundColor,
+  backgroundLim = NULL,
+  backgroundBreaks = NULL
+)
 }
 \arguments{
 \item{backgroundValues}{Values to be used for background coloring, either

@@ -4,10 +4,21 @@
 \alias{SOM}
 \title{Build a self-organizing map}
 \usage{
-SOM(data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
-  alpha = c(0.05, 0.01), radius = stats::quantile(nhbrdist, 0.67) *
-  c(1, 0), init = FALSE, initf = Initialize_KWSP, distf = 2,
-  silent = FALSE, codes = NULL, importance = NULL)
+SOM(
+  data,
+  xdim = 10,
+  ydim = 10,
+  rlen = 10,
+  mst = 1,
+  alpha = c(0.05, 0.01),
+  radius = stats::quantile(nhbrdist, 0.67) * c(1, 0),
+  init = FALSE,
+  initf = Initialize_KWSP,
+  distf = 2,
+  silent = FALSE,
+  codes = NULL,
+  importance = NULL
+)
 }
 \arguments{
 \item{data}{Matrix containing the training data}

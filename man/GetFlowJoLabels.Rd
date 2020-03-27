@@ -4,8 +4,14 @@
 \alias{GetFlowJoLabels}
 \title{Process a flowjo workspace file}
 \usage{
-GetFlowJoLabels(files, wsp_file, group = "All Samples",
-  cell_types = NULL)
+GetFlowJoLabels(
+  files,
+  wsp_file,
+  group = "All Samples",
+  cell_types = NULL,
+  get_data = FALSE,
+  ...
+)
 }
 \arguments{
 \item{files}{The fcs files of interest}
@@ -16,6 +22,10 @@ GetFlowJoLabels(files, wsp_file, group = "All Samples",
 
 \item{cell_types}{Cell types to use for final labeling the cells. Should
 correspond with a subset of the gate names in FlowJo.}
+
+\item{get_data}{If true, flowframes are returned as well.}
+
+\item{...}{Extra arguments to pass to CytoML::flowjo_to_gatingset}
 }
 \value{
 This function returns a list, which for every file contains a list
@@ -42,16 +52,14 @@ cell_types <- c("B cells",
 
 # Parse the FlowJo workspace   
 gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
-                                cell_types = cell_types)
+                                cell_types = cell_types,
+                                get_data = TRUE)
 
 # Check the number of cells assigned to each gate
 colSums(gatingResult$matrix)
 
 # Build a FlowSOM tree
-flowSOM.res <- FlowSOM(fcs_file, 
-                       compensate = TRUE, 
-                       transform = TRUE,
-                       toTransform = 8:18, 
+flowSOM.res <- FlowSOM(gatingResult$flowFrame,
                        colsToUse = c(9,12,14:18),
                        nClus = 10,
                        seed = 1)

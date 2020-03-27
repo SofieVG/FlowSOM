@@ -4,8 +4,7 @@
 \alias{plotStarLegend}
 \title{Plot legend for star plot}
 \usage{
-plotStarLegend(labels, colors = grDevices::rainbow(length(labels)),
-  main = "")
+plotStarLegend(labels, colors = grDevices::rainbow(length(labels)), main = "")
 }
 \arguments{
 \item{labels}{Names to show in the legend}

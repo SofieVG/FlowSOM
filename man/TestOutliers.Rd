@@ -4,8 +4,13 @@
 \alias{TestOutliers}
 \title{Test if any cells are too far from their cluster centers}
 \usage{
-TestOutliers(fsom, mad_allowed = 4, fsom_reference = NULL,
-  plot = FALSE, img_file = "testOutliers.pdf")
+TestOutliers(
+  fsom,
+  mad_allowed = 4,
+  fsom_reference = NULL,
+  plot = FALSE,
+  img_file = "testOutliers.pdf"
+)
 }
 \arguments{
 \item{fsom}{FlowSOM object}
