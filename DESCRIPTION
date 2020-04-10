@@ -11,7 +11,7 @@ Authors@R: c(person("Sofie", "Van Gassen", role = c("aut", "cre"),
 Author: Sofie Van Gassen, Britt Callebaut and Yvan Saeys
 Maintainer: Sofie Van Gassen <sofie.vangassen@ugent.be>
 Depends:
-    R (>= 3.2),
+    R (>= 4.0),
     igraph
 Imports:
     stats,
