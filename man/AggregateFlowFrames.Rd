@@ -7,6 +7,7 @@
 AggregateFlowFrames(
   fileNames,
   cTotal,
+  channels = NULL,
   writeOutput = FALSE,
   outputFile = "aggregate.fcs",
   writeMeta = FALSE,
@@ -21,9 +22,13 @@ to aggregate}
 
 \item{cTotal}{Total number of cells to write to the output file}
 
-\item{writeOutput}{Whether to write the resulting flowframe to a file}
+\item{channels}{Channels to keep in the aggregate. Default NULL takes all
+channels of the first file.}
 
-\item{outputFile}{Full path to output file}
+\item{writeOutput}{Whether to write the resulting flowframe to a file. 
+Default FALSE}
+
+\item{outputFile}{Full path to output file. Default "aggregate.fcs"}
 
 \item{writeMeta}{If TRUE, files with the indices of the selected cells are
 generated}

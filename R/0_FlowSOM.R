@@ -159,8 +159,11 @@ FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
 #' @param fileNames   Character vector containing full paths to the fcs files
 #'                    to aggregate
 #' @param cTotal      Total number of cells to write to the output file
-#' @param writeOutput Whether to write the resulting flowframe to a file
-#' @param outputFile  Full path to output file
+#' @param channels    Channels to keep in the aggregate. Default NULL takes all
+#'                    channels of the first file.
+#' @param writeOutput Whether to write the resulting flowframe to a file. 
+#'                    Default FALSE
+#' @param outputFile  Full path to output file. Default "aggregate.fcs"
 #' @param writeMeta   If TRUE, files with the indices of the selected cells are
 #'                    generated
 #' @param keepOrder If TRUE, the random subsample will be ordered in the same
@@ -183,6 +186,7 @@ FlowSOM <- function(input, pattern=".fcs", compensate=FALSE, spillover=NULL,
 #' 
 #' @export
 AggregateFlowFrames <- function(fileNames, cTotal,
+                                channels = NULL,
                                 writeOutput = FALSE, outputFile  = "aggregate.fcs", 
                                 writeMeta = FALSE, keepOrder = FALSE, 
                                 verbose = FALSE,
@@ -219,7 +223,11 @@ AggregateFlowFrames <- function(fileNames, cTotal,
     }
     f <- flowCore::fr_append_cols(f[c,],m)
     if(is.null(flowFrame)){
-      flowFrame <- f
+      if(is.null(channels)){
+        flowFrame <- f
+      } else {
+        flowFrame <- f[, c(channels, colnames(m))]
+      }
       flowFrame@description$`$FIL` <- gsub(".*/","",outputFile)
       flowFrame@description$`FILENAME` <- gsub(".*/","",outputFile)
     }
@@ -347,6 +355,8 @@ GetFlowJoLabels <- function(files,
   if (length(files) == 1){
     result <- result[[1]]
   }
+  
+  flowWorkspace::gs_cleanup_temp(gates)
   
   return(result)
 }
