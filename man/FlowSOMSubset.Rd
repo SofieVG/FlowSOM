@@ -2,7 +2,7 @@
 % Please edit documentation in R/3_buildMST.R
 \name{FlowSOMSubset}
 \alias{FlowSOMSubset}
-\title{FlowSOM subset}
+\title{FlowSOMSubset}
 \usage{
 FlowSOMSubset(fsom, ids)
 }
@@ -16,27 +16,30 @@ FlowSOM object containg updated data and medianvalues,
    but with the same grid
 }
 \description{
+FlowSOM subset
+}
+\details{
 Take a subset from a FlowSOM object
 }
 \examples{
    # Read two files (Artificially, as we just split 1 file in 2 subsets)
-   fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-   ff1 <- flowCore::read.FCS(fileName)[1:1000,]
-   ff1@description$FIL <- "File1"
-   ff2 <- flowCore::read.FCS(fileName)[1001:2000,]
-   ff2@description$FIL <- "File2"
+   fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+   ff1 <- flowCore::read.FCS(fileName)[1:1000, ]
+   flowCore::keyword(ff1)[["FIL"]] <- "File1"
+   ff2 <- flowCore::read.FCS(fileName)[1001:2000, ]
+   flowCore::keyword(ff2)[["FIL"]] <- "File2"
    
-   flowSOM.res <- FlowSOM(flowCore::flowSet(c(ff1,ff2)), compensate=TRUE,
-                          transform=TRUE, scale=TRUE,
-                          colsToUse=c(9,12,14:18), maxMeta=10)
-   fSOM <- flowSOM.res[[1]]
+   flowSOM.res <- FlowSOM(flowCore::flowSet(c(ff1, ff2)), compensate = TRUE,
+                          transform = TRUE, scale = TRUE,
+                          colsToUse = c(9, 12, 14:18), maxMeta = 10)
    
    # see $metadata for subsets:
-   fSOM$metaData
+   flowSOM.res$metaData
    
    # Use only the second file, without changing the map
-   fSOM2 <- FlowSOMSubset(fSOM,
-                          (fSOM$metaData[[2]][1]):(fSOM$metaData[[2]][2]))
+   fSOM2 <- FlowSOMSubset(flowSOM.res,
+                          (flowSOM.res$metaData[[2]][1]):
+                           (flowSOM.res$metaData[[2]][2]))
 
 }
 \seealso{

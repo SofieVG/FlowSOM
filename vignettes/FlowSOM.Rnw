@@ -56,6 +56,29 @@ automatic clustering results.
 # BiocManager::install("FlowSOM")
 @
 
+\section{Preprocessing}
+FlowSOM handles different inputs, such as a flowFrame, a flowSet or an array of 
+filepaths. For this purpose we will make use of a flowFrame. This allows
+easier preprocessing. We start with compensating the data and then we transform 
+the data with a logicle data. For CyTOF data an arcsinh transformation is 
+preferred which is also found in the \Biocpkg{flowCore} package. Besides 
+compensation and transformation, we also recommend cleaning the data by removing
+margin events and by using cleaning algorithms.
+
+<<>>=
+fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+ff <- flowCore::read.FCS(fileName)
+
+# Compensation
+comp <- flowCore::keyword(ff)[["SPILL"]]
+ff <- flowWorkspace::compensate(ff, comp)
+
+# Transformation
+transformList <- flowCore::estimateLogicle(ff, channels = colnames(comp))
+ff <- flowWorkspace::transform(ff, transformList)
+@
+
+
 \section{The easy way}
 The easiest way to use this package is using the wrapper function 
 \Rfunction{FlowSOM}. It has less options than using the separate functions, 
@@ -67,18 +90,17 @@ package) and the second item is the result of the metaclustering.
 set.seed(42)
 library(FlowSOM)
 
-fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-fSOM <- FlowSOM(fileName,
+fSOM <- FlowSOM(ff,
                 # Input options:
-                compensate = TRUE, transform = TRUE, toTransform=c(8:18),
-                scale = TRUE,
+                compensate = FALSE, 
+                transform = FALSE,
+                scale = FALSE,
                 # SOM options:
-                colsToUse = c(9,12,14:18), xdim = 7, ydim = 7,
+                colsToUse = c(9, 12, 14:18), xdim = 7, ydim = 7,
                 # Metaclustering options:
                 nClus = 10)
 
-PlotStars(fSOM[[1]],
-            backgroundValues = as.factor(fSOM[[2]]))
+PlotStars(fSOM, backgroundValues = fSOM$metaclustering)
 @
 
 
@@ -116,9 +138,9 @@ set.seed(42)
 library(flowCore)
 library(FlowSOM)
 
-fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
 fSOM <- ReadInput(fileName, compensate = TRUE, transform = TRUE, 
-                    toTransform=c(8:18), scale = TRUE)
+                    toTransform = c(8:18), scale = TRUE)
 
 ff <- suppressWarnings(flowCore::read.FCS(fileName))
 fSOM <- ReadInput(ff, compensate = TRUE, transform = TRUE, scale = TRUE)
@@ -152,7 +174,7 @@ return a FlowSOM object with all information about the self organizing map
 added in the \Rcode{\$map} parameter of the FlowSOM object.
 \medskip{}
 <<>>=
-fSOM <- BuildSOM(fSOM, colsToUse = c(9,12,14:18))
+fSOM <- BuildSOM(fSOM, colsToUse = c(9, 12, 14:18))
 str(fSOM$map, max.level = 2)
 @
 
@@ -164,40 +186,42 @@ the \Rcode{\$MST} parameter.
 
 \medskip{}
 <<>>=
-fSOM <- BuildMST(fSOM, tSNE=TRUE)
+fSOM <- BuildMST(fSOM, tSNE = TRUE)
 str(fSOM$MST)
 @
 
 Once this step is finished, the FlowSOM object can be used for visualization.
 You can plot the nodes in several layouts ("MST": Minimal spanning tree
-(default),"grid": SOM grid, "tSNE": alternative layout, only possible when 
-tSNE was TRUE in \Rcode{BuildMST})
+(default),"grid": SOM grid, "matrix": alternative layout. You can make use of 
+\code{PlotFlowSOM} or you can use the \code{PlotStars} function. 
 \medskip{}
 <<fig=TRUE>>=
 PlotStars(fSOM)
+# PlotFlowSOM(fSOM)
 @
 <<fig=TRUE>>=
-PlotStars(fSOM, view="grid")
+PlotStars(fSOM, view = "grid")
+# PlotFlowSOM(fsom, view = "grid")
 @
 <<fig=TRUE>>=
-PlotStars(fSOM, view="tSNE")
+set.seed(1)
+PlotStars(fSOM, view = fSOM$MST$l2, maxNodeSize = 0.3)
+# PlotFlowSOM(fSOM, view = fSOM$MST$l2, maxNodeSize = 0.3)
 @
 
 If you do not want the size to depend on the number of cells assigned to a 
-node, you can reset the node size. This can be used in combination with any of
-the plotting functions.
+node, you can use the parameter \code{equalNodeSize = T} in every plotting
+function.
 <<fig=TRUE>>=
-fSOM <- UpdateNodeSize(fSOM, maxNodeSize = 8, reset=TRUE)
-PlotStars(fSOM)
-fSOM <- UpdateNodeSize(fSOM)
+PlotStars(fSOM, equalNodeSize = TRUE)
+# PlotFlowSOM(fSOM, equalNodeSize = TRUE)
 @
 
 
 It might also be interesting to compare with a manual gating. The 
 \Rcode{cellTypes} can be any factor which has a value for each individual
 cell, so you can also map other clustering results.
-<<>>=
-#fig=TRUE
+<<fig=TRUE>>=
 wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
 
 # Specify the cell types of interest for assigning one label per cell
@@ -206,12 +230,13 @@ cell_types <- c("B cells",
                 "NK cells","NK T cells")
 
 # Parse the FlowJo workspace
-#gatingResult <- GetFlowJoLabels(fileName, 
-#                                wsp_file,
-#                                cell_types = cell_types)
+gatingResult <- GetFlowJoLabels(fileName, 
+                                wsp_file,
+                                cell_types = cell_types)
 
 
-#PlotPies(fSOM, cellTypes=gatingResult$manual)
+PlotPies(fSOM, cellTypes = gatingResult$manual)
+# PlotFlowSOM(fSOM, type = "pies", metadata = gatingResult$manual)
 @
 
 If you are interested in one specific marker, you can use the 
@@ -219,17 +244,24 @@ If you are interested in one specific marker, you can use the
 
 <<fig=TRUE>>=
 print(colnames(fSOM$map$medianValues))
-PlotMarker(fSOM,"Pacific Blue-A")
+PlotMarker(fSOM, "Pacific Blue-A")
+# PlotFlowSOM(fSOM, type = "marker", metadata = "Pacific Blue-A", 
+#             title = "Pacific Blue-A")
+
 @
 
 If you need to refer to the nodes, it might be useful to number them.
 <<fig=TRUE>>=
-PlotNumbers(UpdateNodeSize(fSOM,reset=TRUE, maxNodeSize = 0))
+PlotNumbers(fSOM)
+
+# PlotFlowSOM(fSOM, type = "labels", metadata = seq_len(fSOM$FlowSOM$map$nNodes), 
+#             equalNodeSize = T)
+
 @
 
 You can use this number for a 2D scatter plot indicating the node values.
 <<fig=TRUE>>=
-PlotClusters2D(fSOM,"PE-Texas Red-A","Pacific Blue-A",c(81,82,91,92,93))
+PlotClusters2D(fSOM, "PE-Texas Red-A", "Pacific Blue-A", c(81, 82, 91, 92, 93))
 @
 
 
@@ -243,11 +275,10 @@ If you have background knowledge about the number of cell types you are
 looking for, it might be optimal to provide this number to the algorithm.
 
 <<fig=TRUE>>=
-metaClustering <- metaClustering_consensus(fSOM$map$codes,k=7)
-#PlotPies(fSOM,cellTypes=gatingResult$manual,
-#        backgroundValues = as.factor(metaClustering))
-PlotLabels(UpdateNodeSize(fSOM,reset=TRUE, maxNodeSize = 0),
-           metaClustering)
+metaClustering <- as.character(metaClustering_consensus(fSOM$map$codes,k = 7))
+PlotPies(fSOM,cellTypes=gatingResult$manual,
+        backgroundValues = metaClustering)
+PlotLabels(fSOM, labels = metaClustering)
 @
 
 You can also extract the meta-clustering for each cell individually
@@ -267,58 +298,94 @@ corresponds to your expectations.
 query <- c("PE-Cy7-A" = "high", #CD3
             "APC-Cy7-A" = "high", #TCRb
             "Pacific Blue-A" = "high") #CD8
-query_res <- QueryStarPlot(UpdateNodeSize(fSOM,reset=TRUE), query, 
-                            plot = FALSE)
+query_res <- QueryStarPlot(fSOM, query, equalNodeSize = TRUE, plot = FALSE)
 
-cellTypes <- factor(rep("Unknown",49),levels=c("Unknown","CD8 T cells"))
+cellTypes <- factor(rep("Unknown", fSOM$map$nNodes), 
+                    levels=c("Unknown", "CD8 T cells"))
 cellTypes[query_res$selected] <- "CD8 T cells"
-PlotStars(fSOM,
-            backgroundValues=cellTypes,
-            backgroundColor=c("#FFFFFF00","#0000FF22"))
+PlotStars(fSOM, backgroundValues=cellTypes, 
+          backgroundColor=c("#FFFFFF00","#0000FF"))
 @
 
 \section{Comparing different groups}
-It is possible to compare between groups with the FlowSOM package as well. The tree should be build on either a concatenation of all files, or a representative subset of all cell types. Then a list identifying which files belong to specific groups should be defined, and the differences will be computed. For a smaller number of samples, you can look at the fold change between the groups. For coloring, a treshold is used. A treshold of 0.50 means the difference should be at least 50\% of the max of both groups, which corresponds with a 2-fold change. The higher the threshold, the stricter, a threshold of 0 will colour each node. For a larger number of samples you can also use a wilcox test. This will be selected when a value is provided for the p\_tresh parameter.
+It is possible to compare between groups with the FlowSOM package as well. The tree should be build on either a concatenation of all files, or a representative subset of all cell types. Then a list identifying which files belong to specific groups should be defined, and the differences will be computed. For a smaller number of samples, you can look at the fold change between the groups. For coloring, a treshold is used. A treshold of 0.50 means the difference should be at least 50\% of the max of both groups, which corresponds with a 2-fold change. The higher the threshold, the stricter, a threshold of 0 will colour each node. For a larger number of samples you can also use a wilcox test. This will be selected when a value is provided for the p\_thresh parameter.
 
 <<>>=
 #fig=TRUE>>=
 library(FlowSOM)
 set.seed(1)
 
-# Build the FlowSOM tree on the example file
-fileName <-  system.file("extdata", "68983.fcs", package="FlowSOM")
-flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
-scale = TRUE, colsToUse = c(9,12,14:18), nClus = 10)
+# Build FlowSom result
+ fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+ ff <- flowCore::read.FCS(fileName)
+ ff <- flowCore::compensate(ff, ff@description$SPILL)
+ ff <- flowCore::transform(ff,
+           flowCore::transformList(colnames(ff@description$SPILL),
+                                     flowCore::logicleTransform()))
+ flowSOM.res <- FlowSOM(ff, scale = TRUE, colsToUse = c(9, 12, 14:18),
+                          nClus = 10)
+   
+# Create new data
+# To illustrate the output, we here generate new fcs files (with more 
+# cells in metaclusters 1 and 9).
+# In practice you would not generate any new file but use your different
+# files from your different groups
+ flowCore::write.FCS(ff[sample(1:nrow(ff), 1000), ], file = "ff_tmp1.fcs")                    
+ flowCore::write.FCS(ff[sample(1:nrow(ff), 1000), ], file = "ff_tmp2.fcs")                    
+ flowCore::write.FCS(ff[sample(1:nrow(ff), 1000), ], file = "ff_tmp3.fcs")                    
+ ff_tmp <- ff[c(1:1000,
+                which(flowSOM.res$map$mapping[, 1] %in% 
+                     which(flowSOM.res$metaclustering == 9)),
+                which(flowSOM.res$map$mapping[, 1] %in% 
+                     which(flowSOM.res$metaclustering == 1))), ]
+ flowCore::write.FCS(ff_tmp[sample(1:nrow(ff_tmp), 1000), ], file = "ff_tmp4.fcs")
+ flowCore::write.FCS(ff_tmp[sample(1:nrow(ff_tmp), 1000), ], file = "ff_tmp5.fcs")
+ 
+# Get the count matrix
+ percentages <- GetFeatures(fsom = flowSOM.res, 
+                            files = c("ff_tmp1.fcs", "ff_tmp2.fcs", "ff_tmp3.fcs",
+                                      "ff_tmp4.fcs", "ff_tmp5.fcs"), 
+                            type = "percentages")
+  
+# Perform the statistics
+groups <- list("Group 1" = c("ff_tmp1.fcs", "ff_tmp2.fcs", "ff_tmp3.fcs"), 
+               "Group 2" = c("ff_tmp4.fcs", "ff_tmp5.fcs"))
+MC_stats <- GroupStats(percentages[["metacluster_percentages"]], groups)
+C_stats <- GroupStats(percentages[["cluster_percentages"]], groups)
 
-# Have a look at the resulting tree
-# PlotStars(flowSOM.res[[1]],backgroundValues = as.factor(flowSOM.res[[2]]))
+# Process the fold changes vector
+fold_changes <- C_stats["fold changes", ]
+fold_changes <- factor(ifelse(fold_changes < -3, "Underrepresented compared to Group 1",
+                       ifelse(fold_changes > 3, "Overrepresented compared to Group 1",
+                       "--")), levels = c("--", "Underrepresented compared to Group 1",
+                       "Overrepresented compared to Group 1"))
+fold_changes[is.na(fold_changes)] <- "--"
 
-# Select all cells except the branch that corresponds with automated
-# cluster 7 (CD3+ TCRyd +) and write te another file for the example
-# In practice you would not generate any new file but 
-# use your different files from your different groups
-ff <- flowCore::read.FCS(fileName)
-selection_1 <- which(GetClusters(flowSOM.res) %in% which(flowSOM.res$metaclustering != 7))
-ff_tmp <- ff[selection_1,]
-flowCore::write.FCS(ff_tmp,file="ff_tmp.fcs")
-# Make an additional file without cluster 7 and double amount of cluster 5
-selection_2 <- c(which(GetClusters(flowSOM.res) %in% which(flowSOM.res$metaclustering != 7)),
-                 which(GetClusters(flowSOM.res) %in% which(flowSOM.res$metaclustering == 5)))
-ff_tmp <- ff[selection_2,]
-flowCore::write.FCS(ff_tmp, file="ff_tmp2.fcs")
+# Show in figure
+## Fold change
+gr_1 <- PlotStars(flowSOM.res, title = "Group 1", 
+                  nodeSizes = C_stats["medians Group 1", ], 
+                  list_insteadof_ggarrange = FALSE)
+gr_2 <- PlotStars(flowSOM.res, title = "Group 2", 
+                  nodeSizes = C_stats["medians Group 2", ], 
+                  backgroundValues = fold_changes,
+                  backgroundColors = c("white", "red", "blue"), 
+                  list_insteadof_ggarrange = FALSE)
+p <- ggpubr::ggarrange(plotlist = c(list(gr_1$tree), gr_2), heights = c(3, 1))
 
-# Compare the original file with the two new files we made
-groupRes <- CountGroups(flowSOM.res[[1]], 
-                        groups=list("AllCells" = c(fileName),
-                                    "Without_ydTcells" = c("ff_tmp.fcs",
-                                                           "ff_tmp2.fcs")))
-# PlotGroups(flowSOM.res[[1]], groupRes)
+## p values
+p <- PlotVariable(flowSOM.res, title = "Wilcox test group 1 vs. group 2",
+variable <- C_stats["p values", ])
+variable
 
-# Compare only the file with the double amount of cluster 10
-groupRes <- CountGroups(flowSOM.res$FlowSOM, 
-                        groups = list("AllCells" = c(fileName),
-                                      "Without_ydTcells" = c("ff_tmp2.fcs")))
-PlotGroups(flowSOM.res$FlowSOM, groupRes, p_tresh = NULL, tresh = 2)
+## volcano plot
+p <- ggplot2::ggplot(data.frame("-log10 p values" = c(C_stats[4, ], MC_stats[4, ]), 
+                                "log10 fold changes" = c(C_stats[7, ], MC_stats[7, ]), 
+check.names = FALSE), ggplot2::aes(x = `log10 fold changes`, y = `-log10 p values`)) +
+ggplot2::xlim(-3, 3) +
+ggplot2::ylim(0, 3) +
+ggplot2::geom_point() 
+
 @
 
 \section{Summary}

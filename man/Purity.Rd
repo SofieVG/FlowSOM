@@ -23,9 +23,9 @@ Calculate mean weighted cluster purity
 }
 \examples{
 # Generate some random data as an example
-realClusters <- sample(1:5,100,replace = TRUE)
+realClusters <- sample(1:5, 100, replace = TRUE)
 predictedClusters <- sample(1:6, 100, replace = TRUE)
 
 # Calculate the FMeasure
-Purity(realClusters,predictedClusters)
+Purity(realClusters, predictedClusters)
 }

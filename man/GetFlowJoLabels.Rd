@@ -6,24 +6,24 @@
 \usage{
 GetFlowJoLabels(
   files,
-  wsp_file,
+  wspFile,
   group = "All Samples",
-  cell_types = NULL,
-  get_data = FALSE,
+  cellTypes = NULL,
+  getData = FALSE,
   ...
 )
 }
 \arguments{
 \item{files}{The fcs files of interest}
 
-\item{wsp_file}{The FlowJo wsp file to read}
+\item{wspFile}{The FlowJo wsp file to read}
 
 \item{group}{The FlowJo group to parse. Default "All Samples".}
 
-\item{cell_types}{Cell types to use for final labeling the cells. Should
+\item{cellTypes}{Cell types to use for final labeling the cells. Should
 correspond with a subset of the gate names in FlowJo.}
 
-\item{get_data}{If true, flowframes are returned as well.}
+\item{getData}{If true, flowframes are returned as well.}
 
 \item{...}{Extra arguments to pass to CytoML::flowjo_to_gatingset}
 }
@@ -43,29 +43,29 @@ a label for each cell from a set of specified gates
 
 # Identify the files
 fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
-wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
+wspFile <- system.file("extdata", "gating.wsp", package = "FlowSOM")
 
 # Specify the cell types of interest for assigning one label per cell
-cell_types <- c("B cells",
+cellTypes <- c("B cells",
                 "gd T cells", "CD4 T cells", "CD8 T cells",
-                "NK cells","NK T cells")
+                "NK cells", "NK T cells")
 
 # Parse the FlowJo workspace   
-gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
-                                cell_types = cell_types,
-                                get_data = TRUE)
+gatingResult <- GetFlowJoLabels(fcs_file, wspFile,
+                                cellTypes = cellTypes,
+                                getData = TRUE)
 
 # Check the number of cells assigned to each gate
 colSums(gatingResult$matrix)
 
 # Build a FlowSOM tree
 flowSOM.res <- FlowSOM(gatingResult$flowFrame,
-                       colsToUse = c(9,12,14:18),
+                       colsToUse = c(9, 12, 14:18),
                        nClus = 10,
                        seed = 1)
    
  # Plot pies indicating the percentage of cell types present in the nodes
- PlotPies(flowSOM.res$FlowSOM,
+ PlotPies(flowSOM.res,
           gatingResult$manual,
           backgroundValues = flowSOM.res$metaclustering)
 

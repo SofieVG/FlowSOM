@@ -2,7 +2,7 @@
 % Please edit documentation in R/3_buildMST.R
 \name{PlotOverview2D}
 \alias{PlotOverview2D}
-\title{Plot metaclusters on scatter plots}
+\title{PlotOverview2D}
 \usage{
 PlotOverview2D(fsom, markerlist, metaclusters, colors = NULL, ff, ...)
 }
@@ -29,16 +29,22 @@ Nothing is returned, but a plot is drawn for every markerpair and
         center of each FlowSOM cluster is indicated with a blue cross.
 }
 \description{
+Plot metaclusters on scatter plots
+}
+\details{
 Write multiple 2D scatter plots to a png file. 
 All cells of fsom$data are plotted in black, and those of the selected 
 metaclusters are plotted in color.
 }
 \examples{
+
+   ## Deprecated - use Plot2DScatter instead ##
+
    # Read from file, build self-organizing map and minimal spanning tree
-   fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+   fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
    flowSOM.res <- FlowSOM(fileName, 
-                          compensate=TRUE, transform=TRUE, scale=TRUE,
-                          colsToUse=c(9,12,14:18),
+                          compensate = TRUE, transform = TRUE, scale = TRUE,
+                          colsToUse = c(9, 12, 14:18),
                           nClus = 10,
                           seed = 1)
                           
@@ -51,15 +57,17 @@ metaclusters are plotted in color.
    
    # Recommended to write to png
    
-   png("Markeroverview.png",
-       width = 500 * length(markers_of_interest),
-       height = 500 * length(metaclusters_of_interest))
-   PlotOverview2D(flowSOM.res,
-                  markerlist = markers_of_interest,
-                  metaclusters = metaclusters_of_interest,
-                  pchCluster = 19,
-                  ff = flowCore::read.FCS(fileName))
-   dev.off()
+   \dontrun{
+     png("Markeroverview.png",
+         width = 500 * length(markers_of_interest),
+         height = 500 * length(metaclusters_of_interest))
+     PlotOverview2D(flowSOM.res,
+                    markerlist = markers_of_interest,
+                    metaclusters = metaclusters_of_interest,
+                    pchCluster = 19,
+                    ff = flowCore::read.FCS(fileName))
+     dev.off()
+   }
 
 }
 \seealso{

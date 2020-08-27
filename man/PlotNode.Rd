@@ -2,7 +2,7 @@
 % Please edit documentation in R/3_buildMST.R
 \name{PlotNode}
 \alias{PlotNode}
-\title{Plot star chart}
+\title{PlotNode}
 \usage{
 PlotNode(
   fsom,
@@ -32,19 +32,23 @@ Nothing is returned. A plot is drawn in which the node is
 represented by a star chart indicating the median fluorescence intensities.
 }
 \description{
+Plot star chart
+}
+\details{
 Plot a star chart indicating median marker values of a single node
 }
 \examples{
    # Read from file, build self-organizing map and minimal spanning tree
-   fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-   flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-                            scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
+   fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+   flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
+                          scale = TRUE, colsToUse = c(9, 12, 14:18), 
+                          nClus = 10)
    
    # Plot stars indicating the MFI of the cells present in the nodes
-   PlotNode(flowSOM.res$FlowSOM,1)
+   PlotNode(flowSOM.res, 1)
 
 }
 \seealso{
-\code{\link{PlotStars}},\code{\link{PlotNumbers}},
+\code{\link{PlotStars}}, \code{\link{PlotNumbers}},
  \code{\link{FlowSOM}}
 }

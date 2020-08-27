@@ -2,7 +2,7 @@
 % Please edit documentation in R/3_buildMST.R
 \name{BuildMST}
 \alias{BuildMST}
-\title{Build Minimal Spanning Tree}
+\title{BuildMST}
 \usage{
 BuildMST(fsom, silent = FALSE, tSNE = FALSE)
 }
@@ -17,14 +17,17 @@ BuildMST(fsom, silent = FALSE, tSNE = FALSE)
 FlowSOM object containing MST description
 }
 \description{
+Build Minimal Spanning Tree
+}
+\details{
 Add minimal spanning tree description to the FlowSOM object
 }
 \examples{
 # Read from file, build self-organizing map
 fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
-                         scale=TRUE)
-flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
+flowSOM.res <- ReadInput(fileName, compensate=TRUE, transform = TRUE,
+                         scale = TRUE)
+flowSOM.res <- BuildSOM(flowSOM.res, colsToUse = c(9, 12, 14:18))
 
 # Build the Minimal Spanning Tree
 flowSOM.res <- BuildMST(flowSOM.res)

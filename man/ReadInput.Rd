@@ -12,6 +12,7 @@ ReadInput(
   transform = FALSE,
   toTransform = NULL,
   transformFunction = flowCore::logicleTransform(),
+  transformList = NULL,
   scale = FALSE,
   scaled.center = TRUE,
   scaled.scale = TRUE,
@@ -28,16 +29,19 @@ select only files containing pattern}
 \item{compensate}{logical, does the data need to be compensated}
 
 \item{spillover}{spillover matrix to compensate with
-If \code{NULL} and compensate=\code{TRUE}, we will
+If \code{NULL} and compensate = \code{TRUE}, we will
 look for \code{$SPILL} description in fcs file.}
 
 \item{transform}{logical, does the data need to be transformed}
 
 \item{toTransform}{column names or indices that need to be transformed.
-If \code{NULL} and transform=\code{TRUE}, column names
+Will be ignored if \code{transformList} is given.
+If \code{NULL} and transform = \code{TRUE}, column names
 of \code{$SPILL} description in fcs file will be used.}
 
 \item{transformFunction}{Defaults to logicleTransform()}
+
+\item{transformList}{transformList to apply on the samples.}
 
 \item{scale}{logical, does the data needs to be rescaled}
 
@@ -57,30 +61,30 @@ the preprocessed data (compensated, transformed, scaled)
 }
 \examples{
 # Read from file
-fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
-                         scale=TRUE)
+fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+flowSOM.res <- ReadInput(fileName, compensate = TRUE, transform = TRUE,
+                         scale = TRUE)
 
 # Or read from flowFrame object
 ff <- flowCore::read.FCS(fileName)
-ff <- flowCore::compensate(ff,ff@description$SPILL)
+ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
 ff <- flowCore::transform(ff,
-                 flowCore::transformList(colnames(ff@description$SPILL),
-                                 flowCore::logicleTransform()))
-flowSOM.res <- ReadInput(ff,scale=TRUE)
+         flowCore::transformList(colnames(flowCore::keyword(ff)[["SPILL"]]),
+                                flowCore::logicleTransform()))
+flowSOM.res <- ReadInput(ff, scale = TRUE)
 
 # Build the self-organizing map and the minimal spanning tree
-flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
+flowSOM.res <- BuildSOM(flowSOM.res, colsToUse = c(9, 12, 14:18))
 flowSOM.res <- BuildMST(flowSOM.res)
 
 # Apply metaclustering
 metacl <- MetaClustering(flowSOM.res$map$codes,
-                         "metaClustering_consensus",max=10)
+                         "metaClustering_consensus", max = 10)
 
 # Get metaclustering per cell
-flowSOM.clustering <- metacl[flowSOM.res$map$mapping[,1]]    
+flowSOM.clustering <- metacl[flowSOM.res$map$mapping[, 1]]    
  
 }
 \seealso{
-\code{\link{scale}},\code{\link{BuildSOM}}
+\code{\link{scale}}, \code{\link{BuildSOM}}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/3_buildMST.R
 \name{PlotCenters}
 \alias{PlotCenters}
-\title{Plot cluster centers on a 2D plot}
+\title{PlotCenters}
 \usage{
 PlotCenters(fsom, marker1, marker2, MST = TRUE)
 }
@@ -20,22 +20,25 @@ Nothing is returned. A 2D scatter plot is drawn on which the nodes
         of the grid are indicated
 }
 \description{
+Plot cluster centers on a 2D plot
+}
+\details{
 Plot FlowSOM nodes on a 2D scatter plot of the data
 }
 \examples{
    # Read from file, build self-organizing map and minimal spanning tree
-   fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-   flowSOM.res <- ReadInput(fileName, compensate=TRUE,transform=TRUE,
-                            scale=TRUE)
-   flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
+   fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+   flowSOM.res <- ReadInput(fileName, compensate = TRUE, transform = TRUE,
+                            scale = TRUE)
+   flowSOM.res <- BuildSOM(flowSOM.res, colsToUse = c(9, 12, 14:18))
    flowSOM.res <- BuildMST(flowSOM.res)
    
    # Plot centers
-   PlotCenters(flowSOM.res,"FSC-A","SSC-A")
-   PlotCenters(flowSOM.res,2,5)
+   PlotCenters(flowSOM.res, "FSC-A", "SSC-A")
+   PlotCenters(flowSOM.res, 2, 5)
 
 }
 \seealso{
-\code{\link{PlotStars}},\code{\link{PlotPies}},
-         \code{\link{PlotMarker}},\code{\link{BuildMST}}
+\code{\link{PlotStars}}, \code{\link{PlotPies}},
+         \code{\link{PlotMarker}}, \code{\link{BuildMST}}
 }

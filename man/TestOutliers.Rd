@@ -2,42 +2,37 @@
 % Please edit documentation in R/3_buildMST.R
 \name{TestOutliers}
 \alias{TestOutliers}
-\title{Test if any cells are too far from their cluster centers}
+\title{TestOutliers}
 \usage{
-TestOutliers(
-  fsom,
-  mad_allowed = 4,
-  fsom_reference = NULL,
-  plot = FALSE,
-  img_file = "testOutliers.pdf"
-)
+TestOutliers(fsom, madAllowed = 4, fsomReference = NULL, plotFile = NULL)
 }
 \arguments{
 \item{fsom}{FlowSOM object}
 
-\item{mad_allowed}{Number of median absolute deviations allowed. Default = 4.}
+\item{madAllowed}{Number of median absolute deviations allowed. Default = 4.}
 
-\item{fsom_reference}{FlowSOM object to use as reference. If NULL (default),
+\item{fsomReference}{FlowSOM object to use as reference. If NULL (default),
 the original fsom object is used.}
 
-\item{plot}{Should a plot be generated showing the distribution of the
-distances. Default is FALSE.}
-
-\item{img_file}{If plot is TRUE, the output will be written to this file.
-Default is "testOutliers.pdf"}
+\item{plotFile}{If \code{NULL} (default), no plot will be created. If a 
+filepath is given for a pdf, the plot will be written in the
+corresponding file}
 }
 \value{
 A new FlowSOM object
 }
 \description{
+Test if any cells are too far from their cluster centers
+}
+\details{
 For every cluster, the distance from the cells to the cluster centers is
 used to label cells which deviate too far as outliers. The threshold is
-chosen as the median distance + \code{mad_allowed} times the median absolute
+chosen as the median distance + \code{madAllowed} times the median absolute
 deviation of the distances.
 }
 \examples{
  # Build FlowSom result
- fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+ fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
  ff <- flowCore::read.FCS(fileName)
  flowSOM.res <- FlowSOM(ff,
                         compensate = TRUE, transform = TRUE, scale = TRUE,
@@ -46,7 +41,7 @@ deviation of the distances.
    
  # Map new data
  outlier_report <- TestOutliers(flowSOM.res)
-
+ 
 }
 \seealso{
 \code{\link{FlowSOMSubset}} if you want to get a subset of the
