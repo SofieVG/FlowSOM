@@ -2315,6 +2315,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
     
     #----Median expression per metacluster----
     colnames(mfis) <- fsom$prettyColnames[colnames(mfis)]
+    rownames(mfis) <- seq_len(nrow(mfis))
     plotList[["empty"]] <- ggplot2::ggplot() + ggplot2::theme_minimal()
     plotList[["p10"]] <- 
       pheatmap::pheatmap(mfis, scale = "column",
