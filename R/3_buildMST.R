@@ -144,11 +144,11 @@ PlotNode <- function(fsom, id,
                    cex = 0.5)
     
     graphics::lines(x = c(x[i]+c(-0.2, 0.2)[left[i]+1],
-                        c(1.5,-1.5)[left[i]+1],
-                        cos(angles[i])),
+                          c(1.5,-1.5)[left[i]+1],
+                          cos(angles[i])),
                     y = c(y[i],
-                        y[i],
-                        sin(angles[i])),
+                          y[i],
+                          sin(angles[i])),
                     col = colorPalette[i],
                     lwd = 2)    
   }
@@ -209,9 +209,9 @@ PlotClusters2D <- function(fsom, marker1, marker2, nodes,
                            xlab = fsom$prettyColnames[marker1],
                            ylab = fsom$prettyColnames[marker2],
                            xlim = c(min(fsom$data[, marker1]),
-                                  max(fsom$data[, marker1])),
+                                    max(fsom$data[, marker1])),
                            ylim = c(min(fsom$data[, marker2]),
-                                  max(fsom$data[, marker2])),
+                                    max(fsom$data[, marker2])),
                            ...){
   .Deprecated("Plot2DScatters")
   marker1 <- GetChannels(fsom, marker1)
@@ -659,16 +659,16 @@ TestOutliers <- function(fsom,
       if(length(values) > 1){
         nOutliers <- sum(values > thresholds[i])
         p <- suppressMessages(ggplot2::ggplot() +
-          ggplot2::geom_histogram(ggplot2::aes(values), fill = "grey90",
-                                  col = "black", size = 0.2) +
-          ggplot2::geom_vline(ggplot2::aes(xintercept = distances_median[i]),
-                              col = "black") +
-          ggplot2::geom_vline(ggplot2::aes(xintercept = thresholds[i]), 
-                              col = "red") +
-          ggplot2::ggtitle(paste0(i, " (", nOutliers, ")")) +
-          ggplot2::theme_minimal() +
-          ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
-          ggplot2::ylab("Frequency"))
+                                ggplot2::geom_histogram(ggplot2::aes(values), fill = "grey90",
+                                                        col = "black", size = 0.2) +
+                                ggplot2::geom_vline(ggplot2::aes(xintercept = distances_median[i]),
+                                                    col = "black") +
+                                ggplot2::geom_vline(ggplot2::aes(xintercept = thresholds[i]), 
+                                                    col = "red") +
+                                ggplot2::ggtitle(paste0(i, " (", nOutliers, ")")) +
+                                ggplot2::theme_minimal() +
+                                ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
+                                ggplot2::ylab("Frequency"))
         return(p)
       }
     })
@@ -688,7 +688,7 @@ TestOutliers <- function(fsom,
   
   return(result)
 }
- 
+
 #' NClusters
 #' 
 #' Extracts the number of clusters from a FlowSOM object

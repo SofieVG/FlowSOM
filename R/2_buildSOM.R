@@ -38,61 +38,61 @@
 #' 
 #' @export
 BuildSOM <- function(fsom, colsToUse = NULL, silent = FALSE, ...){
-    if(!"data" %in% names(fsom)){
-        stop("Please run the ReadInput function first!")
-    }
-    
-    if(!silent) message("Building SOM\n")
-    
-    if(is.null(colsToUse)){
-        colsToUse <- seq_len(ncol(fsom$data))
-    }
+  if(!"data" %in% names(fsom)){
+    stop("Please run the ReadInput function first!")
+  }
   
-    colsToUse <- GetChannels(fsom, colsToUse)
-    
-    fsom$map <- SOM(fsom$data[, colsToUse], silent = silent, ...)
-    fsom$map$colsUsed <- colsToUse
-    fsom <- UpdateDerivedValues(fsom)
-    return(fsom)
+  if(!silent) message("Building SOM\n")
+  
+  if(is.null(colsToUse)){
+    colsToUse <- seq_len(ncol(fsom$data))
+  }
+  
+  colsToUse <- GetChannels(fsom, colsToUse)
+  
+  fsom$map <- SOM(fsom$data[, colsToUse], silent = silent, ...)
+  fsom$map$colsUsed <- colsToUse
+  fsom <- UpdateDerivedValues(fsom)
+  return(fsom)
 }
 
 UpdateDerivedValues <- function(fsom){
-    fsom$map$medianValues <-
-        t(sapply(seq_len(fsom$map$nNodes), function(i) {
-            apply(subset(fsom$data, fsom$map$mapping[, 1] == i), 
-                  2, 
-                  stats::median)
-        }))
-    fsom$map$medianValues[is.nan(fsom$map$medianValues)] <- NA 
-    colnames(fsom$map$medianValues) <- colnames(fsom$data)
-    
-    fsom$map$cvValues <-
-        t(sapply(seq_len(fsom$map$nNodes), function(i) {
-            apply(subset(fsom$data, fsom$map$mapping[, 1] == i),
-                  2,
-                  function(y){
-                      if(length(y) > 0 && mean(y) != 0){
-                          stats::sd(y)/mean(y)
-                      } else {
-                          NA
-                      }})
-        }))
-    fsom$map$cvValues[is.nan(fsom$map$cvValues)] <- NA 
-    colnames(fsom$map$medianValues) <- colnames(fsom$data)
-    
-    fsom$map$sdValues <-
-        t(sapply(seq_len(fsom$map$nNodes), function(i) {
-            apply(subset(fsom$data, fsom$map$mapping[, 1] == i), 2, stats::sd)
-        }))
-    fsom$map$sdValues[is.nan(fsom$map$sdValues)] <- 0 
-    colnames(fsom$map$sdValues) <- colnames(fsom$data)
-    
-    pctgs <- rep(0, fsom$map$nNodes)
-    names(pctgs) <- as.character(seq_len(fsom$map$nNodes))
-    pctgs_tmp <- table(fsom$map$mapping[, 1]) / nrow(fsom$map$mapping)
-    pctgs[names(pctgs_tmp)] <- pctgs_tmp
-    fsom$map$pctgs <- pctgs
-    return(fsom)
+  fsom$map$medianValues <-
+    t(sapply(seq_len(fsom$map$nNodes), function(i) {
+      apply(subset(fsom$data, fsom$map$mapping[, 1] == i), 
+            2, 
+            stats::median)
+    }))
+  fsom$map$medianValues[is.nan(fsom$map$medianValues)] <- NA 
+  colnames(fsom$map$medianValues) <- colnames(fsom$data)
+  
+  fsom$map$cvValues <-
+    t(sapply(seq_len(fsom$map$nNodes), function(i) {
+      apply(subset(fsom$data, fsom$map$mapping[, 1] == i),
+            2,
+            function(y){
+              if(length(y) > 0 && mean(y) != 0){
+                stats::sd(y)/mean(y)
+              } else {
+                NA
+              }})
+    }))
+  fsom$map$cvValues[is.nan(fsom$map$cvValues)] <- NA 
+  colnames(fsom$map$medianValues) <- colnames(fsom$data)
+  
+  fsom$map$sdValues <-
+    t(sapply(seq_len(fsom$map$nNodes), function(i) {
+      apply(subset(fsom$data, fsom$map$mapping[, 1] == i), 2, stats::sd)
+    }))
+  fsom$map$sdValues[is.nan(fsom$map$sdValues)] <- 0 
+  colnames(fsom$map$sdValues) <- colnames(fsom$data)
+  
+  pctgs <- rep(0, fsom$map$nNodes)
+  names(pctgs) <- as.character(seq_len(fsom$map$nNodes))
+  pctgs_tmp <- table(fsom$map$mapping[, 1]) / nrow(fsom$map$mapping)
+  pctgs[names(pctgs_tmp)] <- pctgs_tmp
+  fsom$map$pctgs <- pctgs
+  return(fsom)
 }
 
 #' Build a self-organizing map
@@ -130,70 +130,70 @@ SOM <- function (data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
                  init = FALSE, initf = Initialize_KWSP, distf = 2, 
                  silent = FALSE,
                  codes = NULL, importance = NULL){
-    if (!is.null(codes)){
-        if((ncol(codes) != ncol(data)) | (nrow(codes) != xdim * ydim)){
-            stop("If codes is not NULL, it should have the same number of 
+  if (!is.null(codes)){
+    if((ncol(codes) != ncol(data)) | (nrow(codes) != xdim * ydim)){
+      stop("If codes is not NULL, it should have the same number of 
              columns as the data and the number of rows should correspond with 
              xdim*ydim")
-        }
     }
-    
-    if(!is.null(importance)){
-        data <- data * rep(importance, each = nrow(data))
-    }
-    
-    # Initialize the grid
-    grid <- expand.grid(seq_len(xdim), seq_len(ydim))
-    nCodes <- nrow(grid)
-    if(is.null(codes)){
-        if(init){
-            codes <- initf(data, xdim, ydim)
-            message("Initialization ready\n")
-        } else {
-            codes <- data[sample(1:nrow(data), nCodes, replace = FALSE), , 
-                          drop = FALSE]
-        }
-    }
-    
-    # Initialize the neighbourhood
-    nhbrdist <- as.matrix(stats::dist(grid, method = "maximum"))
-    
-    # Initialize the radius
-    if(mst == 1){
-        radius <- list(radius)
-        alpha <- list(alpha)
+  }
+  
+  if(!is.null(importance)){
+    data <- data * rep(importance, each = nrow(data))
+  }
+  
+  # Initialize the grid
+  grid <- expand.grid(seq_len(xdim), seq_len(ydim))
+  nCodes <- nrow(grid)
+  if(is.null(codes)){
+    if(init){
+      codes <- initf(data, xdim, ydim)
+      message("Initialization ready\n")
     } else {
-        radius <- seq(radius[1], radius[2], length.out = mst+1)
-        radius <- lapply(1:mst, function(i){c(radius[i], radius[i+1])})
-        alpha <- seq(alpha[1], alpha[2], length.out = mst+1)
-        alpha <- lapply(1:mst, function(i){c(alpha[i], alpha[i+1])})
+      codes <- data[sample(1:nrow(data), nCodes, replace = FALSE), , 
+                    drop = FALSE]
     }
+  }
+  
+  # Initialize the neighbourhood
+  nhbrdist <- as.matrix(stats::dist(grid, method = "maximum"))
+  
+  # Initialize the radius
+  if(mst == 1){
+    radius <- list(radius)
+    alpha <- list(alpha)
+  } else {
+    radius <- seq(radius[1], radius[2], length.out = mst+1)
+    radius <- lapply(1:mst, function(i){c(radius[i], radius[i+1])})
+    alpha <- seq(alpha[1], alpha[2], length.out = mst+1)
+    alpha <- lapply(1:mst, function(i){c(alpha[i], alpha[i+1])})
+  }
+  
+  # Compute the SOM
+  for(i in seq_len(mst)){
+    res <- .C("C_SOM", data = as.double(data), 
+              codes = as.double(codes), 
+              nhbrdist = as.double(nhbrdist), 
+              alpha = as.double(alpha[[i]]), 
+              radius = as.double(radius[[i]]), 
+              xdists = double(nCodes), 
+              n = as.integer(nrow(data)), 
+              px = as.integer(ncol(data)), 
+              ncodes = as.integer(nCodes), 
+              rlen = as.integer(rlen), 
+              distf = as.integer(distf))
     
-    # Compute the SOM
-    for(i in seq_len(mst)){
-        res <- .C("C_SOM", data = as.double(data), 
-                  codes = as.double(codes), 
-                  nhbrdist = as.double(nhbrdist), 
-                  alpha = as.double(alpha[[i]]), 
-                  radius = as.double(radius[[i]]), 
-                  xdists = double(nCodes), 
-                  n = as.integer(nrow(data)), 
-                  px = as.integer(ncol(data)), 
-                  ncodes = as.integer(nCodes), 
-                  rlen = as.integer(rlen), 
-                  distf = as.integer(distf))
-        
-        codes <- matrix(res$codes, nrow(codes), ncol(codes))
-        colnames(codes) <- colnames(data)
-        nhbrdist <- Dist.MST(codes)
-    }
-    
-    if(!silent) message("Mapping data to SOM\n")
-    mapping <- MapDataToCodes(codes, data)
-    
-    return(list(xdim = xdim, ydim = ydim, rlen = rlen, mst = mst, alpha = alpha,
-         radius = radius, init = init, distf = distf,
-         grid = grid, codes = codes, mapping = mapping, nNodes = nCodes))
+    codes <- matrix(res$codes, nrow(codes), ncol(codes))
+    colnames(codes) <- colnames(data)
+    nhbrdist <- Dist.MST(codes)
+  }
+  
+  if(!silent) message("Mapping data to SOM\n")
+  mapping <- MapDataToCodes(codes, data)
+  
+  return(list(xdim = xdim, ydim = ydim, rlen = rlen, mst = mst, alpha = alpha,
+              radius = radius, init = init, distf = distf,
+              grid = grid, codes = codes, mapping = mapping, nNodes = nCodes))
 }
 
 
@@ -208,17 +208,17 @@ SOM <- function (data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
 #' @return Array with nearest node id for each datapoint
 #' 
 MapDataToCodes <- function (codes, newdata, distf = 2) {
-    
-    nnCodes <- .C("C_mapDataToCodes", 
-                  as.double(newdata[, colnames(codes)]), 
-                  as.double(codes),
-                  as.integer(nrow(codes)),
-                  as.integer(nrow(newdata)),
-                  as.integer(ncol(codes)),
-                  nnCodes = integer(nrow(newdata)),
-                  nnDists = double(nrow(newdata)), 
-                  distf = as.integer(distf))
-    return(cbind(nnCodes$nnCodes, nnCodes$nnDists))
+  
+  nnCodes <- .C("C_mapDataToCodes", 
+                as.double(newdata[, colnames(codes)]), 
+                as.double(codes),
+                as.integer(nrow(codes)),
+                as.integer(nrow(newdata)),
+                as.integer(ncol(codes)),
+                nnCodes = integer(nrow(newdata)),
+                nnDists = double(nrow(newdata)), 
+                distf = as.integer(distf))
+  return(cbind(nnCodes$nnCodes, nnCodes$nnDists))
 }
 
 #' Select k well spread points from X
@@ -235,22 +235,22 @@ MapDataToCodes <- function (codes, newdata, distf = 2) {
 #' 
 #' @export
 Initialize_KWSP <- function(X, xdim, ydim){
-    k <- xdim * ydim
-    
-    # Start with a random point
-    selected <- numeric(k)
-    selected[1] <- sample(1:nrow(X), 1)
-    dists <- apply(X, 1, function(x)sum((x - X[selected[1], ]) ^ 2))
-    
-    for(i in seq_len(k - 1) + 1){ #2:k
-        # Add point wich is furthest away from all previously selected points
-        selected[i] <- which.max(dists)
-        # Update distances
-        dists <- pmin(dists, 
-                      apply(X, 1, function(x)sum((x - X[selected[i], ]) ^ 2)))
-    }
-    
-    return(X[selected, ])
+  k <- xdim * ydim
+  
+  # Start with a random point
+  selected <- numeric(k)
+  selected[1] <- sample(1:nrow(X), 1)
+  dists <- apply(X, 1, function(x)sum((x - X[selected[1], ]) ^ 2))
+  
+  for(i in seq_len(k - 1) + 1){ #2:k
+    # Add point wich is furthest away from all previously selected points
+    selected[i] <- which.max(dists)
+    # Update distances
+    dists <- pmin(dists, 
+                  apply(X, 1, function(x)sum((x - X[selected[i], ]) ^ 2)))
+  }
+  
+  return(X[selected, ])
 }
 
 #' Create a grid from first 2 PCA components
@@ -267,23 +267,23 @@ Initialize_KWSP <- function(X, xdim, ydim){
 #' 
 #' @export
 Initialize_PCA <- function(data, xdim, ydim){
-    pca <- stats::prcomp(data, rank. = 2, retx = FALSE)
-    # scale out to 5-times standard deviation, 
-    # which should cover the data nicely
-    sdev_scale <- 5 
-    ax1 <- t(matrix(pca$rotation[, 1] * sdev_scale * pca$sdev,
-                    nrow = ncol(data),
-                    ncol = xdim * ydim)) *
-        (2 * rep(c(1:xdim) - 1, times = ydim) / (xdim - 1) - 1)
-    ax2 <- t(matrix(pca$rotation[, 2] * sdev_scale * pca$sdev,
-                    nrow = ncol(data),
-                    ncol = xdim * ydim)) *
-        (2 * rep(c(1:ydim) - 1, each = xdim) / (ydim - 1) - 1)
-    
-    return(t(matrix(pca$center, 
-                    nrow = ncol(data), 
-                    ncol = xdim * ydim)) + 
-             ax1 + ax2)
+  pca <- stats::prcomp(data, rank. = 2, retx = FALSE)
+  # scale out to 5-times standard deviation, 
+  # which should cover the data nicely
+  sdev_scale <- 5 
+  ax1 <- t(matrix(pca$rotation[, 1] * sdev_scale * pca$sdev,
+                  nrow = ncol(data),
+                  ncol = xdim * ydim)) *
+    (2 * rep(c(1:xdim) - 1, times = ydim) / (xdim - 1) - 1)
+  ax2 <- t(matrix(pca$rotation[, 2] * sdev_scale * pca$sdev,
+                  nrow = ncol(data),
+                  ncol = xdim * ydim)) *
+    (2 * rep(c(1:ydim) - 1, each = xdim) / (ydim - 1) - 1)
+  
+  return(t(matrix(pca$center, 
+                  nrow = ncol(data), 
+                  ncol = xdim * ydim)) + 
+           ax1 + ax2)
 }
 
 #' Calculate mean weighted cluster purity
@@ -304,17 +304,17 @@ Initialize_PCA <- function(data, xdim, ydim){
 #' Purity(realClusters, predictedClusters)
 #' @export
 Purity <- function(realClusters, predictedClusters, weighted = TRUE){
-    
-    t <- table(predictedClusters, realClusters)
-    maxPercentages <- apply(t/rowSums(t), 1, max)
-    
-    if(weighted)
-        weightedPercentages <- maxPercentages * rowSums(t)/sum(t)
-    else 
-        weightedPercentages <- maxPercentages/nrow(t)
-    
-    return(c(sum(weightedPercentages), min(maxPercentages), 
-      sum(maxPercentages<0.75)))
+  
+  t <- table(predictedClusters, realClusters)
+  maxPercentages <- apply(t/rowSums(t), 1, max)
+  
+  if(weighted)
+    weightedPercentages <- maxPercentages * rowSums(t)/sum(t)
+  else 
+    weightedPercentages <- maxPercentages/nrow(t)
+  
+  return(c(sum(weightedPercentages), min(maxPercentages), 
+           sum(maxPercentages<0.75)))
 }
 
 #' Calculate distance matrix using a minimal spanning tree neighbourhood
@@ -323,13 +323,13 @@ Purity <- function(realClusters, predictedClusters, weighted = TRUE){
 #'
 #' @return Distance matrix
 Dist.MST <- function(X){
-    adjacency <- stats::dist(X, method = "euclidean")
-    fullGraph <- igraph::graph.adjacency(as.matrix(adjacency), 
-                                         mode = "undirected", 
-                                         weighted = TRUE)
-    mst <- igraph::minimum.spanning.tree(fullGraph)
-    return(igraph::shortest.paths(mst, v = igraph::V(mst), to = igraph::V(mst), 
-                           weights = NA))
+  adjacency <- stats::dist(X, method = "euclidean")
+  fullGraph <- igraph::graph.adjacency(as.matrix(adjacency), 
+                                       mode = "undirected", 
+                                       weighted = TRUE)
+  mst <- igraph::minimum.spanning.tree(fullGraph)
+  return(igraph::shortest.paths(mst, v = igraph::V(mst), to = igraph::V(mst), 
+                                weights = NA))
 }
 
 #' Write FlowSOM clustering results to the original FCS files
@@ -348,34 +348,34 @@ SaveClustersToFCS <- function(fsom, originalFiles,
                               ppFiles = originalFiles, 
                               selectionFiles = NULL, 
                               silent = FALSE){
-    for(i in seq_along(originalFiles)){
-        if(!silent){message("Extending ", originalFiles[i],
-                            " using the FlowSOM",
-                            "mapping of ", ppFiles[i], "indexed by ",
-                            selectionFiles[i])}
-        
-        ff_o <- flowCore::read.FCS(originalFiles[i])
-        ff <- flowCore::read.FCS(ppFiles[i])
-        if(!is.null(selectionFiles)){
-            s <- unlist(utils::read.table(selectionFiles[i]))
-        } else {
-            s <- seq_len(nrow(ff_o))    
-        }
-        
-        # Map the data
-        fsom_f <- NewData(fsom, ff)
-        
-        # Put on corresponding indices
-        m <- matrix(0, nrow = nrow(ff_o), ncol = 1)
-        m[s, ] <- fsom_f$map$mapping[, 1]
-        colnames(m) <- "FlowSOM"
-        
-        # Save as fcs file
-        ff_o <- flowCore::cbind2(ff_o, m)
-        flowCore::write.FCS(ff_o, filename = gsub("\\.fcs",
-                                               "_FlowSOM.fcs",
-                                               originalFiles[i]))        
+  for(i in seq_along(originalFiles)){
+    if(!silent){message("Extending ", originalFiles[i],
+                        " using the FlowSOM",
+                        "mapping of ", ppFiles[i], "indexed by ",
+                        selectionFiles[i])}
+    
+    ff_o <- flowCore::read.FCS(originalFiles[i])
+    ff <- flowCore::read.FCS(ppFiles[i])
+    if(!is.null(selectionFiles)){
+      s <- unlist(utils::read.table(selectionFiles[i]))
+    } else {
+      s <- seq_len(nrow(ff_o))    
     }
+    
+    # Map the data
+    fsom_f <- NewData(fsom, ff)
+    
+    # Put on corresponding indices
+    m <- matrix(0, nrow = nrow(ff_o), ncol = 1)
+    m[s, ] <- fsom_f$map$mapping[, 1]
+    colnames(m) <- "FlowSOM"
+    
+    # Save as fcs file
+    ff_o <- flowCore::cbind2(ff_o, m)
+    flowCore::write.FCS(ff_o, filename = gsub("\\.fcs",
+                                              "_FlowSOM.fcs",
+                                              originalFiles[i]))        
+  }
 }
 
 #' Get cluster label for all individual cells
@@ -392,8 +392,8 @@ SaveClustersToFCS <- function(fsom, originalFiles,
 #'
 #' @export 
 GetClusters <- function(fsom) {
-    fsom <- UpdateFlowSOM(fsom)
-    return(fsom$map$mapping[, 1])
+  fsom <- UpdateFlowSOM(fsom)
+  return(fsom$map$mapping[, 1])
 }
 
 #' Get metacluster label for all individual cells
@@ -415,9 +415,9 @@ GetClusters <- function(fsom) {
 #'
 #' @export 
 GetMetaclusters <- function(fsom, meta = NULL){
-    fsom <- UpdateFlowSOM(fsom)
-    meta <- fsom$metaclustering
-    return(meta[fsom$map$mapping[, 1]])
+  fsom <- UpdateFlowSOM(fsom)
+  meta <- fsom$metaclustering
+  return(meta[fsom$map$mapping[, 1]])
 } 
 
 #' Get MFI values for all clusters
@@ -438,20 +438,20 @@ GetMetaclusters <- function(fsom, meta = NULL){
 #' mfis <- GetClusterMFIs(flowSOM.res)
 #' @export 
 GetClusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
-    fsom <- UpdateFlowSOM(fsom)
-    MFIs <- fsom$map$medianValues
-    rownames(MFIs) <- seq_len(nrow(MFIs))
-    if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
-    if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
-    if(colsUsed && !prettyColnames){
-        MFIs <- MFIs[, fsom$map$colsUsed]
-    } else if(!colsUsed && prettyColnames) {
-        colnames(MFIs) <- fsom$prettyColnames
-    } else if(colsUsed && prettyColnames) {
-        MFIs <- MFIs[, fsom$map$colsUsed]
-        colnames(MFIs) <- fsom$prettyColnames[fsom$map$colsUsed]
-    }
-    return(MFIs)
+  fsom <- UpdateFlowSOM(fsom)
+  MFIs <- fsom$map$medianValues
+  rownames(MFIs) <- seq_len(nrow(MFIs))
+  if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
+  if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
+  if(colsUsed && !prettyColnames){
+    MFIs <- MFIs[, fsom$map$colsUsed]
+  } else if(!colsUsed && prettyColnames) {
+    colnames(MFIs) <- fsom$prettyColnames
+  } else if(colsUsed && prettyColnames) {
+    MFIs <- MFIs[, fsom$map$colsUsed]
+    colnames(MFIs) <- fsom$prettyColnames[fsom$map$colsUsed]
+  }
+  return(MFIs)
 }
 
 #' Get CV values for all clusters
@@ -468,8 +468,8 @@ GetClusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
 #'
 #' @export
 GetClusterCVs <- function(fsom){
-    fsom <- UpdateFlowSOM(fsom)
-    return(fsom$map$cvValues)
+  fsom <- UpdateFlowSOM(fsom)
+  return(fsom$map$cvValues)
 }
 
 #' GetFeatures
@@ -599,8 +599,10 @@ GetFeatures <- function(fsom,
     counts_t <- table(GetClusters(fsom_tmp))
     C_counts[i, paste0("C", names(counts_t))] <- counts_t
     outliers_t <- fsom_tmp$outliers[, "Number_of_outliers", drop = FALSE]
-    C_outliers[i, paste0("C", rownames(outliers_t))] <- 
-      outliers_t$Number_of_outliers
+    if (nrow(outliers_t) != 0) {
+      C_outliers[i, paste0("C", rownames(outliers_t))] <- 
+        outliers_t$Number_of_outliers
+    }
     
     if ("MFIs" %in% type){
       if ("clusters" %in% population){

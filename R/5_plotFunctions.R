@@ -101,7 +101,7 @@ PlotFlowSOM <- function(fsom,
                 "clusters in FlowSOM object (", nNodes, " clusters and ",
                 length(backgroundValues), " backgroundValues)."))
   }
- 
+  
   #---- Layout----
   layout <- ParseLayout(fsom, view)
   if(is.matrix(view) || is.data.frame(view)) view <- "matrix"
@@ -112,7 +112,7 @@ PlotFlowSOM <- function(fsom,
                                    overlap = ifelse(view %in% c("grid"),
                                                     -0.3, 1))
   }
-
+  
   if (equalNodeSize){
     scaledNodeSize <- rep(maxNodeSize, nNodes)
   } else {
@@ -120,8 +120,8 @@ PlotFlowSOM <- function(fsom,
   }
   
   if (any(isEmpty)) { scaledNodeSize[isEmpty] <- min(maxNodeSize, 0.05) }
- 
-   #----GGplot----
+  
+  #----GGplot----
   plot_df <- data.frame(x = layout$x,
                         y = layout$y,
                         size = scaledNodeSize,
@@ -221,7 +221,7 @@ PlotStars <- function(fsom,
                       list_insteadof_ggarrange = FALSE,
                       ...){
   fsom <- UpdateFlowSOM(fsom)
-
+  
   channels <- GetChannels(fsom, markers)
   
   p <- PlotFlowSOM(fsom = fsom, 
@@ -535,7 +535,7 @@ PlotMarker <- function(fsom,
     warning("Only the first marker will be shown.")
     marker <- marker[1]
   } 
-    
+  
   fsom <- UpdateFlowSOM(fsom)
   
   # Get median values to visualise
@@ -685,13 +685,13 @@ QueryStarPlot <- function(fsom,
   query <- ParseQuery(fsom, query)
   if (plot){
     fP <- PlotStars(fsom = fsom,
-                      markers = markers,
-                      backgroundColors = 
-                        grDevices::colorRampPalette(c(rep("#FFFFFF00", 3), 
-                                                      backgroundColors)),
-                      backgroundValues = query$nodeScores,
-                      list_insteadof_ggarrange = TRUE,
-                      ...)
+                    markers = markers,
+                    backgroundColors = 
+                      grDevices::colorRampPalette(c(rep("#FFFFFF00", 3), 
+                                                    backgroundColors)),
+                    backgroundValues = query$nodeScores,
+                    list_insteadof_ggarrange = TRUE,
+                    ...)
     nMarkers <- length(markers)
     starHeight <- rep(1, nMarkers)
     starHeight[lowMarkers] <- 0
@@ -810,9 +810,9 @@ PlotSD <- function(fsom,
   if(!is.null(marker)) marker <- GetChannels(fsom, marker)
   SDs <- ParseSD(fsom, marker)
   PlotVariable(fsom = fsom, 
-              variable = SDs,
-              variableName = "SD", 
-              ...)
+               variable = SDs,
+               variableName = "SD", 
+               ...)
 }
 
 #' PlotStarLegend 
@@ -1208,8 +1208,8 @@ UpdateFlowSOM <- function(fsom){
   }
   if (is.null(fsom$map$metaclusterMFIs) && !is.null(fsom$metaclustering)){
     fsom$map$metaclusterMFIs <- data.frame(fsom$data, 
-                                          mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
-                                          check.names = FALSE) %>% 
+                                           mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
+                                           check.names = FALSE) %>% 
       dplyr::group_by(.data$mcl) %>% 
       dplyr::summarise_all(stats::median) %>% 
       dplyr::select(-.data$mcl) %>% 
@@ -1309,7 +1309,7 @@ AddStarsPies <- function(p, arcs, colorPalette, showLegend = TRUE){
 #' @export
 AddLabels <- function(p, labels, hjust = 0.5, layout = NULL, ...){
   requireNamespace("ggplot2")
- 
+  
   if(is.null(layout)) layout <- ggplot2::ggplot_build(p)$plot$data
   
   p <- p + ggplot2::geom_text(data = layout,
@@ -2162,9 +2162,9 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                  label = "Metaclusters") %>% 
         AddLabels(labels = seq_len(NClusters(fsom)))
       p2.2 <- PlotFlowSOM(fsom, 
-                            view = view, 
-                            equalNodeSize = TRUE,
-                            title = "FlowSOM Metaclusters") %>% 
+                          view = view, 
+                          equalNodeSize = TRUE,
+                          title = "FlowSOM Metaclusters") %>% 
         AddNodes(values = fsom$metaclustering, 
                  showLegend = TRUE,
                  label = "Metaclusters") %>% 
@@ -2213,7 +2213,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                                                                               "#FF7F00", 
                                                                               "red", 
                                                                               "#7F0000")))
-
+    
     filesI <- as.character(unique(fsom$data[, "File"]))
     expectedDistr <- rep(1, length(filesI))
     names(expectedDistr) <- filesI

@@ -23,7 +23,9 @@
 #' @param scaled.center see \code{\link{scale}}
 #' @param scaled.scale  see \code{\link{scale}}
 #' @param silent        if \code{TRUE}, no progress updates will be printed
-#' @param colsToUse     column names or indices to use for building the SOM
+#' @param colsToUse     column names or indices to use for building the SOM. 
+#'                      Default (NULL) is all the columns used to build the 
+#'                      FlowSOM object.
 #' @param importance    array with numeric values. Parameters will be scaled 
 #'                      according to importance
 #' @param nClus         Exact number of clusters for meta-clustering. 
@@ -99,7 +101,7 @@ FlowSOM <- function(input, pattern = ".fcs",
                     transformFunction = flowCore::logicleTransform(), 
                     transformList = NULL, scale = TRUE, 
                     scaled.center = TRUE, scaled.scale = TRUE, silent = TRUE, 
-                    colsToUse, nClus = 10, maxMeta = NULL, importance = NULL, 
+                    colsToUse = NULL, nClus = 10, maxMeta = NULL, importance = NULL, 
                     seed = NULL, ...){
   # Method to run general FlowSOM workflow. 
   # Will scale the data and uses consensus meta-clustering by default.
@@ -139,13 +141,14 @@ FlowSOM <- function(input, pattern = ".fcs",
   } else {
     t <- system.time(cl <- as.factor(MetaClustering(fsom$map$codes,
                                                     "metaClustering_consensus", 
-                                                    maxMeta)))
+                                                    maxMeta,
+                                                    seed = seed)))
   }
   fsom$map$nMetaclusters <- length(levels(cl))
   fsom$metaclustering <- cl
   fsom$map$metaclusterMFIs <- data.frame(fsom$data, 
-                                        mcl = cl[fsom$map$mapping[, 1]],
-                                        check.names = FALSE) %>% 
+                                         mcl = cl[fsom$map$mapping[, 1]],
+                                         check.names = FALSE) %>% 
     dplyr::group_by(.data$mcl) %>% 
     dplyr::summarise_all(stats::median) %>% 
     dplyr::select(-.data$mcl) %>% 
@@ -535,7 +538,7 @@ GetFlowJoLabels <- function(files,
     
     if(is.null(cellTypes)){
       cellTypes <- flowWorkspace::gs_get_leaf_nodes(gates,
-                                                     path = "auto")
+                                                    path = "auto")
     }
     
     manual <- ManualVector(gatingMatrix, cellTypes)
