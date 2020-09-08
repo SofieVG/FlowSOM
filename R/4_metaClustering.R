@@ -216,7 +216,11 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 #' 
 #' Compute the median fluorescence intensities for the metaclusters
 #'
-#' @param fsom Result of calling the FlowSOM function
+#' @param fsom     Result of calling the FlowSOM function
+#' @param colsUsed Logical. Should report only the columns used to 
+#'                 build the SOM. Default = FALSE.
+#' @param prettyColnames    Logical. Should report pretty column names instead
+#'                          of standard column names. Default = FALSE.
 #' @return  Metacluster MFIs
 #' @examples
 #' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -231,9 +235,21 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 #'                        nClus = 10)
 #' mfis <- GetMetaclusterMFIs(flowSOM.res)
 #' @export
-GetMetaclusterMFIs <- function(fsom){
+GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
   fsom <- UpdateFlowSOM(fsom)
-  return(fsom$map$metaclusterMFIs)
+  MFIs <- fsom$map$metaclusterMFIs
+  rownames(MFIs) <- seq_len(nrow(MFIs))
+  if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
+  if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
+  if(colsUsed && !prettyColnames){
+    MFIs <- MFIs[, fsom$map$colsUsed]
+  } else if(!colsUsed && prettyColnames) {
+    colnames(MFIs) <- fsom$prettyColnames
+  } else if(colsUsed && prettyColnames) {
+    MFIs <- MFIs[, fsom$map$colsUsed]
+    colnames(MFIs) <- fsom$prettyColnames[fsom$map$colsUsed]
+  }
+  return(MFIs)
 }
 
 #' GetMetaclusterCVs
