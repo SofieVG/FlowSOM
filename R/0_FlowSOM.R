@@ -403,7 +403,7 @@ PlotFileScatters <- function(input,
       ylab(GetMarkers(ff, channel)) +
       theme_classic() +
       theme(axis.title.x=element_blank()) +
-      theme(axis.text.x=element_text(angle = -90, vjust = 0.5)) +
+      theme(axis.text.x=element_text(angle = 90, vjust = 0.5)) +
       guides(colour = guide_legend(override.aes = list(size = 5, shape = 15, 
                                                        alpha = 1)))
     if (!is.null(color)) { # if manual colors are provided
