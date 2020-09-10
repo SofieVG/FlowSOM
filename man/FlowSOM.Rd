@@ -58,7 +58,7 @@ of \code{$SPILL} description in fcs file will be used.}
 
 \item{silent}{if \code{TRUE}, no progress updates will be printed}
 
-\item{colsToUse}{column names or indices to use for building the SOM. 
+\item{colsToUse}{Markers, channels or indices to use for building the SOM. 
 Default (NULL) is all the columns used to build the 
 FlowSOM object.}
 

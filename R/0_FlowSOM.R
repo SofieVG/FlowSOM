@@ -23,7 +23,7 @@
 #' @param scaled.center see \code{\link{scale}}
 #' @param scaled.scale  see \code{\link{scale}}
 #' @param silent        if \code{TRUE}, no progress updates will be printed
-#' @param colsToUse     column names or indices to use for building the SOM. 
+#' @param colsToUse     Markers, channels or indices to use for building the SOM. 
 #'                      Default (NULL) is all the columns used to build the 
 #'                      FlowSOM object.
 #' @param importance    array with numeric values. Parameters will be scaled 

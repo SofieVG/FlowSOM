@@ -925,7 +925,6 @@ PlotStarLegend <- function(markers,
 #' 
 #' @importFrom igraph as_edgelist
 #' 
-#' @export
 ParseEdges <- function(fsom){
   edgeList <- as.data.frame(igraph::as_edgelist(fsom$MST$g),
                             stringsAsFactors = FALSE)
@@ -995,7 +994,6 @@ ParseLayout <- function(fsom, layout){
 #' 
 #' @importFrom dplyr count mutate pull
 #' 
-#' @export
 ParseNodeSize <- function(nodeSizes, maxNodeSize, refNodeSize){
   if(any(is.na(nodeSizes))) nodeSizes[is.na(nodeSizes)] <- 0
   nNodes <- length(nodeSizes)
@@ -1029,7 +1027,6 @@ ParseNodeSize <- function(nodeSizes, maxNodeSize, refNodeSize){
 #' \code{\link{ParseNodeSize}},
 #' \code{\link{ParseQuery}}, \code{\link{ParseSD}}
 #' 
-#' @export
 ParseArcs <- function(x, y, arcValues, arcHeights){
   markers <- names(arcValues)
   arcValues <- c(0, (arcValues / sum(arcValues)) * (2 * pi))
@@ -1058,7 +1055,6 @@ ParseArcs <- function(x, y, arcValues, arcHeights){
 #' \code{\link{ParseNodeSize}}, \code{\link{ParseArcs}},
 #' \code{\link{QueryStarPlot}}, \code{\link{ParseSD}}
 #' 
-#' @export
 ParseQuery <- function(fsom, query){
   scores <- matrix(NA, ncol = length(query), nrow = nrow(fsom$map$medianValues),
                    dimnames = list(NULL, names(query)))
@@ -1102,7 +1098,6 @@ ParseQuery <- function(fsom, query){
 #' 
 #' @importFrom stats median
 #' 
-#' @export
 ParseSD <-function (fsom, marker = NULL){
   stdevs <- fsom$map$sdValues[, fsom$map$colsUsed]
   stdev_medians <- apply(stdevs, 2, stats::median)
@@ -1132,7 +1127,6 @@ ParseSD <-function (fsom, marker = NULL){
 #' @seealso \code{\link{PlotFlowSOM}}, \code{\link{ParseNodeSize}}, 
 #' \code{\link{AutoMaxNodeSize}}
 #' 
-#' @export
 ScaleStarHeights <- function(data, nodeSizes){
   nNodes <- length(nodeSizes)
   maxAllNodes <- max(data)
@@ -1163,7 +1157,7 @@ ScaleStarHeights <- function(data, nodeSizes){
 #' \code{\link{ParseNodeSize}}
 #' 
 #' @importFrom stats dist
-#' @export
+#' 
 AutoMaxNodeSize <- function(layout, overlap){
   overlap <- 1 + overlap
   minDistance <- min(stats::dist(layout[, c(1, 2)]))
@@ -1614,7 +1608,7 @@ AddPies <- function(p,
 #' @export
 AddStars <- function(p, 
                      fsom, 
-                     markers = fsom$map$colsUsed, 
+                     markers = fsom$map$colsUsed,
                      colorPalette = NULL){
   requireNamespace("ggplot2")
   
@@ -1625,7 +1619,6 @@ AddStars <- function(p,
   nMarkers <- length(markers)
   
   nodeInfo <- ggplot2::ggplot_build(p)$plot$data
-  
   l1 <- NULL
   data <- fsom$map$medianValues[, markers, drop = FALSE]
   data[is.na(data)] <- 0
@@ -1641,8 +1634,8 @@ AddStars <- function(p,
     return(nodeData)
   })
   starValues <- do.call(rbind, starValues)
-  starValues$Markers <- factor(starValues$Markers, levels = colnames(data))
-  
+  starValues$Markers <- factor(starValues$Markers, 
+                               levels = colnames(data))
   p <- AddStarsPies(p, starValues, colorPalette, showLegend = FALSE)
   
   return(p)

@@ -174,9 +174,6 @@ SSE <- function(data,clustering){
   c_wss
 }
 
-
-
-
 #' F measure
 #' 
 #' Compute the F measure between two clustering results

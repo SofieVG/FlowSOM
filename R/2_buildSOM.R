@@ -4,7 +4,7 @@
 #'
 #' @param fsom      FlowSOM object containing the data, as constructed by 
 #'                  the \code{\link{ReadInput}} function
-#' @param colsToUse column names or indices to use for building the SOM
+#' @param colsToUse Markers, channels or indices to use for building the SOM
 #' @param silent    if \code{TRUE}, no progress updates will be printed
 #' @param ...       options to pass on to the SOM function (xdim, ydim, rlen, 
 #'                  mst, alpha, radius, init, distf, importance)
