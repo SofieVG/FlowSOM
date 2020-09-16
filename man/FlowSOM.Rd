@@ -17,7 +17,7 @@ FlowSOM(
   scaled.center = TRUE,
   scaled.scale = TRUE,
   silent = TRUE,
-  colsToUse,
+  colsToUse = NULL,
   nClus = 10,
   maxMeta = NULL,
   importance = NULL,
@@ -58,7 +58,9 @@ of \code{$SPILL} description in fcs file will be used.}
 
 \item{silent}{if \code{TRUE}, no progress updates will be printed}
 
-\item{colsToUse}{column names or indices to use for building the SOM}
+\item{colsToUse}{Markers, channels or indices to use for building the SOM. 
+Default (NULL) is all the columns used to build the 
+FlowSOM object.}
 
 \item{nClus}{Exact number of clusters for meta-clustering. 
 Ignored if maxMeta is specified.

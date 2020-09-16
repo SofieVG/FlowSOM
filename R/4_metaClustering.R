@@ -6,6 +6,7 @@
 #' @param data   Matrix containing the data to cluster
 #' @param method Clustering method to use
 #' @param max    Maximum number of clusters to try out
+#' @param seed   Seed to pass on to given clustering method
 #' @param ...    Extra parameters to pass along
 #' 
 #' @return Numeric array indicating cluster for each datapoint
@@ -28,14 +29,14 @@
 #'    flowSOM.clustering <- metacl[flowSOM.res$map$mapping[, 1]]    
 #'
 #' @export
-MetaClustering <- function(data, method, max = 20, ...){
-  res <- DetermineNumberOfClusters(data, max, method,...)
+MetaClustering <- function(data, method, max = 20, seed = NULL, ...){
+  res <- DetermineNumberOfClusters(data, max, method, seed = seed, ...)
   method <- get(method)
-  method(data, k = res)
+  method(data, k = res, seed = seed)
 }
 
-DetermineNumberOfClusters <- function(data,max,method,plot = FALSE,smooth = 0.2,
-                                      ...){
+DetermineNumberOfClusters <- function(data, max, method, plot = FALSE,
+                                      smooth = 0.2, seed = NULL, ...){
   # Try out a clustering algorithm for several numbers of clusters and 
   # select optimal
   #
@@ -46,11 +47,12 @@ DetermineNumberOfClusters <- function(data,max,method,plot = FALSE,smooth = 0.2,
   #     plot:     Whether to plot the results for different k
   #     smooth: Smoothing option to find elbow: 
   #             0: no smoothing, 1: maximal smoothing
+  #     seed:   Seed to pass on to given method
   #
   # Returns:
   #     Optimal number of clusters
   if(method ==    "metaClustering_consensus"){
-    results <- consensus(data,max,...)
+    results <- consensus(data,max, seed, ...)
     res <- rep(0,max)
     res[1] <- SSE(data,rep(1,nrow(data)))
     for(i in 2:max){
@@ -68,8 +70,8 @@ DetermineNumberOfClusters <- function(data,max,method,plot = FALSE,smooth = 0.2,
   
   for(i in 2:(max - 1)){
     res[i] <- (1 - smooth) * res[i] + 
-              (smooth / 2) * res[i - 1] + 
-              (smooth / 2) * res[i + 1]
+      (smooth / 2) * res[i - 1] + 
+      (smooth / 2) * res[i + 1]
   }
   
   if(plot) plot(1:max, res, type = "b", xlab = "Number of Clusters", 
@@ -118,7 +120,7 @@ findElbow <- function(data){
 #'    metacl <- metaClustering_consensus(flowSOM.res$map$codes, k = 10)    
 #'
 #' @export
-metaClustering_consensus <- function(data, k = 7,seed = NULL){
+metaClustering_consensus <- function(data, k = 7, seed = NULL){
   results <- suppressMessages(ConsensusClusterPlus::ConsensusClusterPlus(
     t(data),
     maxK = k, reps = 100, pItem = 0.9, pFeature = 1, 
@@ -132,14 +134,15 @@ metaClustering_consensus <- function(data, k = 7,seed = NULL){
   results[[k]]$consensusClass
 }
 
-consensus <- function(data,max,...){
+consensus <- function(data, max, seed = NULL, ...){
   results <- suppressMessages(ConsensusClusterPlus::ConsensusClusterPlus(
     t(data),
     maxK = max, reps = 100, pItem = 0.9, pFeature = 1,
     title = tempdir(), plot = "pdf", verbose = FALSE,
     clusterAlg = "hc", # "hc","km","kmdist","pam"
-    distance = "euclidean" 
+    distance = "euclidean",
     #"euclidean","pearson","spearman","binary","maximum","canberra","minkowski"
+    seed = seed
   ))
 }
 
@@ -170,9 +173,6 @@ SSE <- function(data,clustering){
   }
   c_wss
 }
-
-
-
 
 #' F measure
 #' 
@@ -213,7 +213,11 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 #' 
 #' Compute the median fluorescence intensities for the metaclusters
 #'
-#' @param fsom Result of calling the FlowSOM function
+#' @param fsom     Result of calling the FlowSOM function
+#' @param colsUsed Logical. Should report only the columns used to 
+#'                 build the SOM. Default = FALSE.
+#' @param prettyColnames    Logical. Should report pretty column names instead
+#'                          of standard column names. Default = FALSE.
 #' @return  Metacluster MFIs
 #' @examples
 #' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -228,9 +232,21 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 #'                        nClus = 10)
 #' mfis <- GetMetaclusterMFIs(flowSOM.res)
 #' @export
-GetMetaclusterMFIs <- function(fsom){
+GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
   fsom <- UpdateFlowSOM(fsom)
-  return(fsom$map$metaclusterMFIs)
+  MFIs <- fsom$map$metaclusterMFIs
+  rownames(MFIs) <- seq_len(nrow(MFIs))
+  if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
+  if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
+  if(colsUsed && !prettyColnames){
+    MFIs <- MFIs[, fsom$map$colsUsed]
+  } else if(!colsUsed && prettyColnames) {
+    colnames(MFIs) <- fsom$prettyColnames
+  } else if(colsUsed && prettyColnames) {
+    MFIs <- MFIs[, fsom$map$colsUsed]
+    colnames(MFIs) <- fsom$prettyColnames[fsom$map$colsUsed]
+  }
+  return(MFIs)
 }
 
 #' GetMetaclusterCVs

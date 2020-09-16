@@ -101,7 +101,7 @@ PlotFlowSOM <- function(fsom,
                 "clusters in FlowSOM object (", nNodes, " clusters and ",
                 length(backgroundValues), " backgroundValues)."))
   }
- 
+  
   #---- Layout----
   layout <- ParseLayout(fsom, view)
   if(is.matrix(view) || is.data.frame(view)) view <- "matrix"
@@ -112,7 +112,7 @@ PlotFlowSOM <- function(fsom,
                                    overlap = ifelse(view %in% c("grid"),
                                                     -0.3, 1))
   }
-
+  
   if (equalNodeSize){
     scaledNodeSize <- rep(maxNodeSize, nNodes)
   } else {
@@ -120,8 +120,8 @@ PlotFlowSOM <- function(fsom,
   }
   
   if (any(isEmpty)) { scaledNodeSize[isEmpty] <- min(maxNodeSize, 0.05) }
- 
-   #----GGplot----
+  
+  #----GGplot----
   plot_df <- data.frame(x = layout$x,
                         y = layout$y,
                         size = scaledNodeSize,
@@ -221,7 +221,7 @@ PlotStars <- function(fsom,
                       list_insteadof_ggarrange = FALSE,
                       ...){
   fsom <- UpdateFlowSOM(fsom)
-
+  
   channels <- GetChannels(fsom, markers)
   
   p <- PlotFlowSOM(fsom = fsom, 
@@ -535,7 +535,7 @@ PlotMarker <- function(fsom,
     warning("Only the first marker will be shown.")
     marker <- marker[1]
   } 
-    
+  
   fsom <- UpdateFlowSOM(fsom)
   
   # Get median values to visualise
@@ -685,13 +685,13 @@ QueryStarPlot <- function(fsom,
   query <- ParseQuery(fsom, query)
   if (plot){
     fP <- PlotStars(fsom = fsom,
-                      markers = markers,
-                      backgroundColors = 
-                        grDevices::colorRampPalette(c(rep("#FFFFFF00", 3), 
-                                                      backgroundColors)),
-                      backgroundValues = query$nodeScores,
-                      list_insteadof_ggarrange = TRUE,
-                      ...)
+                    markers = markers,
+                    backgroundColors = 
+                      grDevices::colorRampPalette(c(rep("#FFFFFF00", 3), 
+                                                    backgroundColors)),
+                    backgroundValues = query$nodeScores,
+                    list_insteadof_ggarrange = TRUE,
+                    ...)
     nMarkers <- length(markers)
     starHeight <- rep(1, nMarkers)
     starHeight[lowMarkers] <- 0
@@ -810,9 +810,9 @@ PlotSD <- function(fsom,
   if(!is.null(marker)) marker <- GetChannels(fsom, marker)
   SDs <- ParseSD(fsom, marker)
   PlotVariable(fsom = fsom, 
-              variable = SDs,
-              variableName = "SD", 
-              ...)
+               variable = SDs,
+               variableName = "SD", 
+               ...)
 }
 
 #' PlotStarLegend 
@@ -925,7 +925,6 @@ PlotStarLegend <- function(markers,
 #' 
 #' @importFrom igraph as_edgelist
 #' 
-#' @export
 ParseEdges <- function(fsom){
   edgeList <- as.data.frame(igraph::as_edgelist(fsom$MST$g),
                             stringsAsFactors = FALSE)
@@ -995,7 +994,6 @@ ParseLayout <- function(fsom, layout){
 #' 
 #' @importFrom dplyr count mutate pull
 #' 
-#' @export
 ParseNodeSize <- function(nodeSizes, maxNodeSize, refNodeSize){
   if(any(is.na(nodeSizes))) nodeSizes[is.na(nodeSizes)] <- 0
   nNodes <- length(nodeSizes)
@@ -1029,7 +1027,6 @@ ParseNodeSize <- function(nodeSizes, maxNodeSize, refNodeSize){
 #' \code{\link{ParseNodeSize}},
 #' \code{\link{ParseQuery}}, \code{\link{ParseSD}}
 #' 
-#' @export
 ParseArcs <- function(x, y, arcValues, arcHeights){
   markers <- names(arcValues)
   arcValues <- c(0, (arcValues / sum(arcValues)) * (2 * pi))
@@ -1058,7 +1055,6 @@ ParseArcs <- function(x, y, arcValues, arcHeights){
 #' \code{\link{ParseNodeSize}}, \code{\link{ParseArcs}},
 #' \code{\link{QueryStarPlot}}, \code{\link{ParseSD}}
 #' 
-#' @export
 ParseQuery <- function(fsom, query){
   scores <- matrix(NA, ncol = length(query), nrow = nrow(fsom$map$medianValues),
                    dimnames = list(NULL, names(query)))
@@ -1102,7 +1098,6 @@ ParseQuery <- function(fsom, query){
 #' 
 #' @importFrom stats median
 #' 
-#' @export
 ParseSD <-function (fsom, marker = NULL){
   stdevs <- fsom$map$sdValues[, fsom$map$colsUsed]
   stdev_medians <- apply(stdevs, 2, stats::median)
@@ -1132,7 +1127,6 @@ ParseSD <-function (fsom, marker = NULL){
 #' @seealso \code{\link{PlotFlowSOM}}, \code{\link{ParseNodeSize}}, 
 #' \code{\link{AutoMaxNodeSize}}
 #' 
-#' @export
 ScaleStarHeights <- function(data, nodeSizes){
   nNodes <- length(nodeSizes)
   maxAllNodes <- max(data)
@@ -1163,7 +1157,7 @@ ScaleStarHeights <- function(data, nodeSizes){
 #' \code{\link{ParseNodeSize}}
 #' 
 #' @importFrom stats dist
-#' @export
+#' 
 AutoMaxNodeSize <- function(layout, overlap){
   overlap <- 1 + overlap
   minDistance <- min(stats::dist(layout[, c(1, 2)]))
@@ -1208,8 +1202,8 @@ UpdateFlowSOM <- function(fsom){
   }
   if (is.null(fsom$map$metaclusterMFIs) && !is.null(fsom$metaclustering)){
     fsom$map$metaclusterMFIs <- data.frame(fsom$data, 
-                                          mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
-                                          check.names = FALSE) %>% 
+                                           mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
+                                           check.names = FALSE) %>% 
       dplyr::group_by(.data$mcl) %>% 
       dplyr::summarise_all(stats::median) %>% 
       dplyr::select(-.data$mcl) %>% 
@@ -1309,7 +1303,7 @@ AddStarsPies <- function(p, arcs, colorPalette, showLegend = TRUE){
 #' @export
 AddLabels <- function(p, labels, hjust = 0.5, layout = NULL, ...){
   requireNamespace("ggplot2")
- 
+  
   if(is.null(layout)) layout <- ggplot2::ggplot_build(p)$plot$data
   
   p <- p + ggplot2::geom_text(data = layout,
@@ -1614,7 +1608,7 @@ AddPies <- function(p,
 #' @export
 AddStars <- function(p, 
                      fsom, 
-                     markers = fsom$map$colsUsed, 
+                     markers = fsom$map$colsUsed,
                      colorPalette = NULL){
   requireNamespace("ggplot2")
   
@@ -1625,7 +1619,6 @@ AddStars <- function(p,
   nMarkers <- length(markers)
   
   nodeInfo <- ggplot2::ggplot_build(p)$plot$data
-  
   l1 <- NULL
   data <- fsom$map$medianValues[, markers, drop = FALSE]
   data[is.na(data)] <- 0
@@ -1641,8 +1634,8 @@ AddStars <- function(p,
     return(nodeData)
   })
   starValues <- do.call(rbind, starValues)
-  starValues$Markers <- factor(starValues$Markers, levels = colnames(data))
-  
+  starValues$Markers <- factor(starValues$Markers, 
+                               levels = colnames(data))
   p <- AddStarsPies(p, starValues, colorPalette, showLegend = FALSE)
   
   return(p)
@@ -2162,9 +2155,9 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                  label = "Metaclusters") %>% 
         AddLabels(labels = seq_len(NClusters(fsom)))
       p2.2 <- PlotFlowSOM(fsom, 
-                            view = view, 
-                            equalNodeSize = TRUE,
-                            title = "FlowSOM Metaclusters") %>% 
+                          view = view, 
+                          equalNodeSize = TRUE,
+                          title = "FlowSOM Metaclusters") %>% 
         AddNodes(values = fsom$metaclustering, 
                  showLegend = TRUE,
                  label = "Metaclusters") %>% 
@@ -2213,7 +2206,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                                                                               "#FF7F00", 
                                                                               "red", 
                                                                               "#7F0000")))
-
+    
     filesI <- as.character(unique(fsom$data[, "File"]))
     expectedDistr <- rep(1, length(filesI))
     names(expectedDistr) <- filesI
@@ -2315,6 +2308,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
     
     #----Median expression per metacluster----
     colnames(mfis) <- fsom$prettyColnames[colnames(mfis)]
+    rownames(mfis) <- seq_len(nrow(mfis))
     plotList[["empty"]] <- ggplot2::ggplot() + ggplot2::theme_minimal()
     plotList[["p10"]] <- 
       pheatmap::pheatmap(mfis, scale = "column",

@@ -10,7 +10,7 @@ BuildSOM(fsom, colsToUse = NULL, silent = FALSE, ...)
 \item{fsom}{FlowSOM object containing the data, as constructed by 
 the \code{\link{ReadInput}} function}
 
-\item{colsToUse}{column names or indices to use for building the SOM}
+\item{colsToUse}{Markers, channels or indices to use for building the SOM}
 
 \item{silent}{if \code{TRUE}, no progress updates will be printed}
 

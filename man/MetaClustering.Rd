@@ -4,7 +4,7 @@
 \alias{MetaClustering}
 \title{MetaClustering}
 \usage{
-MetaClustering(data, method, max = 20, ...)
+MetaClustering(data, method, max = 20, seed = NULL, ...)
 }
 \arguments{
 \item{data}{Matrix containing the data to cluster}
@@ -12,6 +12,8 @@ MetaClustering(data, method, max = 20, ...)
 \item{method}{Clustering method to use}
 
 \item{max}{Maximum number of clusters to try out}
+
+\item{seed}{Seed to pass on to given clustering method}
 
 \item{...}{Extra parameters to pass along}
 }
