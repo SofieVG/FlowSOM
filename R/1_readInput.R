@@ -210,8 +210,8 @@ AddFlowFrame <- function(fsom, flowFrame){
   
   # Save pretty names for nicer visualisation later on
   if(is.null(fsom$prettyColnames)){
-    n <- flowFrame@parameters@data[, "name"]
-    d <- flowFrame@parameters@data[, "desc"]
+    n <- flowCore::parameters(flowFrame)@data[, "name"]
+    d <- flowCore::parameters(flowFrame)@data[, "desc"]
     d[is.na(d)] <- n[is.na(d)]
     if(any(grepl("#", d))){
       # Support for hashtag notation: 
@@ -226,7 +226,7 @@ AddFlowFrame <- function(fsom, flowFrame){
   # Add the data to the matrix
   f <- flowCore::exprs(flowFrame)
   attr(f, "ranges") <- NULL
-  name <- flowFrame@description$FIL
+  name <- description(flowFrame)$FIL[[1]]
   if(is.null(name)) name <- flowFrame@description$`$FIL`
   if(is.null(name)) name <- length(fsom$metaData)+1
   if(is.null(fsom$data)){ 
