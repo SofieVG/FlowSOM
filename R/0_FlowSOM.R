@@ -342,7 +342,7 @@ PlotFileScatters <- function(input,
   #---Read in data---
   if (is(input, "flowSet")) {
     data <- flowCore::fsApply(input, function(ff) {
-      ff@exprs
+      flowCore::exprs(ff)
     })
     cell_counts <- flowCore::fsApply(input, function(ff) {
       nrow(ff)
@@ -354,7 +354,7 @@ PlotFileScatters <- function(input,
     ff <- input[[1]]
   } else if (is(input, "flowFrame")) {
     ff <- input
-    data <- ff@exprs
+    data <- flowCore::exprs(ff)
     file_values <- data[, "File"]
   } else {
     ff <- AggregateFlowFrames(input,
@@ -556,7 +556,9 @@ GetFlowJoLabels <- function(files,
     result <- result[[1]]
   }
   
-  flowWorkspace::gs_cleanup_temp(gates)
+  #flowWorkspace::gs_cleanup_temp(gates) 
+  # Commenting this out might give issues with files in the temp folder not 
+  # being cleaned up, but otherwise the getData=TRUE won't work anymore
   
   return(result)
 }

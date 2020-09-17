@@ -226,7 +226,7 @@ AddFlowFrame <- function(fsom, flowFrame){
   # Add the data to the matrix
   f <- flowCore::exprs(flowFrame)
   attr(f, "ranges") <- NULL
-  name <- description(flowFrame)$FIL[[1]]
+  name <- flowCore::keyword(flowFrame,"FIL")[[1]]
   if(is.null(name)) name <- flowFrame@description$`$FIL`
   if(is.null(name)) name <- length(fsom$metaData)+1
   if(is.null(fsom$data)){ 

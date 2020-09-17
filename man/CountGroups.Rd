@@ -30,33 +30,30 @@ Calculate differences in cell counts between groups
                     scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10)
    
    # Have a look at the resulting tree
-   PlotStars(flowSOM.res[[1]],backgroundValues = as.factor(flowSOM.res[[2]]))
+   PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
    
    # Select all cells except the branch that corresponds with automated 
    # cluster 7 (CD3+ TCRyd +) and write te another file for the example
    # In practice you would not generate any new file but use your different
    # files from your different groups
    ff <- flowCore::read.FCS(fileName)
-   ff_tmp <- ff[flowSOM.res[[1]]$map$mapping[,1] \%in\% 
-                     which(flowSOM.res[[2]] != 7),]
+   ff_tmp <- ff[GetMetaclusters(flowSOM.res) != 7,]
    flowCore::write.FCS(ff_tmp,file="ff_tmp.fcs")
-   # Make an extra file without cluster 7 and double amount of cluster 10
-   ff_tmp <- ff[c(which(flowSOM.res[[1]]$map$mapping[,1] \%in\% 
-                                 which(flowSOM.res[[2]] != 7)),
-                  which(flowSOM.res[[1]]$map$mapping[,1] \%in\% 
-                                 which(flowSOM.res[[2]] == 5))),]
+   # Make an extra file without cluster 7 and double amount of cluster 5
+   ff_tmp <- ff[c(which(GetMetaclusters(flowSOM.res) != 7),
+                  which(GetMetaclusters(flowSOM.res) == 5)),]
    flowCore::write.FCS(ff_tmp,file="ff_tmp2.fcs")
    
    # Compare the original file with the two new files we made
-   groupRes <- CountGroups(flowSOM.res[[1]], 
+   groupRes <- CountGroups(flowSOM.res, 
                  groups=list("AllCells"=c(fileName),
                            "Without_ydTcells"=c("ff_tmp.fcs","ff_tmp2.fcs")))
-   PlotGroups(flowSOM.res[[1]], groupRes)
+   PlotGroups(flowSOM.res, groupRes)
    
-   # Compare only the file with the double amount of cluster 10
-   groupRes <- CountGroups(flowSOM.res[[1]], 
+   # Compare only the file with the double amount of cluster 5
+   groupRes <- CountGroups(flowSOM.res, 
                  groups=list("AllCells"=c(fileName),
                  "Without_ydTcells"=c("ff_tmp2.fcs")))
-   PlotGroups(flowSOM.res[[1]], groupRes)
+   PlotGroups(flowSOM.res, groupRes)
 
 }

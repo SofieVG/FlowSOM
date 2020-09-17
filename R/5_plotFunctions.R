@@ -749,7 +749,7 @@ QueryMultiple <- function(fsom,
                           plotFile = "queryMultiple.pdf",
                           ...){
   fsom <- UpdateFlowSOM(fsom)
-  labels <- rep("Unknown", fsom$map$nNodes)
+  labels <- rep("Unlabeled", fsom$map$nNodes)
   plotList <- list()
   plot <- ifelse(is.null(plotFile), FALSE, TRUE)
   for(cell_type in names(cellTypes)){

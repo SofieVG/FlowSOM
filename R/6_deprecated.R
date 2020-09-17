@@ -67,7 +67,6 @@ get_markers <- function(ff, markers) {
 #' flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
 #'                       scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 #' mfis <- GetMFIs(flowSOM.res)
-#' mfis <- GetMFIs(flowSOM.res$FlowSOM)
 #' @export 
 GetMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
   .Deprecated("GetClusterMFIs")
@@ -86,7 +85,6 @@ GetMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
 #' flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
 #'                       scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 #' cvs <- GetCVs(flowSOM.res)
-#' cvs <- GetCVs(flowSOM.res$FlowSOM)
 #'
 #' @export
 GetCVs <- function(fsom){
@@ -470,18 +468,19 @@ PlotGroups <- function(fsom,
   resultList <- list("annotation" = annotation)
   groupNames <- rownames(groups$means)
   p <- PlotStars(fsom,
-                   nodeSizes = fsom$MST$size * groups$means_norm[[groupNames[1]]],
+                   nodeSizes = groups$means_norm[[groupNames[1]]],
                    title = groupNames[1],
                    ...)
   resultList[[groupNames[1]]] <- p
   backgroundColors <- grDevices::colorRampPalette(
     c("#FFFFFF22","#00FFFF55","#FF000055"), alpha=TRUE)
   for (group in groupNames[-1]){
-    nodeSizes <- fsom$MST$size * groups$means_norm[[group]]
+    #nodeSizes <-  groups$means_norm[[group]]
     p <- PlotStars(fsom,
                      backgroundValues = annotation[[group]],
                      title = group,
                      backgroundColors = backgroundColors,
+                   nodeSizes = groups$means_norm[[group]],
                      ...)
     resultList[[group]] <- p
   }
@@ -506,34 +505,31 @@ PlotGroups <- function(fsom,
 #'                     scale=TRUE,colsToUse=c(9,12,14:18),nClus = 10)
 #'    
 #'    # Have a look at the resulting tree
-#'    PlotStars(flowSOM.res[[1]],backgroundValues = as.factor(flowSOM.res[[2]]))
+#'    PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 #'    
 #'    # Select all cells except the branch that corresponds with automated 
 #'    # cluster 7 (CD3+ TCRyd +) and write te another file for the example
 #'    # In practice you would not generate any new file but use your different
 #'    # files from your different groups
 #'    ff <- flowCore::read.FCS(fileName)
-#'    ff_tmp <- ff[flowSOM.res[[1]]$map$mapping[,1] %in% 
-#'                      which(flowSOM.res[[2]] != 7),]
+#'    ff_tmp <- ff[GetMetaclusters(flowSOM.res) != 7,]
 #'    flowCore::write.FCS(ff_tmp,file="ff_tmp.fcs")
-#'    # Make an extra file without cluster 7 and double amount of cluster 10
-#'    ff_tmp <- ff[c(which(flowSOM.res[[1]]$map$mapping[,1] %in% 
-#'                                  which(flowSOM.res[[2]] != 7)),
-#'                   which(flowSOM.res[[1]]$map$mapping[,1] %in% 
-#'                                  which(flowSOM.res[[2]] == 5))),]
+#'    # Make an extra file without cluster 7 and double amount of cluster 5
+#'    ff_tmp <- ff[c(which(GetMetaclusters(flowSOM.res) != 7),
+#'                   which(GetMetaclusters(flowSOM.res) == 5)),]
 #'    flowCore::write.FCS(ff_tmp,file="ff_tmp2.fcs")
 #'    
 #'    # Compare the original file with the two new files we made
-#'    groupRes <- CountGroups(flowSOM.res[[1]], 
+#'    groupRes <- CountGroups(flowSOM.res, 
 #'                  groups=list("AllCells"=c(fileName),
 #'                            "Without_ydTcells"=c("ff_tmp.fcs","ff_tmp2.fcs")))
-#'    PlotGroups(flowSOM.res[[1]], groupRes)
+#'    PlotGroups(flowSOM.res, groupRes)
 #'    
-#'    # Compare only the file with the double amount of cluster 10
-#'    groupRes <- CountGroups(flowSOM.res[[1]], 
+#'    # Compare only the file with the double amount of cluster 5
+#'    groupRes <- CountGroups(flowSOM.res, 
 #'                  groups=list("AllCells"=c(fileName),
 #'                  "Without_ydTcells"=c("ff_tmp2.fcs")))
-#'    PlotGroups(flowSOM.res[[1]], groupRes)
+#'    PlotGroups(flowSOM.res, groupRes)
 #'
 #' @export 
 CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE) 
@@ -550,7 +546,7 @@ CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE)
       ff <- flowCore::read.FCS(file)
       fsom_f <- NewData(fsom, ff)
       if (plot) {
-        PlotStars(fsom_f, main = file)
+        PlotStars(fsom_f, title = file)
       }
       tmp <- table(fsom_f$map$mapping[, 1])
       counts[file, names(tmp)] <- tmp
@@ -605,7 +601,7 @@ CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE)
 #' 
 #' @examples
 #'    file <- system.file("extdata", "68983.fcs", package="FlowSOM")
-#'    ff <- read.FCS(file)
+#'    ff <- flowCore::read.FCS(file)
 #'    # Use the wrapper function to build a flowSOM object (saved in fsom[[1]])
 #'    # and a metaclustering (saved in fsom[[2]])
 #'    fsom <- FlowSOM(ff,compensate = TRUE, transform = TRUE,scale = TRUE,
@@ -618,7 +614,7 @@ CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE)
 #'                        "NK cells" = c("PE-A" = "high",
 #'                                       "PE-Cy7-A" = "low",
 #'                                       "APC-Cy7-A" = "low"))
-#'    query_res <- query_multiple(fsom, ff, cell_types, "query_multiple.pdf")
+#'    query_res <- query_multiple(fsom, cell_types, "query_multiple.pdf")
 #'    
 #' @export
 query_multiple <- function(fsom,
@@ -657,7 +653,7 @@ query_multiple <- function(fsom,
 #'                             scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
 #'    
 #'    # Plot stars indicating the MFI of the cells present in the nodes
-#'    PlotNode(flowSOM.res$FlowSOM,1)
+#'    PlotNode(flowSOM.res,1)
 #'
 #' @export
 PlotNode <- function(fsom, id, 

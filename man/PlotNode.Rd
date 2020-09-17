@@ -42,7 +42,7 @@ Plot a star chart indicating median marker values of a single node
                             scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
    
    # Plot stars indicating the MFI of the cells present in the nodes
-   PlotNode(flowSOM.res$FlowSOM,1)
+   PlotNode(flowSOM.res,1)
 
 }
 \seealso{
