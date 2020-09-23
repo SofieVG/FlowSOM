@@ -92,6 +92,19 @@ UpdateDerivedValues <- function(fsom){
   pctgs_tmp <- table(fsom$map$mapping[, 1]) / nrow(fsom$map$mapping)
   pctgs[names(pctgs_tmp)] <- pctgs_tmp
   fsom$map$pctgs <- pctgs
+  
+  
+  if(! is.null(fsom$metaclustering)){
+    fsom$map$metaclusterMFIs <- 
+      data.frame(fsom$data, 
+                 mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
+                 check.names = FALSE) %>% 
+      dplyr::group_by(.data$mcl) %>% 
+      dplyr::summarise_all(stats::median) %>% 
+      dplyr::select(-.data$mcl) %>% 
+      as.matrix()
+  }
+  
   return(fsom)
 }
 
