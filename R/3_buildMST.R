@@ -212,6 +212,7 @@ NewData <- function(fsom,
   fsom_new$map <- fsom$map
   fsom_new$MST <- fsom$MST
   
+  fsom_new$metaclustering <- fsom$metaclustering
   fsom_new$map$mapping <- MapDataToCodes(fsom$map$codes, fsom_new$data)
   fsom_new <- UpdateDerivedValues(fsom_new)
   
@@ -228,7 +229,6 @@ NewData <- function(fsom,
   }
   
   fsom_new$outliers <- test_outliers
-  fsom_new$metaclustering <- fsom$metaclustering
   return(fsom_new)
 }
 
