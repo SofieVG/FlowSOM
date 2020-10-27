@@ -1190,6 +1190,7 @@ UpdateFlowSOM <- function(fsom){
   if (!is(fsom,"FlowSOM")) {
     stop("fsom should be a FlowSOM object.")
   }
+  fsom$prettyColnames <- gsub("\\((.*)\\)", "<\\1>", fsom$prettyColnames)
   if (is.null(fsom$map$pctgs)){
     pctgs <- rep(0, fsom$map$nNodes)
     names(pctgs) <- as.character(seq_len(fsom$map$nNodes))

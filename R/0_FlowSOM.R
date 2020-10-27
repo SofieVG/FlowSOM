@@ -638,7 +638,7 @@ GetChannels <- function(object, markers, exact = TRUE) {
       iChannel <- grep(marker, object_markers)
     }
     if (length(iChannel) != 0){
-      for (i in iMarker){
+      for (i in iChannel){
         channel <- object_channels[iChannel]
         names(channel) <- object_markers[iChannel]
         channelnames <- c(channelnames, channel)
