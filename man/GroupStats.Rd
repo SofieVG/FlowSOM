@@ -16,10 +16,10 @@ with the rownames of the \code{matrix}).}
 \value{
 Matrix with the medians per group, the p-values (the raw, Benjamini 
 Hochberg corrected one and the -log10) that resulted from a Wilcox test and 
-the fold and log10 fold changes beteween the medians of the 2 groups
+the fold and log10 fold changes between the medians of the 2 groups
 }
 \description{
-Calculate statistics between 2 groupes based on the \code{\link{GetFeatures}}
+Calculate statistics between 2 groups based on the \code{\link{GetFeatures}}
 output
 }
 \examples{

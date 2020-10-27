@@ -628,7 +628,9 @@ GetChannels <- function(object, markers, exact = TRUE) {
   } else {
     stop("Object should be of class flowFrame or FlowSOM")
   }
-  channelnames <- sapply(markers, function(marker){
+  
+  channelnames <- c()
+  for (marker in markers){
     if(is.numeric(marker)) {
       iChannel <- marker
     } else {
@@ -636,16 +638,22 @@ GetChannels <- function(object, markers, exact = TRUE) {
       iChannel <- grep(marker, object_markers)
     }
     if (length(iChannel) != 0){
-      return(object_channels[iChannel])
+      for (i in iMarker){
+        channel <- object_channels[iChannel]
+        names(channel) <- object_markers[iChannel]
+        channelnames <- c(channelnames, channel)
+      }
     } else {
-      iChannel <- grep(marker, object_channels)
-      if (length(iChannel)){
-        return(object_channels[iChannel])
+      iChannel <- grep(paste0("^", marker, "$"), object_channels)
+      if (length(iChannel) != 0){
+        channel <- object_channels[iChannel]
+        names(channel) <- channel
+        channelnames <- c(channelnames, channel)
       } else {
         stop(paste("Marker", marker, "could not be found"))
       }
     }
-  })
+  }
   return(channelnames)
 }
 
@@ -687,8 +695,9 @@ GetMarkers <- function(object, channels, exact = TRUE) {
   } else {
     stop("Object should be of class flowFrame or FlowSOM")
   }
-  
-  markernames <- sapply(channels, function(channel){
+
+  markernames <- c()
+  for (channel in channels){
     if (is.numeric(channel)) {
       iMarker <- channel
     } else {
@@ -696,17 +705,22 @@ GetMarkers <- function(object, channels, exact = TRUE) {
       iMarker <- grep(channel, object_channels)
     }
     if (length(iMarker) != 0){
-      marker <- object_markers[iMarker]
-      if (is.na(marker)) marker <- object_channels[iMarker]
-      return(marker)
+      for (i in iMarker){
+        marker <- object_markers[i]
+        if (is.na(marker)) marker <- object_channels[i]
+        names(marker) <- object_channels[i]
+        markernames <- c(markernames, marker)
+      }
     } else {
-      iMarker <- grep(channel, object_markers)
-      if (length(iMarker)){
-        return(object_markers[iMarker])
+      iMarker <- grep(paste0("^", channel, "$"), object_markers)
+      if (length(iMarker) != 0){
+        marker <- object_markers[iMarker]
+        names(marker) <- marker
+        markernames <- c(markernames, marker)
       } else {
         stop(paste("Channel", channel, "could not be found"))
       }
     }
-  })
+  }
   return(markernames)
 }
