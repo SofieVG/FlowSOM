@@ -594,16 +594,15 @@ ManualVector <- function(manualMatrix, cellTypes){
 #' GetChannels
 #' 
 #' Get channel names for an array of markers, given a flowframe or a FlowSOM
-#' object. \code{\link{grep}} is used to look for the markers and ^ and $ is 
-#' added respectively before and after each marker to get a strict match. 
-#' Other regex can be added.
+#' object. As available in "name". \code{\link{grep}} is used to look for the 
+#' markers. Other regex can be added.
 #' 
 #' @param object  The flowFrame or the FlowSOM object of interest 
 #' @param markers Vector with markers or channels of interest. Also accepts the
 #'                index of the marker found in the object.
 #' @param exact   If TRUE (default), the grep pattern will be extended to
-#'                start with ^ and end with $, so only exact matches are 
-#'                possible
+#'                start with ^\\\\Q and end with \\\\E$, so only exact matches 
+#'                are possible.
 #'                  
 #' @return Corresponding channel names
 #'
@@ -634,7 +633,7 @@ GetChannels <- function(object, markers, exact = TRUE) {
     if(is.numeric(marker)) {
       iChannel <- marker
     } else {
-      if(exact) marker <- paste0("^", marker, "$")
+      if(exact) marker <- paste0("^\\Q", marker, "\\E$")
       iChannel <- grep(marker, object_markers)
     }
     if (length(iChannel) != 0){
@@ -644,7 +643,7 @@ GetChannels <- function(object, markers, exact = TRUE) {
         channelnames <- c(channelnames, channel)
       }
     } else {
-      iChannel <- grep(paste0("^", marker, "$"), object_channels)
+      iChannel <- grep(marker, object_channels)
       if (length(iChannel) != 0){
         channel <- object_channels[iChannel]
         names(channel) <- channel
@@ -659,18 +658,16 @@ GetChannels <- function(object, markers, exact = TRUE) {
 
 #' GetMarkers
 #' 
-#' Get marker names, given a flowframe or a FlowSOM object. 
-#' As available in "desc". If this is NA, defaults to channel name. 
-#' \code{\link{grep}} is used to look for the markers and ^ and $ is 
-#' added respectively before and after each marker to get a strict match. 
-#' Other regex can be added.
+#' Get marker names for an array of channels, given a flowframe or a FlowSOM 
+#' object. As available in "desc". If this is NA, defaults to channel name. 
+#' \code{\link{grep}} is used to look for the markers. Other regex can be added.
 #' 
 #' @param object   The flowFrame or the FlowSOM object of interest 
 #' @param channels Vector with markers or channels of interest. Also accepts the
 #'                 index of the channel in the object.
 #' @param exact   If TRUE (default), the grep pattern will be extended to
-#'                start with ^ and end with $, so only exact matches are 
-#'                possible
+#'                start with ^\\\\Q and end with \\\\E$, so only exact matches 
+#'                are possible.
 #'                                  
 #' @return Corresponding marker names
 #'
@@ -701,7 +698,7 @@ GetMarkers <- function(object, channels, exact = TRUE) {
     if (is.numeric(channel)) {
       iMarker <- channel
     } else {
-      if (exact) channel <- paste0("^", channel, "$")
+      if (exact) channel <- paste0("^\\Q", channel, "\\E$")
       iMarker <- grep(channel, object_channels)
     }
     if (length(iMarker) != 0){
@@ -712,7 +709,7 @@ GetMarkers <- function(object, channels, exact = TRUE) {
         markernames <- c(markernames, marker)
       }
     } else {
-      iMarker <- grep(paste0("^", channel, "$"), object_markers)
+      iMarker <- grep(channel, object_markers)
       if (length(iMarker) != 0){
         marker <- object_markers[iMarker]
         names(marker) <- marker

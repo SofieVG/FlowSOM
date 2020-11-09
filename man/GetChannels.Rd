@@ -13,17 +13,16 @@ GetChannels(object, markers, exact = TRUE)
 index of the marker found in the object.}
 
 \item{exact}{If TRUE (default), the grep pattern will be extended to
-start with ^ and end with $, so only exact matches are 
-possible}
+start with ^\\\\Q and end with \\\\E$, so only exact matches 
+are possible.}
 }
 \value{
 Corresponding channel names
 }
 \description{
 Get channel names for an array of markers, given a flowframe or a FlowSOM
-object. \code{\link{grep}} is used to look for the markers and ^ and $ is 
-added respectively before and after each marker to get a strict match. 
-Other regex can be added.
+object. As available in "name". \code{\link{grep}} is used to look for the 
+markers. Other regex can be added.
 }
 \examples{
 
