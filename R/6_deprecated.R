@@ -14,8 +14,8 @@
 #'    # Read the flowFrame
 #'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    ff <- flowCore::read.FCS(fileName)
-#'    get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
-#'    get_markers(ff, c("FSC-A", "CD3", "FITC-A"))
+#'    GetChannels(ff, c("FSC-A", "CD3", "FITC-A"))
+#'    GetMarkers(ff, c("FSC-A", "CD3", "FITC-A"))
 #'
 #' @export
 get_channels <- function(ff, markers) { 
@@ -41,8 +41,8 @@ get_channels <- function(ff, markers) {
 #'    # Read the flowFrame
 #'    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    ff <- flowCore::read.FCS(fileName)
-#'    get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
-#'    get_markers(ff, c("FSC-A", "CD3", "FITC-A"))
+#'    GetChannels(ff, c("FSC-A", "CD3", "FITC-A"))
+#'    GetMarkers(ff, c("FSC-A", "CD3", "FITC-A"))
 #'
 #' @export
 get_markers <- function(ff, markers) {
@@ -66,7 +66,7 @@ get_markers <- function(ff, markers) {
 #' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
 #'                       scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
-#' mfis <- GetMFIs(flowSOM.res)
+#' mfis <- GetClusterMFIs(flowSOM.res)
 #' @export 
 GetMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
   .Deprecated("GetClusterMFIs")
@@ -84,7 +84,7 @@ GetMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
 #' fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #' flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
 #'                       scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
-#' cvs <- GetCVs(flowSOM.res)
+#' cvs <- GetClusterCVs(flowSOM.res)
 #'
 #' @export
 GetCVs <- function(fsom){
@@ -124,11 +124,9 @@ GetCVs <- function(fsom){
 #' flowSOM.res <- BuildMST(flowSOM.res)
 #'
 #' # Give all nodes same size
-#' flowSOM.res <- UpdateNodeSize(flowSOM.res,reset=TRUE)
-#' PlotStars(flowSOM.res)
+#' PlotStars(flowSOM.res, equalNodeSize = TRUE)
 #'
 #' # Node sizes relative to amount of cells assigned to the node
-#' flowSOM.res <- UpdateNodeSize(flowSOM.res)
 #' PlotStars(flowSOM.res)
 #' 
 #' @export
@@ -193,7 +191,7 @@ UpdateNodeSize <- function(fsom, count = NULL, reset=FALSE, transform=sqrt,
 #' 
 #' @examples
 #' 
-#'    ## Deprecated - use Plot2DScatter instead ##
+#'    ## Deprecated - use Plot2DScatters instead ##
 #'  
 #'    # Read from file, build self-organizing map and minimal spanning tree
 #'    fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -204,7 +202,7 @@ UpdateNodeSize <- function(fsom, count = NULL, reset=FALSE, transform=sqrt,
 #'    
 #'    # Plot cells
 #'    \dontrun{
-#'    PlotClusters2D(flowSOM.res, 1, 2, 91)
+#'    Plot2DScatters(flowSOM.res, c(1, 2), clusters = 91)
 #'    }
 #'
 #' @export
@@ -270,7 +268,7 @@ PlotClusters2D <- function(fsom, marker1, marker2, nodes,
 #' 
 #' @examples
 #' 
-#'    ## Deprecated - use Plot2DScatter instead ##
+#'    ## Deprecated - use Plot2DScatters instead ##
 #' 
 #'    # Read from file, build self-organizing map and minimal spanning tree
 #'    fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -293,11 +291,9 @@ PlotClusters2D <- function(fsom, marker1, marker2, nodes,
 #'      png("Markeroverview.png",
 #'          width = 500 * length(markers_of_interest),
 #'          height = 500 * length(metaclusters_of_interest))
-#'      PlotOverview2D(flowSOM.res,
-#'                     markerlist = markers_of_interest,
-#'                     metaclusters = metaclusters_of_interest,
-#'                     pchCluster = 19,
-#'                     ff = flowCore::read.FCS(fileName))
+#'      Plot2DScatters(flowSOM.res,
+#'                     channelpairs = markers_of_interest,
+#'                     metaclusters = metaclusters_of_interest)
 #'      dev.off()
 #'    }
 #'
@@ -347,7 +343,7 @@ PlotOverview2D <- function(fsom,
 #'          flowCore::transformList(colnames(ff@@description$SPILL),
 #'                                 flowCore::logicleTransform()))
 #' flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),maxMeta=10)
-#' mfis <- MetaclusterMFIs(flowSOM.res)
+#' mfis <- GetMetaclusterMFIs(flowSOM.res)
 #' @export
 MetaclusterMFIs <- function(fsom){
   .Deprecated("GetMetaclusterMFIs")
@@ -369,7 +365,7 @@ MetaclusterMFIs <- function(fsom){
 #'          flowCore::transformList(colnames(ff@@description$SPILL),
 #'                                 flowCore::logicleTransform()))
 #' flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18), nClus=10)
-#' cvs <- MetaclusterCVs(flowSOM.res)
+#' cvs <- GetMetaclusterCVs(flowSOM.res)
 #' @export
 MetaclusterCVs <- function(fsom){
   .Deprecated("GetMetaclusterCVs")
@@ -416,11 +412,37 @@ MetaclusterCVs <- function(fsom){
 #' flowCore::write.FCS(ff_tmp, file="ff_tmp.fcs")
 #' 
 #' # Compare only the file with the double amount of cluster 10
-#' groupRes <- CountGroups(fsom, 
-#'                         groups = list("AllCells" = c(fileName),
-#'                                       "Without_ydTcells" = c("ff_tmp.fcs")))
-#' PlotGroups(fsom, groupRes, pThreshold = NULL, threshold = 2)
-#'         
+#' features <- GetFeatures(fsom, 
+#'                         c(fileName, "ff_tmp.fcs"),
+#'                         population = "clusters",
+#'                         type = "percentages")
+#' stats <- GroupStats(features$cluster_percentages,                     
+#'                     groups = list("AllCells" = c(fileName),
+#'                                   "Without_ydTcells" = c("ff_tmp.fcs")))
+#'
+#' fold_changes <- stats["fold changes", ]
+#' fold_changes_label <- factor(ifelse(fold_changes < -1.5, 
+#'                            "Underrepresented compared to Group 1",
+#'                            ifelse(fold_changes > 1.5, 
+#'                                   "Overrepresented compared to Group 1",
+#'                                   "--")), 
+#'                             levels = c("--", 
+#'                                "Underrepresented compared to Group 1",
+#'                                "Overrepresented compared to Group 1"))
+#' fold_changes_label[is.na(fold_changes_label)] <- "--"                                   
+#' gr_1 <- PlotStars(flowSOM.res, 
+#'                   title = "All Cells", 
+#'                   nodeSizes = stats["medians AllCells", ], 
+#'                   list_insteadof_ggarrange = TRUE)
+#' gr_2 <- PlotStars(flowSOM.res, title = "Group 2", 
+#'                nodeSizes = stats["medians Without_ydTcells", ], 
+#'                 backgroundValues = fold_changes_label,
+#'                backgroundColors = c("white", "red", "blue"), 
+#'                list_insteadof_ggarrange = TRUE)
+#' p <- ggpubr::ggarrange(plotlist = c(list(gr_1$tree), gr_2),
+#'                     heights = c(3, 1))
+#' p                   
+#'          
 #' @importFrom grDevices colorRampPalette
 #' 
 #' @export
