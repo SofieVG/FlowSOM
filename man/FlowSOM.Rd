@@ -13,7 +13,7 @@ FlowSOM(
   toTransform = NULL,
   transformFunction = flowCore::logicleTransform(),
   transformList = NULL,
-  scale = TRUE,
+  scale = FALSE,
   scaled.center = TRUE,
   scaled.scale = TRUE,
   silent = TRUE,

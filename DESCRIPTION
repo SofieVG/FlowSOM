@@ -41,7 +41,8 @@ Imports:
     RColorBrewer,
     rlang,
     Rtsne,
-    XML
+    XML,
+    scattermore
 Suggests:
     BiocStyle,
     testthat

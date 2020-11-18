@@ -99,7 +99,7 @@ FlowSOM <- function(input, pattern = ".fcs",
                     compensate = FALSE, spillover = NULL, 
                     transform = FALSE, toTransform = NULL, 
                     transformFunction = flowCore::logicleTransform(), 
-                    transformList = NULL, scale = TRUE, 
+                    transformList = NULL, scale = FALSE, 
                     scaled.center = TRUE, scaled.scale = TRUE, silent = TRUE, 
                     colsToUse = NULL, nClus = 10, maxMeta = NULL, importance = NULL, 
                     seed = NULL, ...){

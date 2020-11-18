@@ -52,7 +52,8 @@ gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
                                 cellTypes = cellTypes)               
 
 # Build a FlowSOM object
-flowSOM.res <- FlowSOM(fcs_file, 
+flowSOM.res <- FlowSOM(fcs_file,
+                       scale = TRUE,
                        compensate = TRUE, 
                        transform = TRUE,
                        toTransform = 8:18, 

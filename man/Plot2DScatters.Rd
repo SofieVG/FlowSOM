@@ -75,6 +75,7 @@ fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs",
 
 # Build a FlowSOM object
 flowSOM.res <- FlowSOM(fcs, 
+                       scale = TRUE,
                        compensate = TRUE, 
                        transform = TRUE,
                        toTransform = 8:18, 

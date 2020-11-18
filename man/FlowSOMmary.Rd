@@ -19,8 +19,8 @@ Returns a summary of the FlowSOM object
 \description{
 This functions plots a summary of a flowSOM object. It includes a table of 
 (meta)cluster data, the flowSOM trees and grid view, the (meta)cluster 
-labels, the markers expression, the file distribution if present, the 
-relative (meta)cluster expression, the cluster per metacluster percentage 
+labels, the markers expression, the file distribution if present,
+the cluster per metacluster percentage, a t-SNE plot,
 and the MFI per metacluster.
 }
 \examples{
@@ -30,6 +30,7 @@ fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs",
 
 # Build a FlowSOM object
 flowSOM.res <- FlowSOM(fcs, 
+                       scale = TRUE,
                        compensate = TRUE, 
                        transform = TRUE,
                        toTransform = 8:18, 

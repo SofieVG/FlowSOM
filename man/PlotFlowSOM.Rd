@@ -70,6 +70,7 @@ fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
 
 # Build FlowSOM model
 flowSOM.res <- FlowSOM(fcs_file, 
+                       scale = TRUE,
                        compensate = TRUE, 
                        transform = TRUE,
                        toTransform = 8:18, 
