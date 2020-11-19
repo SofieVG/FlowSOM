@@ -23,8 +23,8 @@ defaults to channel name.
    # Read the flowFrame
    fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
    ff <- flowCore::read.FCS(fileName)
-   get_channels(ff, c("FSC-A", "CD3", "FITC-A"))
-   get_markers(ff, c("FSC-A", "CD3", "FITC-A"))
+   GetChannels(ff, c("FSC-A", "CD3", "FITC-A"))
+   GetMarkers(ff, c("FSC-A", "CD3", "FITC-A"))
 
 }
 \seealso{

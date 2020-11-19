@@ -1,0 +1,25 @@
+citHeader("To cite FlowSOM in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "{FlowSOM}: Using self-organizing maps for visualization and interpretation of cytometry data",
+  author   = c(person("Sofie", "Van Gassen"),
+                    person("Britt", "Callebaut"),
+                    person("Mary J", "Van Helden"),
+                    person("Bart N", "Lambrecht"),
+                    person("Piet", "Demeester"),
+                    person("Tom", "Dhaene"),
+                    person("Yvan", "Saeys")),
+  journal  = "Cytometry Part A",
+  year     = "2015",
+  volume   = "87",
+  number   = "7",
+  pages    = "636-645",
+  url      = "https://onlinelibrary.wiley.com/doi/full/10.1002/cyto.a.22625",
+  textVersion = paste(
+         "Van Gassen S et al. (2015)",
+         "FlowSOM: Using self-organizing maps for visualization and",
+         "interpretation of cytometry data. Cytom Part J Int Soc Anal Cytol 87: ",
+         "636-645. https://onlinelibrary.wiley.com/doi/full/10.1002/cyto.a.22625"
+  )
+)

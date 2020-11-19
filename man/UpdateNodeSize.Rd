@@ -51,11 +51,9 @@ flowSOM.res <- BuildSOM(flowSOM.res,colsToUse=c(9,12,14:18))
 flowSOM.res <- BuildMST(flowSOM.res)
 
 # Give all nodes same size
-flowSOM.res <- UpdateNodeSize(flowSOM.res,reset=TRUE)
-PlotStars(flowSOM.res)
+PlotStars(flowSOM.res, equalNodeSize = TRUE)
 
 # Node sizes relative to amount of cells assigned to the node
-flowSOM.res <- UpdateNodeSize(flowSOM.res)
 PlotStars(flowSOM.res)
 
 }

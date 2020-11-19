@@ -19,7 +19,8 @@
 #'                      of \code{$SPILL} description in fcs file will be used.
 #' @param transformFunction Defaults to logicleTransform()
 #' @param transformList transformList to apply on the samples.
-#' @param scale         logical, does the data needs to be rescaled
+#' @param scale         logical, does the data needs to be rescaled. 
+#'                      Default = FALSE
 #' @param scaled.center see \code{\link{scale}}
 #' @param scaled.scale  see \code{\link{scale}}
 #' @param silent        if \code{TRUE}, no progress updates will be printed

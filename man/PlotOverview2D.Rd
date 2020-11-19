@@ -38,7 +38,7 @@ metaclusters are plotted in color.
 }
 \examples{
 
-   ## Deprecated - use Plot2DScatter instead ##
+   ## Deprecated - use Plot2DScatters instead ##
 
    # Read from file, build self-organizing map and minimal spanning tree
    fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -61,11 +61,9 @@ metaclusters are plotted in color.
      png("Markeroverview.png",
          width = 500 * length(markers_of_interest),
          height = 500 * length(metaclusters_of_interest))
-     PlotOverview2D(flowSOM.res,
-                    markerlist = markers_of_interest,
-                    metaclusters = metaclusters_of_interest,
-                    pchCluster = 19,
-                    ff = flowCore::read.FCS(fileName))
+     Plot2DScatters(flowSOM.res,
+                    channelpairs = markers_of_interest,
+                    metaclusters = metaclusters_of_interest)
      dev.off()
    }
 

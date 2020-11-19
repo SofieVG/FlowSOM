@@ -50,7 +50,8 @@ of \code{$SPILL} description in fcs file will be used.}
 
 \item{transformList}{transformList to apply on the samples.}
 
-\item{scale}{logical, does the data needs to be rescaled}
+\item{scale}{logical, does the data needs to be rescaled. 
+Default = FALSE}
 
 \item{scaled.center}{see \code{\link{scale}}}
 

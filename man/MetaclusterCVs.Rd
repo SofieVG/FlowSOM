@@ -23,5 +23,5 @@ ff <- flowCore::transform(ff,
          flowCore::transformList(colnames(ff@description$SPILL),
                                 flowCore::logicleTransform()))
 flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18), nClus=10)
-cvs <- MetaclusterCVs(flowSOM.res)
+cvs <- GetMetaclusterCVs(flowSOM.res)
 }

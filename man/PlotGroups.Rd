@@ -46,11 +46,37 @@ ff_tmp <- ff[selection,]
 flowCore::write.FCS(ff_tmp, file="ff_tmp.fcs")
 
 # Compare only the file with the double amount of cluster 10
-groupRes <- CountGroups(fsom, 
-                        groups = list("AllCells" = c(fileName),
-                                      "Without_ydTcells" = c("ff_tmp.fcs")))
-PlotGroups(fsom, groupRes, pThreshold = NULL, threshold = 2)
-        
+features <- GetFeatures(fsom, 
+                        c(fileName, "ff_tmp.fcs"),
+                        population = "clusters",
+                        type = "percentages")
+stats <- GroupStats(features$cluster_percentages,                     
+                    groups = list("AllCells" = c(fileName),
+                                  "Without_ydTcells" = c("ff_tmp.fcs")))
+
+fold_changes <- stats["fold changes", ]
+fold_changes_label <- factor(ifelse(fold_changes < -1.5, 
+                           "Underrepresented compared to Group 1",
+                           ifelse(fold_changes > 1.5, 
+                                  "Overrepresented compared to Group 1",
+                                  "--")), 
+                            levels = c("--", 
+                               "Underrepresented compared to Group 1",
+                               "Overrepresented compared to Group 1"))
+fold_changes_label[is.na(fold_changes_label)] <- "--"                                   
+gr_1 <- PlotStars(flowSOM.res, 
+                  title = "All Cells", 
+                  nodeSizes = stats["medians AllCells", ], 
+                  list_insteadof_ggarrange = TRUE)
+gr_2 <- PlotStars(flowSOM.res, title = "Group 2", 
+               nodeSizes = stats["medians Without_ydTcells", ], 
+                backgroundValues = fold_changes_label,
+               backgroundColors = c("white", "red", "blue"), 
+               list_insteadof_ggarrange = TRUE)
+p <- ggpubr::ggarrange(plotlist = c(list(gr_1$tree), gr_2),
+                    heights = c(3, 1))
+p                   
+         
 }
 \seealso{
 \code{\link{PlotStars}},\code{\link{PlotVariable}},

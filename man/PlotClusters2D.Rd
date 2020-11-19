@@ -66,7 +66,7 @@ top left will have index 91.
 }
 \examples{
 
-   ## Deprecated - use Plot2DScatter instead ##
+   ## Deprecated - use Plot2DScatters instead ##
  
    # Read from file, build self-organizing map and minimal spanning tree
    fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -77,7 +77,7 @@ top left will have index 91.
    
    # Plot cells
    \dontrun{
-   PlotClusters2D(flowSOM.res, 1, 2, 91)
+   Plot2DScatters(flowSOM.res, c(1, 2), clusters = 91)
    }
 
 }
