@@ -790,12 +790,11 @@ GroupStats <- function(features, groups){
   
   
   #----Calculate medians per group----
-  i <- c()
+  i <- rep(NA, nrow(features))
   for (group in names(groups)){
-    for (ID in groups[[group]]){
-      i[match(ID, rownames(features))] <- group
-    }
+    i[rownames(features) %in% groups[[group]]] <- group
   }
+  
   medians <- apply(features, 2, function(x) {
     tapply(x, INDEX = factor(i, 
                              levels = names(groups)), stats::median)
