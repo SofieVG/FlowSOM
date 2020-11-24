@@ -41,6 +41,7 @@ Imports:
     RColorBrewer,
     rlang,
     Rtsne,
+    tidyr,
     XML,
     scattermore
 Suggests:

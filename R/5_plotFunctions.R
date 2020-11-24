@@ -713,8 +713,10 @@ PlotDimRed <- function(fsom,
     dimred_plot <- dimred_plot %>% tidyr::pivot_longer(3:ncol(dimred_plot), 
                                                        names_to = "markers")
     p <- ggplot2::ggplot(dimred_plot) + 
-      scattermore::geom_scattermore(ggplot2::aes(x = dimred_1, y = dimred_2, 
-                                                 col = value), pointsize = 1) +
+      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
+                                                 y = .data$dimred_2, 
+                                                 col = .data$value), 
+                                    pointsize = 1) +
       ggplot2::facet_wrap(~markers) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
@@ -722,8 +724,9 @@ PlotDimRed <- function(fsom,
   } else {
     colnames(dimred_plot) <- c("dimred_1", "dimred_2", "colors")
     p <- ggplot2::ggplot(dimred_plot) +
-      scattermore::geom_scattermore(ggplot2::aes(x = dimred_1, y = dimred_2, 
-                                                 col = colors), 
+      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
+                                                 y = .data$dimred_2, 
+                                                 col = .data$colors), 
                                     pointsize = 1) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
@@ -2245,6 +2248,7 @@ Plot2DScatters <- function(fsom,
 #' 
 #' @export
 FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
+  
   #----Initializing ----
   fsom <- UpdateFlowSOM(fsom)
   metaclustersPresent <- !is.null(fsom$metaclustering)
@@ -2257,12 +2261,16 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   nNodes <- seq_len(NClusters(fsom))
   filePresent <- "File" %in% colnames(fsom$data)
   plotList <- list()
+  
   #----Plot fsom trees and grids----
   message("Plot FlowSOM trees")
+  
   for(view in c("MST", "grid")){
+    
     plotList[[paste0("stars_", view)]] <- 
       PlotStars(fsom, view = view, backgroundValues = fsom$metaclustering, 
                 title = paste0("FlowSOM ", view))
+    
     if (metaclustersPresent){
       p2.1 <- PlotFlowSOM(fsom, view = view, title = "FlowSOM Clusters",
                           equalNodeSize = TRUE) %>% 
@@ -2270,6 +2278,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                  showLegend = TRUE,
                  label = "Metaclusters") %>% 
         AddLabels(labels = seq_len(NClusters(fsom)))
+      
       p2.2 <- PlotFlowSOM(fsom, view = view, equalNodeSize = TRUE,
                           title = "FlowSOM Metaclusters") %>% 
         AddNodes(values = fsom$metaclustering, showLegend = TRUE,
@@ -2285,6 +2294,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
       ggpubr::ggarrange(p2.1, p2.2, 
                         common.legend = TRUE, legend = "right")
   }
+  
   #----Plot Markers----
   plotMarkerList <- list()
   for (channel in fsom$map$colsUsed){
@@ -2296,6 +2306,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   plotList[["p5"]] <- ggpubr::ggarrange(plotlist = plotMarkerList, 
                                         common.legend = TRUE, 
                                         legend = "right")
+  
   #----File distribution----
   if (filePresent){
     message("Plot file distribution")
@@ -2303,6 +2314,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                    equalNodeSize = TRUE, view = "grid", 
                    title = "File distribution per cluster", 
                    colorPalette = FlowSOM_colors)
+    
     filesI <- as.character(unique(fsom$data[, "File"]))
     expectedDistr <- rep(1, length(filesI))
     names(expectedDistr) <- filesI
@@ -2313,6 +2325,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
       ggplot2::geom_text(ggplot2::aes(x = 0, y = -1, 
                                       label = "Expected distribution"))
   }
+  
   #----t-SNE----
   message("Calculate t-SNE")
   dimred_res <- PlotDimRed(fsom, cTotal = 5000, colorBy = fsom$map$colsUsed,
@@ -2323,25 +2336,29 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
     metaclusters_dr <- GetMetaclusters(fsom)[dimred_res$layout[ ,"Original_ID"]]
     dimred_plot <- cbind(dimred_res$layout, metaclusters_dr)
     plotList[["p7"]] <- ggplot2::ggplot(dimred_plot) +
-      scattermore::geom_scattermore(ggplot2::aes(x = dimred_1, 
-                                                 y = dimred_2, 
-                                                 col = metaclusters_dr), 
+      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1,
+                                                 y = .data$dimred_2,
+                                                 col = .data$metaclusters_dr),
                                     pointsize = 1) +
       ggplot2::theme_minimal() + ggplot2::coord_fixed() +
       ggplot2::xlab("tSNE_1") + ggplot2::ylab("tSNE_2") +
       ggplot2::ggtitle(paste0("t-SNE with markers used in FlowSOM ",
-                              "call (perplexity = 30, cells = 5000)")) 
+                              "call (perplexity = 30, cells = 5000)"))
   }
   plotList[["p8"]] <- dimred_res$plot
+  
   #----Cluster Per Metacluster----
   if (metaclustersPresent){
+    
     message("Plot cluster per metacluster distibution")
+    
     clusterPerMetacluster <- data.frame(metaclusters, clusters) %>%
       dplyr::group_by(metaclusters) %>%
       dplyr::count(clusters) %>%
       dplyr::mutate(Percentage = .data$n / sum(.data$n) * 100) %>%
       dplyr::mutate(LabelPos = cumsum(.data$Percentage) - 1) %>%
       as.data.frame()
+    
     clusterPerMetacluster$clusters <- factor(clusterPerMetacluster$cluster)
     plotList[["p9"]] <- ggplot2::ggplot(clusterPerMetacluster,
                                         ggplot2::aes(x = metaclusters)) +
@@ -2353,7 +2370,9 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                      panel.grid.minor.x = ggplot2::element_blank(),
                      legend.position = "none") +
       ggplot2::ggtitle("Percentages clusters per metacluster")
+    
     #----Median expression per metacluster----
+    
     message("Plot heatmap")
     colnames(mfis) <- fsom$prettyColnames[colnames(mfis)]
     rownames(mfis) <- seq_len(nrow(mfis))
@@ -2363,22 +2382,9 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                          display_numbers = round(mfis, 2),
                          main = "Median expression per metacluster")
   }
+  
   #----Table----
   message("Make tables")
-  freqClusters <- as.data.frame(clusters) %>%
-    dplyr::count(.data$clusters) %>%
-    dplyr::mutate(freq = .data$n / sum(.data$n) * 100)
-  if (metaclustersPresent){
-    freqClusters <- data.frame(Metaclusters = fsom$metaclustering,
-                               Cluster = factor(nNodes, levels = order(
-                                 fsom$metaclustering)),
-                               n = freqClusters$n,
-                               Percentage = freqClusters$freq)
-  } else {
-    freqClusters <- data.frame(Cluster = factor(nNodes),
-                               n = freqClusters$n,
-                               Percentage = freqClusters$freq)
-  }
   
   datatable1 <- data.frame("Total number of cells" = nrow(fsom$data), 
                            check.names = FALSE)
@@ -2392,51 +2398,65 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   datatable1 <- format(datatable1, digits = 2)
   t1 <- ggpubr::ggtexttable(datatable1, theme = ggpubr::ttheme("minimal"),
                             rows = NULL)
+  
   if (metaclustersPresent){
-    clusterdatatable <- lapply(seq_len(nMetaclusters), function(i){
-      subClPerMetacl <- clusterPerMetacluster %>% 
-        dplyr::filter(metaclusters == i) %>% 
-        dplyr::pull(clusters) %>% as.numeric()
-      if (length(subClPerMetacl) > 25){
-        ws <- seq(from = 25, to = length(subClPerMetacl), by = 26)
-        for (n in ws){
-          subClPerMetacl <- append(subClPerMetacl, "\n", n)
-        }
-      }
-      clString <- paste(subClPerMetacl, collapse = ", ")
-      clString <- gsub("\n,", "\n", clString)
-      return(clString)
-    })
-    freqMetaclusters <- as.data.frame(metaclusters) %>%
+    freqMetaclusters <- data.frame(metaclusters = 
+                                     as.numeric(as.character(metaclusters))) %>%
       dplyr::count(.data$metaclusters) %>%
       dplyr::mutate(percentage = .data$n / sum(.data$n) * 100) %>%
       as.data.frame()
     datatable2 <- data.frame("Metacluster" = seq_len(nMetaclusters),
-                             "Number of cells" = freqMetaclusters$n,
-                             "Percentage of cells" = 
-                               format(freqMetaclusters$percentage, digits = 2),
-                             "Number of clusters" = 
-                               as.numeric(
-                                 table(clusterPerMetacluster$metaclusters)),
-                             "Clusters" = do.call(rbind, clusterdatatable),
+                             "Number of cells" = 0,
+                             "Percentage of cells" = 0,
+                             "Number of clusters" = 0,
+                             "Clusters" = "",
                              check.names = FALSE)
+    datatable2[freqMetaclusters[,"metaclusters"], "Number of cells"] <- 
+      freqMetaclusters[,"n"]
+    datatable2[freqMetaclusters[,"metaclusters"], "Percentage of cells"] <- 
+      freqMetaclusters[,"percentage"]
+    datatable2[, "Number of clusters"] <- 
+      sapply(seq_len(nMetaclusters), function(x){
+        which(fsom$metaclustering == x) %>% length()})
+    datatable2[, "Clusters"] <- 
+      sapply(seq_len(nMetaclusters), function(x){
+        cl_selected <- which(fsom$metaclustering == x)
+        clusters_string <- split(cl_selected, 
+                                 rep(seq_len(ceiling(length(cl_selected)/25)), 
+                                     each = 25)[seq_len(length(cl_selected))]) %>% 
+          sapply(paste, collapse =", ") %>% 
+          paste(collapse = ",\n")
+        return(clusters_string)
+      })
+    
+    datatable2 <- format(datatable2, digits = 2)
     split_datatable2 <- split(datatable2, rep(seq_len(
       ceiling(nrow(datatable2) / 30)), each = 30, 
       length.out=nrow(datatable2)))
-    datatable2 <- format(datatable2, digits = 2)
-    tmp <- clusterPerMetacluster %>% 
-      dplyr::arrange(clusters) %>% 
-      dplyr::pull(.data$Percentage)
   }
-  datatable3 <- data.frame("Cluster" = nNodes,
-                           "Number of cells" = freqClusters$n,
-                           "Percentage of cells" = freqClusters$Percentage,
+  
+  freqClusters <- as.data.frame(clusters) %>%
+    dplyr::count(.data$clusters) %>%
+    dplyr::mutate(freq = .data$n / sum(.data$n) * 100)
+  
+  datatable3 <- data.frame("Cluster" = factor(nNodes),
+                           "Number of cells" = 0,
+                           "Percentage of cells" = 0,
                            check.names = FALSE)
+  datatable3[freqClusters[,"clusters"], "Number of cells"] <- 
+    freqClusters[,"n"]
+  datatable3[freqClusters[,"clusters"], "Percentage of cells"] <- 
+    freqClusters[,"freq"]
+  
   if (metaclustersPresent){
-    datatable3 <- cbind(datatable3, 
-                        "Belongs to metacluster" = freqClusters$Metaclusters,
-                        "Percentage in metacluster" = tmp)
+    datatable3 <-  cbind(datatable3, 
+                         "Belongs to metacluster" = fsom$metaclustering,
+                         "Percentage in metacluster" = 0)
+    datatable3[as.numeric(as.character(clusterPerMetacluster[,"clusters"])), 
+               "Percentage in metacluster"] <-
+      clusterPerMetacluster[, "Percentage"]
   }
+  
   datatable3 <- format(datatable3, digits = 2)
   split_datatable3 <- split(datatable3, rep(seq_len(
     ceiling(nrow(datatable3) / 30)), each = 30, 

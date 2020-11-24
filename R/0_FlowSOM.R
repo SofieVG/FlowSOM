@@ -520,7 +520,7 @@ GetFlowJoLabels <- function(files,
   result <- list()
   for(file in files){
     print(paste0("Processing ", file))
-    file_id <- grep(paste0("^", basename(file), "$"), 
+    file_id <- grep(paste0("^\\Q", basename(file), "\\E$"), 
                     files_in_wsp)
     if(length(file_id) == 0) {stop("File ", basename(file), 
                                    " not found. Files available: \n",

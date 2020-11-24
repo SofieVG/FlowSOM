@@ -430,11 +430,11 @@ MetaclusterCVs <- function(fsom){
 #'                                "Underrepresented compared to Group 1",
 #'                                "Overrepresented compared to Group 1"))
 #' fold_changes_label[is.na(fold_changes_label)] <- "--"                                   
-#' gr_1 <- PlotStars(flowSOM.res, 
+#' gr_1 <- PlotStars(fsom, 
 #'                   title = "All Cells", 
 #'                   nodeSizes = stats["medians AllCells", ], 
 #'                   list_insteadof_ggarrange = TRUE)
-#' gr_2 <- PlotStars(flowSOM.res, title = "Group 2", 
+#' gr_2 <- PlotStars(fsom, title = "Group 2", 
 #'                nodeSizes = stats["medians Without_ydTcells", ], 
 #'                 backgroundValues = fold_changes_label,
 #'                backgroundColors = c("white", "red", "blue"), 
@@ -636,7 +636,7 @@ CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE)
 #'                        "NK cells" = c("PE-A" = "high",
 #'                                       "PE-Cy7-A" = "low",
 #'                                       "APC-Cy7-A" = "low"))
-#'    query_res <- query_multiple(fsom, cell_types, "query_multiple.pdf")
+#'    query_res <- QueryMultiple(fsom, cell_types, "query_multiple.pdf")
 #'    
 #' @export
 query_multiple <- function(fsom,
