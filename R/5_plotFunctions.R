@@ -13,9 +13,8 @@
 #'                          given in coords. Default = "MST"  
 #' @param nodeSizes         A vector containing nodesizes. These will 
 #'                          automatically be scaled between 0 and maxNodeSize 
-#'                          and transformed with a sqrt Default = fsom$MST$sizes
-#' @param maxNodeSize       Determines the maximum nodesize. Default is "auto" 
-#'                          determined by \code{\link{AutoMaxNodeSize}}. 
+#'                          and transformed with a sqrt. Default = fsom$MST$sizes
+#' @param maxNodeSize       Determines the maximum nodesize. Default is 1.
 #' @param refNodeSize       Reference for nodesize against which the nodeSizes 
 #'                          will be scaled. Default = max(nodeSizes)
 #' @param equalNodeSize     If \code{TRUE}, the nodes will be equal to 
@@ -75,7 +74,7 @@
 PlotFlowSOM <- function(fsom,
                         view = "MST",
                         nodeSizes = fsom$map$pctgs,
-                        maxNodeSize = "auto",
+                        maxNodeSize = 1,
                         refNodeSize = max(nodeSizes),
                         equalNodeSize = FALSE,
                         backgroundValues = NULL,
@@ -108,11 +107,10 @@ PlotFlowSOM <- function(fsom,
   if(is.matrix(view) || is.data.frame(view)) view <- "matrix"
   
   #---- Nodesize----
-  if (maxNodeSize == "auto"){
-    maxNodeSize <- AutoMaxNodeSize(layout = layout, 
-                                   overlap = ifelse(view %in% c("grid"),
-                                                    -0.3, 1))
-  }
+  autoNodeSize <- AutoMaxNodeSize(layout = layout, 
+                                 overlap = ifelse(view %in% c("grid"),
+                                                  -0.3, 1)) 
+  maxNodeSize <- autoNodeSize * maxNodeSize
   
   if (equalNodeSize){
     scaledNodeSize <- rep(maxNodeSize, nNodes)

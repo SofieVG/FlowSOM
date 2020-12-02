@@ -8,7 +8,7 @@ PlotFlowSOM(
   fsom,
   view = "MST",
   nodeSizes = fsom$map$pctgs,
-  maxNodeSize = "auto",
+  maxNodeSize = 1,
   refNodeSize = max(nodeSizes),
   equalNodeSize = FALSE,
   backgroundValues = NULL,
@@ -26,10 +26,9 @@ given in coords. Default = "MST"}
 
 \item{nodeSizes}{A vector containing nodesizes. These will 
 automatically be scaled between 0 and maxNodeSize 
-and transformed with a sqrt Default = fsom$MST$sizes}
+and transformed with a sqrt. Default = fsom$MST$sizes}
 
-\item{maxNodeSize}{Determines the maximum nodesize. Default is "auto" 
-determined by \code{\link{AutoMaxNodeSize}}.}
+\item{maxNodeSize}{Determines the maximum nodesize. Default is 1.}
 
 \item{refNodeSize}{Reference for nodesize against which the nodeSizes 
 will be scaled. Default = max(nodeSizes)}
