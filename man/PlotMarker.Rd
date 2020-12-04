@@ -17,14 +17,14 @@ PlotMarker(
 \arguments{
 \item{fsom}{FlowSOM object}
 
-\item{marker}{A marker/channel to plot.}
+\item{marker}{A vector of markers/channels to plot.}
 
 \item{refMarkers}{Is used to determine relative scale of the marker 
 that will be plotted. Default are all markers used in the
 clustering.}
 
-\item{title}{Add a custom title for the plot. Default is the marker
-name}
+\item{title}{A vector with custom titles for the plot. Default is 
+the marker name.}
 
 \item{colorPalette}{Colorpalette to use. Can be a function or a vector.}
 
@@ -60,11 +60,8 @@ PlotMarker(flowSOM.res,
            colorPalette = c("grey", "red"))
            
 # Plot all markers
-plots <- list()
-for(marker in c(9,12,14:18)){
-  plots[[length(plots)+1]] <- PlotMarker(flowSOM.res, marker)
-}
-ggpubr::ggarrange(plotlist = plots, common.legend = TRUE)
+PlotMarker(flowSOM.res,
+           c(9, 12, 14:18))
 
 # Use specific limits if the ones from the columns used for clustering
 # are not relevant for  your marker of choice

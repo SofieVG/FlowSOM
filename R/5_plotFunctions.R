@@ -465,12 +465,12 @@ PlotNumbers <- function(fsom,
 #' Plot FlowSOM grid or tree, coloured by node values for a specific marker
 #'
 #' @param fsom         FlowSOM object
-#' @param marker       A marker/channel to plot.
+#' @param marker       A vector of markers/channels to plot.
 #' @param refMarkers  Is used to determine relative scale of the marker 
 #'                     that will be plotted. Default are all markers used in the
 #'                     clustering.
-#' @param title        Add a custom title for the plot. Default is the marker
-#'                     name
+#' @param title        A vector with custom titles for the plot. Default is 
+#'                     the marker name.
 #' @param colorPalette Colorpalette to use. Can be a function or a vector.
 #' @param lim          Limits for the scale
 #' @param ...     Additional arguments to pass to \code{\link{PlotFlowSOM}},
@@ -498,11 +498,8 @@ PlotNumbers <- function(fsom,
 #'            colorPalette = c("grey", "red"))
 #'            
 #' # Plot all markers
-#' plots <- list()
-#' for(marker in c(9,12,14:18)){
-#'   plots[[length(plots)+1]] <- PlotMarker(flowSOM.res, marker)
-#' }
-#' ggpubr::ggarrange(plotlist = plots, common.legend = TRUE)
+#' PlotMarker(flowSOM.res,
+#'            c(9, 12, 14:18))
 #' 
 #' # Use specific limits if the ones from the columns used for clustering
 #' # are not relevant for  your marker of choice
@@ -531,35 +528,36 @@ PlotMarker <- function(fsom,
                        lim = NULL,
                        ...){
   
-  if (length(marker) != 1){
-    warning("Only the first marker will be shown.")
-    marker <- marker[1]
-  } 
-  
   fsom <- UpdateFlowSOM(fsom)
   
   # Get median values to visualise
   mfis <- GetClusterMFIs(fsom)
   
   # Get column names
-  channel <- GetChannels(fsom, marker)
-  if(!channel %in% colnames(mfis)) stop("No MFI values for ", marker, ".")
-  
+  channels <- GetChannels(fsom, marker)
+
   # Compute limits based on all reference markers
   ref_channels <- GetChannels(fsom, refMarkers)
   if (is.null(lim)) lim <- c(min(mfis[, ref_channels]), 
                              max(mfis[, ref_channels]))
   
-  # Use MFI values as variable to plot
-  p <- PlotVariable(fsom, 
-                    variable = mfis[, channel],
-                    variableName = "MFI",
-                    colorPalette = colorPalette,
-                    lim = lim,
-                    ...)
-  
-  # Add title
-  p <- p + ggplot2::ggtitle(title)
+  plotList <- lapply(seq_along(channels), function(channelI){
+    
+    # Use MFI values as variable to plot
+    p <- PlotVariable(fsom, 
+                      variable = mfis[, channels[channelI]],
+                      variableName = "MFI",
+                      colorPalette = colorPalette,
+                      lim = lim,
+                      ...)
+    
+    # Add title
+    if (is.na(title[channelI])) title[channelI] <- ""
+    p <- p + ggplot2::ggtitle(title[channelI])
+  })
+
+  p <- ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE, 
+                         legend = "right")
   
   return(p)
 }
@@ -2294,16 +2292,9 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   }
   
   #----Plot Markers----
-  plotMarkerList <- list()
-  for (channel in fsom$map$colsUsed){
-    title <- fsom$prettyColnames[channel]
-    plotMarkerList[[title]] <- PlotMarker(fsom, marker = channel, title = title, 
-                                          refMarkers = fsom$map$colsUsed,
-                                          equalNodeSize = TRUE)
-  }
-  plotList[["p5"]] <- ggpubr::ggarrange(plotlist = plotMarkerList, 
-                                        common.legend = TRUE, 
-                                        legend = "right")
+  plotList[["p5"]] <- PlotMarker(fsom, marker = fsom$map$colsUsed, 
+                                 refMarkers = fsom$map$colsUsed, 
+                                 equalNodeSize = TRUE)
   
   #----File distribution----
   if (filePresent){
