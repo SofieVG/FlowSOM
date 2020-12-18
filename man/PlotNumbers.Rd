@@ -45,7 +45,7 @@ PlotNumbers(flowSOM.res,
             view = "grid")
 
 PlotNumbers(flowSOM.res,
-            maxNodeSize = "auto",
+            maxNodeSize = 1,
             equalNodeSize = TRUE)
 
 }

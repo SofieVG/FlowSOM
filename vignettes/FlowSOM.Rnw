@@ -86,7 +86,7 @@ but in general it has enough power. It returns a list, of which the first
 item is the FlowSOM object (as required as input by many functions in this 
 package) and the second item is the result of the metaclustering.
 
-<<fig=TRUE>>=
+<<>>=
 set.seed(42)
 library(FlowSOM)
 
@@ -99,7 +99,9 @@ fSOM <- FlowSOM(ff,
                 colsToUse = c(9, 12, 14:18), xdim = 7, ydim = 7,
                 # Metaclustering options:
                 nClus = 10)
+@
 
+<<fig=TRUE>>=
 PlotStars(fSOM, backgroundValues = fSOM$metaclustering)
 @
 
@@ -197,16 +199,15 @@ You can plot the nodes in several layouts ("MST": Minimal spanning tree
 \medskip{}
 <<fig=TRUE>>=
 PlotStars(fSOM)
-# PlotFlowSOM(fSOM)
 @
+
 <<fig=TRUE>>=
 PlotStars(fSOM, view = "grid")
-# PlotFlowSOM(fsom, view = "grid")
 @
+
 <<fig=TRUE>>=
 set.seed(1)
-PlotStars(fSOM, view = fSOM$MST$l2, maxNodeSize = 0.3)
-# PlotFlowSOM(fSOM, view = fSOM$MST$l2, maxNodeSize = 0.3)
+PlotStars(fSOM, view = fSOM$MST$l2, maxNodeSize = 2)
 @
 
 If you do not want the size to depend on the number of cells assigned to a 
@@ -214,14 +215,13 @@ node, you can use the parameter \code{equalNodeSize = T} in every plotting
 function.
 <<fig=TRUE>>=
 PlotStars(fSOM, equalNodeSize = TRUE)
-# PlotFlowSOM(fSOM, equalNodeSize = TRUE)
 @
 
 
 It might also be interesting to compare with a manual gating. The 
 \Rcode{cellTypes} can be any factor which has a value for each individual
 cell, so you can also map other clustering results.
-<<fig=TRUE>>=
+<<>>=
 wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
 
 # Specify the cell types of interest for assigning one label per cell
@@ -233,10 +233,10 @@ cell_types <- c("B cells",
 gatingResult <- GetFlowJoLabels(fileName, 
                                 wsp_file,
                                 cell_types = cell_types)
+@
 
-
+<<fig=TRUE>>=
 PlotPies(fSOM, cellTypes = gatingResult$manual)
-# PlotFlowSOM(fSOM, type = "pies", metadata = gatingResult$manual)
 @
 
 If you are interested in one specific marker, you can use the 
@@ -245,23 +245,19 @@ If you are interested in one specific marker, you can use the
 <<fig=TRUE>>=
 print(colnames(fSOM$map$medianValues))
 PlotMarker(fSOM, "Pacific Blue-A")
-# PlotFlowSOM(fSOM, type = "marker", metadata = "Pacific Blue-A", 
-#             title = "Pacific Blue-A")
-
 @
 
 If you need to refer to the nodes, it might be useful to number them.
 <<fig=TRUE>>=
 PlotNumbers(fSOM)
-
-# PlotFlowSOM(fSOM, type = "labels", metadata = seq_len(fSOM$FlowSOM$map$nNodes), 
-#             equalNodeSize = T)
-
 @
 
 You can use this number for a 2D scatter plot indicating the node values.
 <<fig=TRUE>>=
-PlotClusters2D(fSOM, "PE-Texas Red-A", "Pacific Blue-A", c(81, 82, 91, 92, 93))
+Plot2DScatters(fSOM, 
+               channelpairs = list(c("PE-Texas Red-A", "Pacific Blue-A")),
+               clusters = list(c(81, 82, 91, 92, 93)),
+               plotFile = NULL)
 @
 
 
@@ -278,6 +274,9 @@ looking for, it might be optimal to provide this number to the algorithm.
 metaClustering <- as.character(metaClustering_consensus(fSOM$map$codes,k = 7))
 PlotPies(fSOM,cellTypes=gatingResult$manual,
         backgroundValues = metaClustering)
+@
+
+<<fig=TRUE>>=
 PlotLabels(fSOM, labels = metaClustering)
 @
 
@@ -293,7 +292,7 @@ query the tree to indicate nodes similar to a specified pattern. This function
 is still being optimized, so make sure to check the marker values to see if it
 corresponds to your expectations.
 
-<<fig=TRUE>>=
+<<>>=
 # Look for CD8+ ab T cells
 query <- c("PE-Cy7-A" = "high", #CD3
             "APC-Cy7-A" = "high", #TCRb
@@ -303,6 +302,9 @@ query_res <- QueryStarPlot(fSOM, query, equalNodeSize = TRUE, plot = FALSE)
 cellTypes <- factor(rep("Unknown", fSOM$map$nNodes), 
                     levels=c("Unknown", "CD8 T cells"))
 cellTypes[query_res$selected] <- "CD8 T cells"
+@
+
+<<fig=TRUE>>=
 PlotStars(fSOM, backgroundValues=cellTypes, 
           backgroundColor=c("#FFFFFF00","#0000FF"))
 @
@@ -311,7 +313,6 @@ PlotStars(fSOM, backgroundValues=cellTypes,
 It is possible to compare between groups with the FlowSOM package as well. The tree should be build on either a concatenation of all files, or a representative subset of all cell types. Then a list identifying which files belong to specific groups should be defined, and the differences will be computed. For a smaller number of samples, you can look at the fold change between the groups. For coloring, a treshold is used. A treshold of 0.50 means the difference should be at least 50\% of the max of both groups, which corresponds with a 2-fold change. The higher the threshold, the stricter, a threshold of 0 will colour each node. For a larger number of samples you can also use a wilcox test. This will be selected when a value is provided for the p\_thresh parameter.
 
 <<>>=
-#fig=TRUE>>=
 library(FlowSOM)
 set.seed(1)
 
@@ -360,7 +361,9 @@ fold_changes <- factor(ifelse(fold_changes < -3, "Underrepresented compared to G
                        "--")), levels = c("--", "Underrepresented compared to Group 1",
                        "Overrepresented compared to Group 1"))
 fold_changes[is.na(fold_changes)] <- "--"
+@
 
+<<fig=TRUE>>=
 # Show in figure
 ## Fold change
 gr_1 <- PlotStars(flowSOM.res, title = "Group 1", 
@@ -372,12 +375,19 @@ gr_2 <- PlotStars(flowSOM.res, title = "Group 2",
                   backgroundColors = c("white", "red", "blue"), 
                   list_insteadof_ggarrange = FALSE)
 p <- ggpubr::ggarrange(plotlist = c(list(gr_1$tree), gr_2), heights = c(3, 1))
+print(p)
+@
 
+<<fig=TRUE>>=
 ## p values
-p <- PlotVariable(flowSOM.res, title = "Wilcox test group 1 vs. group 2",
-variable <- C_stats["p values", ])
-variable
+p <- PlotVariable(flowSOM.res, 
+                  title = "Wilcox test group 1 vs. group 2",
+                  variable = C_stats["p values", ])
 
+print(p)
+@
+
+<<fig=TRUE>>=
 ## volcano plot
 p <- ggplot2::ggplot(data.frame("-log10 p values" = c(C_stats[4, ], MC_stats[4, ]), 
                                 "log10 fold changes" = c(C_stats[7, ], MC_stats[7, ]), 
@@ -386,6 +396,7 @@ ggplot2::xlim(-3, 3) +
 ggplot2::ylim(0, 3) +
 ggplot2::geom_point() 
 
+print(p)
 @
 
 \section{Summary}

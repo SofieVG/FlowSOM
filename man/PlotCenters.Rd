@@ -34,8 +34,11 @@ Plot FlowSOM nodes on a 2D scatter plot of the data
    flowSOM.res <- BuildMST(flowSOM.res)
    
    # Plot centers
-   PlotCenters(flowSOM.res,"FSC-A","SSC-A")
-   PlotCenters(flowSOM.res,2,5)
+   plot <- Plot2DScatters(flowSOM.res,
+                  channelpairs = list(c("FSC-A","SSC-A")),
+                  clusters = list(seq_len(NClusters(flowSOM.res))),
+                  maxPoints = 0,
+                  plotFile = NULL)
 
 }
 \seealso{

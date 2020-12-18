@@ -41,8 +41,10 @@ Plot a star chart indicating median marker values of a single node
    flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
                             scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
    
-   # Plot stars indicating the MFI of the cells present in the nodes
-   PlotNode(flowSOM.res,1)
+   # Deprecated, it is currently not possible anymore to plot an individual
+   # node alone. If necessary, zooming in on a node can be approximated by
+   # exagerating the size of the node.
+   PlotStars(flowSOM.res, nodeSizes = c(100, rep(0,99)), maxNodeSize = 10)
 
 }
 \seealso{
