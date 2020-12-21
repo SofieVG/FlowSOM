@@ -12,13 +12,14 @@ FlowSOM(
   transform = FALSE,
   toTransform = NULL,
   transformFunction = flowCore::logicleTransform(),
-  scale = TRUE,
+  transformList = NULL,
+  scale = FALSE,
   scaled.center = TRUE,
   scaled.scale = TRUE,
   silent = TRUE,
-  colsToUse,
-  nClus = NULL,
-  maxMeta,
+  colsToUse = NULL,
+  nClus = 10,
+  maxMeta = NULL,
   importance = NULL,
   seed = NULL,
   ...
@@ -34,20 +35,23 @@ only files containing pattern}
 \item{compensate}{logical, does the data need to be compensated}
 
 \item{spillover}{spillover matrix to compensate with
-If NULL and compensate=TRUE, we will look for $SPILL 
+If NULL and compensate = TRUE, we will look for $SPILL 
 description in fcs file.}
 
 \item{transform}{logical, does the data need to be transformed with a
 logicle transform}
 
 \item{toTransform}{column names or indices that need to be transformed.
-If \code{NULL} and transform = \code{TRUE}, column
-names of \code{$SPILL} description in fcs file will
-be used.}
+Will be ignored if \code{transformList} is given.
+If \code{NULL} and transform = \code{TRUE}, column names
+of \code{$SPILL} description in fcs file will be used.}
 
 \item{transformFunction}{Defaults to logicleTransform()}
 
-\item{scale}{logical, does the data needs to be rescaled}
+\item{transformList}{transformList to apply on the samples.}
+
+\item{scale}{logical, does the data needs to be rescaled. 
+Default = FALSE}
 
 \item{scaled.center}{see \code{\link{scale}}}
 
@@ -55,14 +59,17 @@ be used.}
 
 \item{silent}{if \code{TRUE}, no progress updates will be printed}
 
-\item{colsToUse}{column names or indices to use for building the SOM}
+\item{colsToUse}{Markers, channels or indices to use for building the SOM. 
+Default (NULL) is all the columns used to build the 
+FlowSOM object.}
 
 \item{nClus}{Exact number of clusters for meta-clustering. 
-If \code{NULL}, several options will be tried 
-(\code{1:maxMeta})}
+Ignored if maxMeta is specified.
+Default = 10.}
 
 \item{maxMeta}{Maximum number of clusters to try out for 
-meta-clustering. Ignored if nClus is specified}
+meta-clustering. If \code{NULL} (default), only one 
+option will be computed (\code{nClus}).}
 
 \item{importance}{array with numeric values. Parameters will be scaled 
 according to importance}
@@ -87,19 +94,22 @@ Will scale the data and uses consensus meta-clustering by default.
 }
 \examples{
 # Read from file
-fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-flowSOM.res <- FlowSOM(fileName, compensate=TRUE,transform=TRUE,
-                      scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
+fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
+                      scale = TRUE, colsToUse = c(9, 12, 14:18), nClus = 10)
 # Or read from flowFrame object
 ff <- flowCore::read.FCS(fileName)
-ff <- flowCore::compensate(ff,ff@description$SPILL)
+ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
 ff <- flowCore::transform(ff,
-         flowCore::transformList(colnames(ff@description$SPILL),
+         flowCore::transformList(colnames(flowCore::keyword(ff)[["SPILL"]]),
                                 flowCore::logicleTransform()))
-flowSOM.res <- FlowSOM(ff,scale=TRUE,colsToUse=c(9,12,14:18),nClus=10)
+flowSOM.res <- FlowSOM(ff, 
+                       scale = TRUE, 
+                       colsToUse = c(9, 12, 14:18), 
+                       nClus = 10)
 
 # Plot results
-PlotStars(flowSOM.res$FlowSOM,
+PlotStars(flowSOM.res,
           backgroundValues = flowSOM.res$metaclustering)
 
 # Get metaclustering per cell
@@ -109,6 +119,9 @@ flowSOM.clustering <- GetMetaclusters(flowSOM.res)
 
 }
 \seealso{
-\code{\link{scale}},\code{\link{ReadInput}},\code{\link{BuildSOM}},
-         \code{\link{BuildMST}},\code{\link{MetaClustering}}
+\code{\link{scale}}, 
+         \code{\link{ReadInput}}, 
+         \code{\link{BuildSOM}},
+         \code{\link{BuildMST}}, 
+         \code{\link{MetaClustering}}
 }

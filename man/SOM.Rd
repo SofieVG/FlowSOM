@@ -37,11 +37,11 @@ SOM(
 
 \item{init}{Initialize cluster centers in a non-random way}
 
-\item{initf}{Use the given initialization function if init==T
+\item{initf}{Use the given initialization function if init == T
 (default: Initialize_KWSP)}
 
-\item{distf}{Distance function (1=manhattan, 2=euclidean, 3=chebyshev, 
-4=cosine)}
+\item{distf}{Distance function (1 = manhattan, 2 = euclidean, 3 = chebyshev, 
+4 = cosine)}
 
 \item{silent}{If FALSE, print status updates}
 

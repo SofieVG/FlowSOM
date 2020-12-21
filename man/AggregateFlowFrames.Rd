@@ -10,9 +10,8 @@ AggregateFlowFrames(
   channels = NULL,
   writeOutput = FALSE,
   outputFile = "aggregate.fcs",
-  writeMeta = FALSE,
   keepOrder = FALSE,
-  verbose = FALSE,
+  silent = FALSE,
   ...
 )
 }
@@ -30,14 +29,11 @@ Default FALSE}
 
 \item{outputFile}{Full path to output file. Default "aggregate.fcs"}
 
-\item{writeMeta}{If TRUE, files with the indices of the selected cells are
-generated}
-
 \item{keepOrder}{If TRUE, the random subsample will be ordered in the same
 way as they were originally ordered in the file. Default =
 FALSE.}
 
-\item{verbose}{If TRUE, prints an update every time it starts processing a
+\item{silent}{If FALSE, prints an update every time it starts processing a
 new file. Default = FALSE.}
 
 \item{...}{Additional arguments to pass to read.FCS}
@@ -56,9 +52,9 @@ value between 0 and 0.1).
 }
 \examples{
 # Define filename
-fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
+fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
 # This example will sample 2 times 500 cells.
-ff_new <- AggregateFlowFrames(c(fileName,fileName),1000)
+ff_new <- AggregateFlowFrames(c(fileName, fileName), 1000)
 
 }
 \seealso{

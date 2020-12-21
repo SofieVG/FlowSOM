@@ -10,7 +10,7 @@ BuildSOM(fsom, colsToUse = NULL, silent = FALSE, ...)
 \item{fsom}{FlowSOM object containing the data, as constructed by 
 the \code{\link{ReadInput}} function}
 
-\item{colsToUse}{column names or indices to use for building the SOM}
+\item{colsToUse}{Markers, channels or indices to use for building the SOM}
 
 \item{silent}{if \code{TRUE}, no progress updates will be printed}
 
@@ -27,20 +27,20 @@ Build a SOM based on the data contained in the FlowSOM object
 \examples{
 
 # Read from file
-fileName <- system.file("extdata", "68983.fcs", package="FlowSOM")
-flowSOM.res <- ReadInput(fileName, compensate=TRUE, transform=TRUE,
-                         scale=TRUE)
+fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+flowSOM.res <- ReadInput(fileName, compensate = TRUE, transform = TRUE,
+                         scale = TRUE)
 
 # Build the Self-Organizing Map
 # E.g. with gridsize 5x5, presenting the dataset 20 times, 
 # no use of MST in neighbourhood calculations in between
-flowSOM.res <- BuildSOM(flowSOM.res, colsToUse=c(9,12,14:18),
-                        xdim=5, ydim=5, rlen=20)
+flowSOM.res <- BuildSOM(flowSOM.res, colsToUse = c(9, 12, 14:18),
+                        xdim = 5, ydim = 5, rlen = 20)
 
 # Build the minimal spanning tree and apply metaclustering
 flowSOM.res <- BuildMST(flowSOM.res)
 metacl <- MetaClustering(flowSOM.res$map$codes,
-                         "metaClustering_consensus", max=10)
+                         "metaClustering_consensus", max = 10)
 
 }
 \references{
@@ -49,5 +49,5 @@ This code is strongly based on the \code{kohonen} package.
             in R: the kohonen package J. Stat. Softw., 21(5), 2007
 }
 \seealso{
-\code{\link{ReadInput}},\code{\link{BuildMST}}
+\code{\link{ReadInput}}, \code{\link{BuildMST}}
 }

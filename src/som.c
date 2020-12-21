@@ -34,7 +34,7 @@ double manh(double * p1, double * p2, int px, int n, int ncodes){
     double xdist = 0.0, tmp;
     for (j = 0; j < px; j++) {
         tmp = p1[j*n] - p2[j*ncodes];
-        xdist += abs(tmp);
+        xdist += fabs(tmp);
     }
     return xdist;
 }
@@ -44,7 +44,7 @@ double chebyshev(double * p1, double * p2, int px, int n, int ncodes){
     double xdist = 0.0, tmp;
     for (j = 0; j < px; j++) {
         tmp = p1[j*n] - p2[j*ncodes];
-        tmp = abs(tmp);
+        tmp = fabs(tmp);
         if(tmp > xdist) xdist = tmp;
     }
     return xdist;
@@ -98,7 +98,9 @@ void C_SOM(double *data,
 
 
     for (k = 0; k < niter; k++) {
-    
+        
+        if (k % 1024 == 0) R_CheckUserInterrupt();
+            
         if(k%n == 0){
             if(change < 1){
                 k = niter;
@@ -131,7 +133,7 @@ void C_SOM(double *data,
 
             for(j = 0; j < px; j++) {
                 tmp = data[i + j*n] - codes[cd + j*ncodes];
-                change += abs(tmp);
+                change += fabs(tmp);
                 codes[cd + j*ncodes] += tmp * alpha; 
             }
         }
@@ -168,6 +170,7 @@ void C_mapDataToCodes(double *data, double *codes,
     and ncodes is the number of SOM units*/
     counter = -1;
     for (i = 0; i < nd; i++) {
+        if (i % 1024 == 0) R_CheckUserInterrupt();
         minid = -1;
         mindist = DBL_MAX; 
         for (cd = 0; cd < ncodes; cd++) {
@@ -193,6 +196,7 @@ static const R_CMethodDef cMethods[] = {
 void R_init_FlowSOM(DllInfo *info)
 {
     R_registerRoutines(info, cMethods, NULL, NULL, NULL);
+    R_useDynamicSymbols(info, TRUE);
 }
 
 

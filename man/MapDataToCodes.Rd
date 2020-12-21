@@ -11,8 +11,8 @@ MapDataToCodes(codes, newdata, distf = 2)
 
 \item{newdata}{datapoints to assign}
 
-\item{distf}{Distance function (1=manhattan, 2=euclidean, 3=chebyshev, 
-4=cosine)}
+\item{distf}{Distance function (1 = manhattan, 2 = euclidean, 3 = chebyshev, 
+4 = cosine)}
 }
 \value{
 Array with nearest node id for each datapoint
