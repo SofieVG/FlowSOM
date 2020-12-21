@@ -1802,7 +1802,7 @@ AddStars <- function(p,
 #' PlotManualBars(fsom = flowSOM.res,
 #'                fcs = fcs_file,
 #'                manualVector = gatingResult$manual,
-#'                manualOrder = c(cellTypes, "Unknown"),
+#'                manualOrder = c(cellTypes, "Unlabeled"),
 #'                colors = c("#F8766D", "#B79F00", "#00BA38", "#00BFC4", 
 #'                           "#619CFF", "#F564E3", "#D3D3D3"))
 #' dev.off()
@@ -1858,11 +1858,11 @@ PlotManualBars <- function(fsom, fcs,
   df_s <- data.frame(table(df[, 1:2]))
   p1 <- ggplot2::ggplot(data = 
                           transform(df_s,
-                                    MC = factor(.data$MC,
+                                    MC = factor(MC,
                                                 levels = as.character(
                                                   seq_len(NMetaclusters(
                                                     fsom)))),
-                                    Manual = factor(.data$Manual,
+                                    Manual = factor(Manual,
                                                     levels = manualOrder)),
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
@@ -1885,11 +1885,11 @@ PlotManualBars <- function(fsom, fcs,
   }
   p2 <- ggplot2::ggplot(data = 
                           transform(df_s,
-                                    MC = factor(.data$MC,
+                                    MC = factor(MC,
                                                 levels = as.character(
                                                   seq_len(NMetaclusters(
                                                     fsom)))),
-                                    Manual = factor(.data$Manual,
+                                    Manual = factor(Manual,
                                                     levels = manualOrder)), 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
@@ -1908,13 +1908,13 @@ PlotManualBars <- function(fsom, fcs,
   df_s$MC <- fsom$metaclustering[as.numeric(as.character(df_s$C))]
   p3 <- ggplot2::ggplot(data =
                           transform(df_s,
-                                    C = factor(.data$C,
+                                    C = factor(C,
                                                levels = as.character(
                                                  seq_len(NClusters(fsom)))),
-                                    MC = factor(.data$MC,
+                                    MC = factor(MC,
                                                 levels = as.character(seq_len(
                                                   NMetaclusters(fsom)))),
-                                    Manual = factor(.data$Manual,
+                                    Manual = factor(Manual,
                                                     levels = manualOrder)),
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
@@ -1938,13 +1938,13 @@ PlotManualBars <- function(fsom, fcs,
   df_s$MC <- fsom$metaclustering[as.numeric(as.character(df_s$C))]
   p4 <- ggplot2::ggplot(data = 
                           transform(df_s,
-                                    C = factor(.data$C,
+                                    C = factor(C,
                                                levels = as.character(seq_len(
                                                  NClusters(fsom)))),
-                                    MC = factor(.data$MC,
+                                    MC = factor(MC,
                                                 levels = as.character(seq_len(
                                                   NMetaclusters(fsom)))),
-                                    Manual = factor(.data$Manual,
+                                    Manual = factor(Manual,
                                                     levels = manualOrder)), 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
