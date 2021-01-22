@@ -1,3 +1,8 @@
+CHANGES IN VERSION 2.1.8 (2020/11/19)
+--------------------------------------
+o Solved issue when matrix with no column was given to the SOM function
+
+
 CHANGES IN VERSION 2.1.5 (2020/11/19)
 --------------------------------------
 o Scale parameter in FlowSOM function defaults to FALSE.

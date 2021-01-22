@@ -155,6 +155,9 @@ SOM <- function (data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
     data <- data * rep(importance, each = nrow(data))
   }
   
+  if (is.null(colnames(data))) {
+    colnames(data) <- as.character(seq_len(ncol(data)))
+  }
   # Initialize the grid
   grid <- expand.grid(seq_len(xdim), seq_len(ydim))
   nCodes <- nrow(grid)
