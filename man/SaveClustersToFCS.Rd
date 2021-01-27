@@ -7,9 +7,11 @@
 SaveClustersToFCS(
   fsom,
   originalFiles,
-  ppFiles = originalFiles,
-  selectionFiles = NULL,
-  silent = FALSE
+  preprocessedFiles = NULL,
+  selectionColumn = NULL,
+  silent = FALSE,
+  outputDir = ".",
+  suffix = "_FlowSOM.fcs"
 )
 }
 \arguments{
@@ -17,16 +19,29 @@ SaveClustersToFCS(
 
 \item{originalFiles}{FCS files that should be extended}
 
-\item{ppFiles}{FCS files that correspond to the input of FlowSOM}
+\item{preprocessedFiles}{FCS files that correspond to the input of FlowSOM,
+If NULL (default), the originalFiles are used.}
 
-\item{selectionFiles}{Files indicating which cells of the original files
-correspond to the input files}
+\item{selectionColumn}{Column of the FCS file indicating the original cell
+ids. If NULL (default), no selection is made.}
 
 \item{silent}{If FALSE (default), print some extra output}
+
+\item{outputDir}{Directory to save the fcs files. Default to the
+current working directory (".")}
+
+\item{suffix}{Suffix added to the filename. Default _FlowSOM.fcs}
 }
 \value{
 Saves the extended fcs file as [originalName]_FlowSOM.fcs
 }
 \description{
 Write FlowSOM clustering results to the original FCS files
+}
+\examples{
+fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
+                      scale = TRUE, colsToUse = c(9, 12, 14:18), nClus = 10)
+SaveClustersToFCS(flowSOM.res, fileName)
+
 }

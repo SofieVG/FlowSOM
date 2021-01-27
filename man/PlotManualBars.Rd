@@ -66,7 +66,7 @@ pdf("PlotManualBars.pdf")
 PlotManualBars(fsom = flowSOM.res,
                fcs = fcs_file,
                manualVector = gatingResult$manual,
-               manualOrder = c(cellTypes, "Unknown"),
+               manualOrder = c(cellTypes, "Unlabeled"),
                colors = c("#F8766D", "#B79F00", "#00BA38", "#00BFC4", 
                           "#619CFF", "#F564E3", "#D3D3D3"))
 dev.off()
