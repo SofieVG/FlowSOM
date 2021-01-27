@@ -637,7 +637,12 @@ PlotVariable <- function(fsom,
 #' @param cTotal          The total amount of cells to be used in the 
 #'                        dimensionality reduction. Default is all the cells.
 #' @param dimred          A dimensionality reduction function. 
-#'                        Default = Rtsne::Rtsne.
+#'                        Default = Rtsne::Rtsne. Alternatively, a data.frame or
+#'                        matrix with either equal number of rows to the
+#'                        fsom or an OriginalID column. Recommended to put
+#'                        cTotal to NULL when providing a matrix (or ensuring
+#'                        that the dimred corresponds to subsampling the
+#'                        flowSOM data for cTotal cells with the same seed).
 #' @param extractLayout   A function to extract the coordinates from the results
 #'                        of the dimred default = function(dimred){dimred$Y}.
 #' @param returnLayout    If TRUE, this function returns a dataframe with 
@@ -701,7 +706,17 @@ PlotDimRed <- function(fsom,
     if (nrow(dimred_layout) == 0 && ncol(dimred_layout) != 2) {
       stop("Please use the right extraction function in extractLayout")
     }
-  } else stop("dimred should be a dimensionality reduction method")
+  } else if((is.matrix(dimred) | is.data.frame(dimred)) & 
+            (nrow(dimred) == nrow(dimred_data) | 
+             any(colnames(dimred) == "Original_ID"))){
+    id_col <- which(colnames(dimred) == "Original_ID")
+    dimred_layout <- as.data.frame(dimred[,-id_col])
+    if("Original_ID" %in% colnames(dimred)){
+      dimred_data <- dimred_data[dimred[,"Original_ID"], , drop = FALSE]
+      dimred_col <- dimred_col[dimred[,"Original_ID"], , drop = FALSE]
+    }
+  } else stop("dimred should be a dimensionality reduction method or matrix")
+  
   colnames(dimred_layout) <- c("dimred_1", "dimred_2")
   dimred_plot <- cbind(dimred_layout, dimred_col)
   
@@ -716,9 +731,13 @@ PlotDimRed <- function(fsom,
       ggplot2::facet_wrap(~markers) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
-      ggplot2::scale_color_gradient(low = "grey90", high = "blue")
+      ggplot2::scale_color_gradientn(colours = FlowSOM_colors(9))
   } else {
     colnames(dimred_plot) <- c("dimred_1", "dimred_2", "colors")
+    
+    median_x <- tapply(dimred_plot[,"dimred_1"], dimred_plot[,"colors"], median)
+    median_y <- tapply(dimred_plot[,"dimred_2"], dimred_plot[,"colors"], median)
+    
     p <- ggplot2::ggplot(dimred_plot) +
       scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
                                                  y = .data$dimred_2, 
@@ -726,6 +745,15 @@ PlotDimRed <- function(fsom,
                                     pointsize = 1) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
+      ggrepel::geom_label_repel(aes(x = .data$x, 
+                                    y = .data$y, 
+                                    label = .data$label, 
+                                    color = .data$label),
+                                data = data.frame(x = median_x,
+                                                  y = median_y,
+                                                  label = names(median_x)),
+                                segment.color = "grey", force = 20, 
+                                segment.size = 0.2, point.padding = 0.5)+
       labs(col = colorBy)
   }
   if (!is.null(title)) p <- p + ggplot2::ggtitle(title)
@@ -2322,16 +2350,8 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                            title = paste0("t-SNE with markers used in FlowSOM ",
                                           "call (perplexity = 30, cells = 5000)"))
   if (metaclustersPresent){
-    metaclusters_dr <- GetMetaclusters(fsom)[dimred_res$layout[ ,"Original_ID"]]
-    dimred_plot <- cbind(dimred_res$layout, metaclusters_dr)
-    plotList[["p7"]] <- ggplot2::ggplot(dimred_plot) +
-      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1,
-                                                 y = .data$dimred_2,
-                                                 col = .data$metaclusters_dr),
-                                    pointsize = 1) +
-      ggplot2::theme_minimal() + ggplot2::coord_fixed() +
-      ggplot2::xlab("tSNE_1") + ggplot2::ylab("tSNE_2") +
-      ggplot2::ggtitle(paste0("t-SNE with markers used in FlowSOM ",
+    plotList[["p7"]] <- PlotDimRed(fsom, dimred = dimred_res$layout, seed = 1,
+               title = paste0("t-SNE with markers used in FlowSOM ",
                               "call (perplexity = 30, cells = 5000)"))
   }
   plotList[["p8"]] <- dimred_res$plot

@@ -31,7 +31,12 @@ or a marker/channel/index.}
 dimensionality reduction. Default is all the cells.}
 
 \item{dimred}{A dimensionality reduction function. 
-Default = Rtsne::Rtsne.}
+Default = Rtsne::Rtsne. Alternatively, a data.frame or
+matrix with either equal number of rows to the
+fsom or an OriginalID column. Recommended to put
+cTotal to NULL when providing a matrix (or ensuring
+that the dimred corresponds to subsampling the
+flowSOM data for cTotal cells with the same seed).}
 
 \item{extractLayout}{A function to extract the coordinates from the results
 of the dimred default = function(dimred){dimred$Y}.}
