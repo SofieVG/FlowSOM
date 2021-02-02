@@ -469,8 +469,8 @@ GetClusters <- function(fsom) {
 #' @export 
 GetMetaclusters <- function(fsom, meta = NULL){
   fsom <- UpdateFlowSOM(fsom)
-  meta <- fsom$metaclustering
-  return(meta[fsom$map$mapping[, 1]])
+  if(is.null(meta)) meta <- fsom$metaclustering
+  return(meta[GetClusters(fsom)])
 } 
 
 #' Get MFI values for all clusters
@@ -836,8 +836,11 @@ GroupStats <- function(features, groups){
   }
   
   medians <- apply(features, 2, function(x) {
-    tapply(x, INDEX = factor(i, 
-                             levels = names(groups)), stats::median)
+    tapply(x, 
+           INDEX = factor(i, 
+                          levels = names(groups)), 
+           stats::median, 
+           na.rm = TRUE)
   })
   
   #----Calculate fold changes between groups----
@@ -847,7 +850,10 @@ GroupStats <- function(features, groups){
     if (any(m <= 0) | any(is.na(m))){
       fold_change <- c(fold_change, NA)
     } else{
-      fold_change <- c(fold_change, max(m) / min(m) * (-1) ^ which.max(m))
+      fold_change <- c(fold_change, 
+                       max(m, na.rm = TRUE) / 
+                         min(m, na.rm = TRUE) * 
+                         (-1) ^ which.max(m))
     }
   }
   
