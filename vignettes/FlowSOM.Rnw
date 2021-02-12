@@ -211,7 +211,7 @@ str(fSOM$MST, max.level =  1)
 Once this step is finished, the FlowSOM object can be used for visualization.
 You can plot the nodes in several layouts ("MST": Minimal spanning tree
 (default),"grid": SOM grid, "matrix": alternative layout. You can make use of 
-\code{PlotFlowSOM} or you can use the \code{PlotStars} function. 
+\Rcode{PlotFlowSOM} or you can use the \Rcode{PlotStars} function. 
 \medskip{}
 <<fig=TRUE>>=
 PlotStars(fSOM)
@@ -228,7 +228,7 @@ PlotStars(fSOM, view = tsne$Y, maxNodeSize = 2)
 @
 
 If you do not want the size to depend on the number of cells assigned to a 
-node, you can use the parameter \code{equalNodeSize = T} in every plotting
+node, you can use the parameter \Rcode{equalNodeSize = T} in every plotting
 function.
 <<fig=TRUE>>=
 p <- PlotStars(fSOM, equalNodeSize = TRUE)
