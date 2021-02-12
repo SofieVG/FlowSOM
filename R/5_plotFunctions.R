@@ -1861,8 +1861,7 @@ PlotManualBars <- function(fsom, fcs,
                      ncol = fsom$map$nNodes,
                      dimnames = 
                        list("fcs",
-                            paste0("C", 
-                                   as.character(seq_len(fsom$map$nNodes)))))
+                            paste0("C", seq_len(fsom$map$nNodes))))
   fsom_tmp <- NewData(fsom, fcs)
   C_counts["fcs", ] <- table(GetClusters(fsom_tmp))
   C_perc <- 100 * prop.table(C_counts, margin = 1)
@@ -1883,13 +1882,14 @@ PlotManualBars <- function(fsom, fcs,
   }
   
   #----Relative barplots MC----
-  df_s1 <- data.frame(table(df[, 1:2]))
-  df_s1 <- transform(df_s1,
-                    MC = factor(df_s1$MC, 
-                                levels = seq_len(NMetaclusters(fsom))),
-                    Manual = factor(df_s1$Manual,
-                                    levels = manualOrder))
-  p1 <- ggplot2::ggplot(data = df_s1,
+  df_s <- data.frame(table(df[, 1:2]))
+  p1 <- ggplot2::ggplot(data = 
+                          transform(df_s,
+                                    MC = factor(df_s$MC,
+                                                levels = seq_len(NMetaclusters(
+                                                    fsom))),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)),
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$MC)) +
@@ -1904,12 +1904,18 @@ PlotManualBars <- function(fsom, fcs,
   }
   
   #----MC composition----
-  df_s2 <- df_s1
+  df_s <- data.frame(table(df[, 1:2]))
   for (mc in as.character(seq_len(NMetaclusters(fsom)))){
-    df_s2$Freq[df_s2$MC == mc] <- 
-      df_s2$Freq[df_s2$MC == mc] / sum(df_s2$Freq[df_s2$MC == mc])
+    df_s$Freq[df_s$MC == mc] <- 
+      df_s$Freq[df_s$MC == mc] / sum(df_s$Freq[df_s$MC == mc])
   }
-  p2 <- ggplot2::ggplot(data = df_s2, 
+  p2 <- ggplot2::ggplot(data = 
+                          transform(df_s,
+                                    MC = factor(df_s$MC,
+                                                levels = seq_len(NMetaclusters(
+                                                    fsom))),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)), 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$MC)) +
@@ -1923,16 +1929,17 @@ PlotManualBars <- function(fsom, fcs,
   }
   
   #----Relative barplots C----
-  df_s3 <- data.frame(table(df[, c(1, 3)]))
-  df_s3$MC <- fsom$metaclustering[as.numeric(as.character(df_s3$C))]
-  df_s3 <- transform(df_s3,
-                    C = factor(df_s3$C,
-                               levels = seq_len(NClusters(fsom))),
-                    MC = factor(df_s3$MC,
-                                levels = seq_len(NMetaclusters(fsom))),
-                    Manual = factor(df_s3$Manual,
-                                    levels = manualOrder))
-  p3 <- ggplot2::ggplot(data = df_s3,
+  df_s <- data.frame(table(df[, c(1, 3)]))
+  df_s$MC <- fsom$metaclustering[df_s$C]
+  p3 <- ggplot2::ggplot(data =
+                          transform(df_s,
+                                    C = factor(df_s$C,
+                                               levels = seq_len(NClusters(fsom))),
+                                    MC = factor(df_s$MC,
+                                                levels = seq_len(
+                                                  NMetaclusters(fsom))),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)),
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$C)) +
@@ -1948,12 +1955,21 @@ PlotManualBars <- function(fsom, fcs,
   }
   
   #----C composition----
-  df_s4 <- df_s3
-  for (c in as.character(seq_len(NClusters(fsom)))){
-    df_s4$Freq[df_s4$C == c] <- df_s4$Freq[df_s4$C == c]/
-      sum(df_s4$Freq[df_s4$C == c])
+  df_s <- data.frame(table(df[, c(1, 3)]))
+  for (c in seq_len(NClusters(fsom))){
+    df_s$Freq[df_s$C == c] <- df_s$Freq[df_s$C == c]/sum(df_s$Freq[df_s$C == c])
   }
-  p4 <- ggplot2::ggplot(data = df_s4, 
+  df_s$MC <- fsom$metaclustering[df_s$C]
+  p4 <- ggplot2::ggplot(data = 
+                          transform(df_s,
+                                    C = factor(df_s$C,
+                                               levels = seq_len(
+                                                 NClusters(fsom))),
+                                    MC = factor(df_s$MC,
+                                                levels = seq_len(
+                                                  NMetaclusters(fsom))),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)), 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$C)) +
