@@ -4,10 +4,13 @@
 \alias{PlotNumbers}
 \title{PlotNumbers}
 \usage{
-PlotNumbers(fsom, maxNodeSize = 0, ...)
+PlotNumbers(fsom, numbers = "Clusters", maxNodeSize = 0, ...)
 }
 \arguments{
 \item{fsom}{FlowSOM object}
+
+\item{numbers}{Character string, should be either "Clusters" or 
+"Metaclusters"}
 
 \item{maxNodeSize}{Determines the maximum nodesize. Default is 0. 
 See \code{\link{PlotFlowSOM}} for more options.}
@@ -39,7 +42,7 @@ flowSOM.res <- FlowSOM(ff,
 
 # Plot the node IDs
 PlotNumbers(flowSOM.res)
-
+PlotNumbers(flowSOM.res, "Metaclusters")
 
 PlotNumbers(flowSOM.res,
             view = "grid")

@@ -411,6 +411,8 @@ PlotLabels <- function(fsom,
 #' Plot FlowSOM grid or tree, with in each node the cluster id.
 #'
 #' @param fsom        FlowSOM object
+#' @param numbers     Character string, should be either "Clusters" or 
+#'                    "Metaclusters"
 #' @param maxNodeSize Determines the maximum nodesize. Default is 0. 
 #'                    See \code{\link{PlotFlowSOM}} for more options.
 #' @param ...         Additional arguments to pass to \code{\link{PlotFlowSOM}}
@@ -438,7 +440,7 @@ PlotLabels <- function(fsom,
 #' 
 #' # Plot the node IDs
 #' PlotNumbers(flowSOM.res)
-#' 
+#' PlotNumbers(flowSOM.res, "Metaclusters")
 #' 
 #' PlotNumbers(flowSOM.res,
 #'             view = "grid")
@@ -449,10 +451,18 @@ PlotLabels <- function(fsom,
 #' 
 #' @export
 PlotNumbers <- function(fsom,
+                        numbers = "Clusters",
                         maxNodeSize = 0,
                         ...){
+  if (numbers == "Clusters"){
+    numbers <- seq_len(NClusters(fsom))
+  } else if (numbers == "Metaclusters") {
+    numbers <- fsom$metaclustering
+  } else {
+    stop("Numbers should be 'Clusters' or 'Metaclusters'")
+  }
   p <- PlotLabels(fsom =  fsom,
-                  labels = seq_len(NClusters(fsom)), 
+                  labels = numbers, 
                   maxNodeSize = maxNodeSize,
                   ...)
   return(p)
@@ -699,6 +709,8 @@ PlotDimRed <- function(fsom,
     downsample <- sample(seq_len(nrow(dimred_data)), cTotal)
     dimred_data <- dimred_data[downsample, , drop = FALSE]
     dimred_col <- dimred_col[downsample, , drop = FALSE]
+  } else {
+    downsample <- seq_len(nrow(dimred_data))
   }
   if (is.function(dimred)){
     dimred_res <- dimred(dimred_data, ...)

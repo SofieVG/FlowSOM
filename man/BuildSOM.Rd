@@ -4,7 +4,7 @@
 \alias{BuildSOM}
 \title{Build a self-organizing map}
 \usage{
-BuildSOM(fsom, colsToUse = NULL, silent = FALSE, ...)
+BuildSOM(fsom, colsToUse = NULL, silent = FALSE, outlierMAD = 4, ...)
 }
 \arguments{
 \item{fsom}{FlowSOM object containing the data, as constructed by 
@@ -13,6 +13,9 @@ the \code{\link{ReadInput}} function}
 \item{colsToUse}{Markers, channels or indices to use for building the SOM}
 
 \item{silent}{if \code{TRUE}, no progress updates will be printed}
+
+\item{outlierMAD}{Number of MAD when a cell is considered an outlier.
+See also \code{\link{TestOutliers}}}
 
 \item{...}{options to pass on to the SOM function (xdim, ydim, rlen, 
 mst, alpha, radius, init, distf, importance)}

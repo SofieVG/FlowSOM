@@ -158,6 +158,45 @@ FlowSOM <- function(input, pattern = ".fcs",
   return(fsom)
 }
 
+#' Print FlowSOM object
+#' 
+#' @param x FlowSOM object to print information about
+#' @param ...  Further arguments, not used
+#' @examples 
+#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
+#'                       scale = TRUE, colsToUse = c(9, 12, 14:18), nClus = 10)
+#' print(flowSOM.res)
+#' 
+#' @export
+print.FlowSOM <- function(x, ...){
+  cat("FlowSOM model trained on", nrow(x$data), "cells and", 
+      length(x$map$colsUsed), "markers, \n using a",
+     paste0(x$map$xdim,"x",x$map$ydim), paste0("grid (",NClusters(x)), "clusters) and",
+      NMetaclusters(x), "metaclusters.")
+
+  cat("\n\nMarkers used: ", paste(x$prettyColnames[x$map$colsUsed], collapse =", "))
+  
+  if(!is.null(x$metaclustering)){
+    cat("\n\nMetacluster cell count:\n")
+    counts <- rep(NA, NMetaclusters(x))
+    names(counts) <- paste0("MC", seq_len(NMetaclusters(x)))
+    tmp <- table(GetMetaclusters(x))
+    counts[paste0("MC", names(tmp))] <- tmp
+    print(counts)
+  }
+  
+  if(!is.null(x$outliers)){
+    n_outliers <- sum(x$outliers$Number_of_outliers)
+    n_mad <- round((x$outliers[1,"Threshold"] - 
+                      x$outliers[1,"Median_distance"]) / 
+                     x$outliers[1,"Median_absolute_deviation"])
+    cat("\n", n_outliers, paste0("cells (",
+                                   round(100*n_outliers/nrow(x$data),2),
+                                   "%)"),
+        "are further than", n_mad,"MAD from their cluster center.")
+  }
+}
 
 
 #' Aggregate multiple fcs files together

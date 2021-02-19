@@ -6,6 +6,8 @@
 #'                  the \code{\link{ReadInput}} function
 #' @param colsToUse Markers, channels or indices to use for building the SOM
 #' @param silent    if \code{TRUE}, no progress updates will be printed
+#' @param outlierMAD Number of MAD when a cell is considered an outlier.
+#'                   See also \code{\link{TestOutliers}}
 #' @param ...       options to pass on to the SOM function (xdim, ydim, rlen, 
 #'                  mst, alpha, radius, init, distf, importance)
 #'
@@ -37,7 +39,11 @@
 #'                          "metaClustering_consensus", max = 10)
 #' 
 #' @export
-BuildSOM <- function(fsom, colsToUse = NULL, silent = FALSE, ...){
+BuildSOM <- function(fsom, 
+                     colsToUse = NULL, 
+                     silent = FALSE, 
+                     outlierMAD = 4,
+                     ...){
   if(!"data" %in% names(fsom)){
     stop("Please run the ReadInput function first!")
   }
@@ -53,6 +59,9 @@ BuildSOM <- function(fsom, colsToUse = NULL, silent = FALSE, ...){
   fsom$map <- SOM(fsom$data[, colsToUse], silent = silent, ...)
   fsom$map$colsUsed <- colsToUse
   fsom <- UpdateDerivedValues(fsom)
+  
+  fsom$outliers <- TestOutliers(fsom,
+                                madAllowed = outlierMAD)
   return(fsom)
 }
 
