@@ -411,8 +411,8 @@ PlotLabels <- function(fsom,
 #' Plot FlowSOM grid or tree, with in each node the cluster id.
 #'
 #' @param fsom        FlowSOM object
-#' @param numbers     Character string, should be either "Clusters" or 
-#'                    "Metaclusters"
+#' @param level       Character string, should be either "clusters" or 
+#'                    "metaclusters"
 #' @param maxNodeSize Determines the maximum nodesize. Default is 0. 
 #'                    See \code{\link{PlotFlowSOM}} for more options.
 #' @param ...         Additional arguments to pass to \code{\link{PlotFlowSOM}}
@@ -451,15 +451,15 @@ PlotLabels <- function(fsom,
 #' 
 #' @export
 PlotNumbers <- function(fsom,
-                        numbers = "Clusters",
+                        level = "clusters",
                         maxNodeSize = 0,
                         ...){
-  if (numbers == "Clusters"){
+  if (numbers == "clusters"){
     numbers <- seq_len(NClusters(fsom))
-  } else if (numbers == "Metaclusters") {
+  } else if (numbers == "metaclusters") {
     numbers <- fsom$metaclustering
   } else {
-    stop("Numbers should be 'Clusters' or 'Metaclusters'")
+    stop("Numbers should be \"clusters\" or \"metaclusters\"")
   }
   p <- PlotLabels(fsom =  fsom,
                   labels = numbers, 

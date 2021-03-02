@@ -7,7 +7,7 @@
 GetFeatures(
   fsom,
   files,
-  population = c("clusters", "metaclusters"),
+  level = c("clusters", "metaclusters"),
   type = "counts",
   MFI = NULL,
   filenames = NULL,
@@ -20,7 +20,7 @@ or the BuildSOM function}
 
 \item{files}{Either a vector of fcs files or paths to fcs files}
 
-\item{population}{or Populations of interest. Default is c("clusters",
+\item{level}{Level(s) of interest. Default is c("clusters",
 "metaclusters"), but can also be only one of them}
 
 \item{type}{Type of features to extract. Default is "counts", 
