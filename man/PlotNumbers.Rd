@@ -15,7 +15,8 @@ PlotNumbers(fsom, level = "clusters", maxNodeSize = 0, ...)
 \item{maxNodeSize}{Determines the maximum nodesize. Default is 0. 
 See \code{\link{PlotFlowSOM}} for more options.}
 
-\item{...}{Additional arguments to pass to \code{\link{PlotFlowSOM}}}
+\item{...}{Additional arguments to pass to \code{\link{PlotLabels}} 
+and to \code{\link{PlotFlowSOM}}}
 }
 \value{
 Nothing is returned. A plot is drawn in which each node is 

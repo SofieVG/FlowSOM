@@ -4,7 +4,7 @@
 \alias{AddLabels}
 \title{AddLabels}
 \usage{
-AddLabels(p, labels, hjust = 0.5, layout = NULL, ...)
+AddLabels(p, labels, hjust = 0.5, layout = NULL, textSize = 3.88, ...)
 }
 \arguments{
 \item{p}{ggplot object}
@@ -15,6 +15,8 @@ AddLabels(p, labels, hjust = 0.5, layout = NULL, ...)
 
 \item{layout}{Dataframe with x and y columns. If null, the dataframe from
 the ggplot object will be reused.}
+
+\item{textSize}{Size for geom_text. Default (=3.88) is from geom_text.}
 
 \item{...}{Additional parameters to pass to geom_text}
 }
