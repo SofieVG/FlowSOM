@@ -1771,8 +1771,9 @@ AddStars <- function(p,
   fsom <- UpdateFlowSOM(fsom)
   nNodes <- NClusters(fsom)
   nMarkers <- length(markers)
-  
+  isEmpty <- which(fsom$map$pctgs == 0)
   nodeInfo <- ggplot2::ggplot_build(p)$plot$data
+  nodeInfo$size[isEmpty] <- 0
   l1 <- NULL
   data <- fsom$map$medianValues[, markers, drop = FALSE]
   data[is.na(data)] <- 0
