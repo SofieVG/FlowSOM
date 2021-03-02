@@ -179,10 +179,7 @@ print.FlowSOM <- function(x, ...){
   
   if(!is.null(x$metaclustering)){
     cat("\n\nMetacluster cell count:\n")
-    counts <- rep(NA, NMetaclusters(x))
-    names(counts) <- paste0("MC", seq_len(NMetaclusters(x)))
-    tmp <- table(GetMetaclusters(x))
-    counts[paste0("MC", names(tmp))] <- tmp
+    counts <- GetCounts(x)
     print(counts)
   }
   

@@ -89,8 +89,8 @@ BuildMST <- function(fsom, silent = FALSE, tSNE = FALSE){
 #' @export
 FlowSOMSubset <- function(fsom, ids){
   fsom_tmp <- fsom
-  fsom_tmp$data <- fsom$data[ids, ]
-  fsom_tmp$map$mapping <- fsom$map$mapping[ids, ]
+  fsom_tmp$data <- fsom$data[ids, , drop = FALSE]
+  fsom_tmp$map$mapping <- fsom$map$mapping[ids, , drop = FALSE]
   fsom_tmp <- UpdateDerivedValues(fsom_tmp)
   return(fsom_tmp)
 }

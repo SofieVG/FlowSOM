@@ -594,12 +594,12 @@ GetFeatures <- function(fsom,
     stop("Filenames vector should have same length as files vector.")
   }
   
-  if (sum(population %in% c("clusters", "metaclusters")) != length(population)){
-    stop("Population should be \"clusters\" and/or \"metaclusters\".")
+  if (sum(level %in% c("clusters", "metaclusters")) != length(level)){
+    stop("level should be \"clusters\" and/or \"metaclusters\".")
   }
   
   if (sum(type %in% c("counts", "percentages", "MFIs")) != length(type)){
-    stop("Population should be \"counts\", \"percentages\" and/or \"MFIs\".")
+    stop("level should be \"counts\", \"percentages\" and/or \"MFIs\".")
   }
   
   if ("MFIs" %in% type & is.null(MFI)){
@@ -667,17 +667,17 @@ GetFeatures <- function(fsom,
     }
     
     if ("MFIs" %in% type){
-      if ("clusters" %in% population){
+      if ("clusters" %in% level){
         C_MFIs[i, ] <- as.vector(t(GetClusterMFIs(fsom_tmp)[, MFI]))
       }
-      if ("metaclusters" %in% population){
+      if ("metaclusters" %in% level){
         MC_MFIs[i, ] <- as.vector(t(GetMetaclusterMFIs(fsom_tmp)[, MFI]))
       }
     }
   }
   
   #----Add matrices to list----
-  if ("clusters" %in% population){
+  if ("clusters" %in% level){
     if ("counts" %in% type){
       C_counts_tmp <- C_counts
       attr(C_counts_tmp, "outliers") <- C_outliers
@@ -693,7 +693,7 @@ GetFeatures <- function(fsom,
     }
   }
   
-  if ("metaclusters" %in% population){
+  if ("metaclusters" %in% level){
     MC_counts <- t(apply(C_counts,
                          1,
                          function(x){
@@ -893,4 +893,75 @@ GroupStats <- function(features, groups){
                        "fold changes", 
                        "log10 fold changes")
   return(stats)
+}
+
+#' GetCounts 
+#' 
+#' Get counts of number of cells in clusters or metaclusters
+#' 
+#' @param fsom        FlowSOM object
+#' @param level       Character string, should be either "clusters" or 
+#'                    "metaclusters" (default)
+#' 
+#' @return A named vector with the counts
+#' 
+#' @examples 
+#' # Read from file, build self-organizing map and minimal spanning tree
+#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' ff <- flowCore::read.FCS(fileName)
+#' ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
+#' ff <- flowCore::transform(ff, flowCore::estimateLogicle(ff,
+#'                                                flowCore::colnames(ff)[8:18]))
+#' flowSOM.res <- FlowSOM(ff,
+#'                        scale = TRUE,
+#'                        colsToUse = c(9, 12, 14:18),
+#'                        nClus = 10,
+#'                        seed = 1)
+#' GetCounts(flowSOM.res)                      
+#' GetCounts(flowSOM.res, level = "clusters")
+#' @export
+GetCounts <- function(fsom, level = "metaclusters"){
+  fsom <- UpdateFlowSOM(fsom)
+  if (!is.null(fsom$metaclustering) && level == "metaclusters"){
+    counts <- rep(NA, NMetaclusters(fsom))
+    names(counts) <- paste0("MC", seq_len(NMetaclusters(fsom)))
+    tmp <- table(GetMetaclusters(fsom))
+    counts[paste0("MC", names(tmp))] <- tmp
+  } else if (level == "clusters"){
+    counts <- rep(NA, NClusters(fsom))
+    names(counts) <- paste0("C", seq_len(NClusters(fsom)))
+    tmp <- table(GetClusters(fsom))
+    counts[paste0("C", names(tmp))] <- tmp
+  } else stop("level should be \"clusters\" or \"metaclusters\"")
+  return(counts)
+}
+
+#' GetPercentages
+#' 
+#' Get percentages of number of cells in clusters or metaclusters
+#' 
+#' @param fsom        FlowSOM object
+#' @param level       Character string, should be either "clusters" or 
+#'                    "metaclusters" (default)
+#' 
+#' @return A named vector with the percentages
+#' 
+#' @examples 
+#' # Read from file, build self-organizing map and minimal spanning tree
+#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' ff <- flowCore::read.FCS(fileName)
+#' ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
+#' ff <- flowCore::transform(ff, flowCore::estimateLogicle(ff,
+#'                                                flowCore::colnames(ff)[8:18]))
+#' flowSOM.res <- FlowSOM(ff,
+#'                        scale = TRUE,
+#'                        colsToUse = c(9, 12, 14:18),
+#'                        nClus = 10,
+#'                        seed = 1)
+#' GetPercentages(flowSOM.res)                      
+#' GetPercentages(flowSOM.res, level = "clusters")
+#' @export
+GetPercentages <- function(fsom, level = "metaclusters"){
+  counts <- GetCounts(fsom, level = level)
+  return(counts / sum(counts, na.rm = TRUE))
 }

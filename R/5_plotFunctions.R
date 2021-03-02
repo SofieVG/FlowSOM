@@ -454,12 +454,12 @@ PlotNumbers <- function(fsom,
                         level = "clusters",
                         maxNodeSize = 0,
                         ...){
-  if (numbers == "clusters"){
+  if (level == "clusters"){
     numbers <- seq_len(NClusters(fsom))
-  } else if (numbers == "metaclusters") {
+  } else if (level == "metaclusters") {
     numbers <- fsom$metaclustering
   } else {
-    stop("Numbers should be \"clusters\" or \"metaclusters\"")
+    stop("level should be \"clusters\" or \"metaclusters\"")
   }
   p <- PlotLabels(fsom =  fsom,
                   labels = numbers, 
