@@ -2393,9 +2393,11 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
     message("Plot heatmap")
     colnames(mfis) <- fsom$prettyColnames[colnames(mfis)]
     rownames(mfis) <- seq_len(nrow(mfis))
+    mfis_scaled <- scale(mfis)
+    mfis_scaled[is.na(mfis_scaled)] <- 0
     plotList[["empty"]] <- ggplot2::ggplot() + ggplot2::theme_minimal()
     plotList[["p10"]] <-
-      pheatmap::pheatmap(mfis, scale = "column",
+      pheatmap::pheatmap(mfis_scaled, scale = "none",
                          display_numbers = round(mfis, 2),
                          main = "Median expression per metacluster")
   }
@@ -2408,10 +2410,15 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   if (metaclustersPresent) {
     datatable1[, "Total number of metaclusters"] <- nMetaclusters
   }
+  n_marker_columns <- ceiling(length(fsom$map$colsUsed)/30)
+  pattern <- paste0("(",
+                    paste(rep("[^\\\t]*,\\\t", n_marker_columns), collapse = ""),
+                    ")")
   datatable1 <- cbind(datatable1,
                       "Total number of clusters" = fsom$map$nNodes,
                       "Markers used for FlowSOM" = paste(fsom$prettyColnames[
-                        fsom$map$colsUsed], collapse = "\n"))
+                        fsom$map$colsUsed], collapse = ",\t") %>% 
+                        gsub(pattern, "\\1\n", .))
   datatable1 <- format(datatable1, digits = 2)
   t1 <- ggpubr::ggtexttable(datatable1, theme = ggpubr::ttheme("minimal"),
                             rows = NULL)
