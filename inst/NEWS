@@ -1,3 +1,20 @@
+CHANGES IN VERSION 2.1.11 (2020/03/03)
+--------------------------------------
+o Added example to AddAnnotation
+o Added example to NClusters, NMetaclusters
+o Changed examples that used fsom to flowSOM.res
+o Added textColor and textSize to AddLabels and PlotNumbers, PlotLabels
+o PlotNumbers can plot clusters and metaclusters with parameter "level"
+o In GetFeatures, the population parameter is changed to level
+o Added GetCounts and GetPercentages to get counts or percentages respectively 
+  per cluster or metacluster
+o FlowSOMmary doesn't crash anymore with a column with the same values in 
+  heatmap
+o Included a print function for FlowSOM class
+o Fixed bug in PlotManualBars
+o PlotMarker also accept multiple markers now
+
+
 CHANGES IN VERSION 2.1.8 (2020/11/19)
 --------------------------------------
 o Solved issue when matrix with no column was given to the SOM function
