@@ -15,3 +15,13 @@ The number of metaclusters
 \description{
 Extracts the number of metaclusters from a FlowSOM object
 }
+\examples{
+ # Build FlowSom result
+ fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+ ff <- flowCore::read.FCS(fileName)
+ flowSOM.res <- FlowSOM(ff,
+                        compensate = TRUE, transform = TRUE, scale = TRUE,
+                        colsToUse = c(9, 12, 14:18),
+                        maxMeta = 10)
+ NMetaclusters(flowSOM.res)
+}

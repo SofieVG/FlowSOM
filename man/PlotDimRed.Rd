@@ -65,10 +65,12 @@ Plot a dimensionality reduction of fsom$data
 }
 \examples{
    file <- system.file("extdata", "68983.fcs", package="FlowSOM")
-   fsom <- FlowSOM(file, compensate = TRUE, transform = TRUE, scale = TRUE,
+   flowSOM.res <- FlowSOM(file, compensate = TRUE, transform = TRUE, 
+                  scale = TRUE,
                   colsToUse = c(9, 12, 14:18), nClus = 10, silent = FALSE,
                   xdim = 7, ydim = 7)
-   PlotDimRed(fsom, cTotal = 5000, seed = 1, title = "t-SNE")
-   PlotDimRed(fsom, cTotal = 5000, colorBy = "CD3", seed = 1, title = "t-SNE")
+   PlotDimRed(flowSOM.res, cTotal = 5000, seed = 1, title = "t-SNE")
+   PlotDimRed(flowSOM.res, cTotal = 5000, colorBy = "CD3", seed = 1, 
+              title = "t-SNE")
    
 }

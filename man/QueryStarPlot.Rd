@@ -44,18 +44,18 @@ or "low" marker expressions.
 }
 \examples{
    file <- system.file("extdata", "68983.fcs", package="FlowSOM")
-   fsom <- FlowSOM(file, compensate = TRUE, transform = TRUE, scale = TRUE,
-                  colsToUse = c(9, 12, 14:18), nClus = 10, silent = FALSE,
-                  xdim = 7, ydim = 7)
+   flowSOM.res <- FlowSOM(file, compensate = TRUE, transform = TRUE, 
+                  scale = TRUE, colsToUse = c(9, 12, 14:18), nClus = 10, 
+                  silent = FALSE, xdim = 7, ydim = 7)
    query <- c("CD3" = "high", #CD3
               "CD4" = "low", #TCRb
               "CD8" = "high") #CD8
-   query_res <- QueryStarPlot(fsom, query, equalNodeSize = TRUE)
+   query_res <- QueryStarPlot(flowSOM.res, query, equalNodeSize = TRUE)
    
    cellTypes <- factor(rep("Unlabeled", 49), 
                        levels = c("Unlabeled", "CD8 T cells"))
    cellTypes[query_res$selected] <- "CD8 T cells"
-   PlotStars(fsom,
+   PlotStars(flowSOM.res,
              backgroundValues = cellTypes,
              backgroundColors = c("#FFFFFF00", "#ca0020aa"))
    

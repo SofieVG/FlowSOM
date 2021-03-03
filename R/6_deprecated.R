@@ -523,18 +523,20 @@ PlotGroups <- function(fsom,
 #' @examples
 #' set.seed(1)
 #' fileName <-  system.file("extdata", "68983.fcs", package="FlowSOM")
-#' fsom <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
+#' flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
 #'                       scale = TRUE, colsToUse = c(9,12,14:18), nClus = 10)
 #' 
 #' ff <- flowCore::read.FCS(fileName)
 #' # Make an additional file without cluster 7 and double amount of cluster 5
-#' selection <- c(which(GetClusters(fsom) %in% which(fsom$metaclustering != 7)),
-#'                  which(GetClusters(fsom) %in% which(fsom$metaclustering == 5)))
+#' selection <- c(which(GetClusters(flowSOM.res) %in% 
+#'                                  which(flowSOM.res$metaclustering != 7)),
+#'                  which(GetClusters(flowSOM.res) %in% 
+#'                                  which(flowSOM.res$metaclustering == 5)))
 #' ff_tmp <- ff[selection,]
 #' flowCore::write.FCS(ff_tmp, file="ff_tmp.fcs")
 #' 
 #' # Compare only the file with the double amount of cluster 10
-#' features <- GetFeatures(fsom, 
+#' features <- GetFeatures(flowSOM.res, 
 #'                         c(fileName, "ff_tmp.fcs"),
 #'                         population = "clusters",
 #'                         type = "percentages")
@@ -613,9 +615,9 @@ CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE)
 #' @examples
 #'    file <- system.file("extdata", "68983.fcs", package="FlowSOM")
 #'    ff <- flowCore::read.FCS(file)
-#'    # Use the wrapper function to build a flowSOM object (saved in fsom[[1]])
-#'    # and a metaclustering (saved in fsom[[2]])
-#'    fsom <- FlowSOM(ff,compensate = TRUE, transform = TRUE,scale = TRUE,
+#'    # Use the wrapper function to build a flowSOM object (saved in flowSOM.res)
+#'    # and a metaclustering (saved in flowSOM.res[["metaclustering"]])
+#'    flowSOM.res <- FlowSOM(ff,compensate = TRUE, transform = TRUE,scale = TRUE,
 #'                   colsToUse = c(9,12,14:18), nClus = 10, silent = FALSE,
 #'                   xdim=7, ydim=7)
 #'    cell_types <- list("CD8 T cells" = c("PE-Cy7-A" = "high",
@@ -625,7 +627,7 @@ CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE)
 #'                        "NK cells" = c("PE-A" = "high",
 #'                                       "PE-Cy7-A" = "low",
 #'                                       "APC-Cy7-A" = "low"))
-#'    query_res <- QueryMultiple(fsom, cell_types, "query_multiple.pdf")
+#'    query_res <- QueryMultiple(flowSOM.res, cell_types, "query_multiple.pdf")
 #'    
 #' @export
 query_multiple <- function(fsom,

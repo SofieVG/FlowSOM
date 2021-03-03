@@ -674,11 +674,13 @@ PlotVariable <- function(fsom,
 #'         
 #' @examples 
 #'    file <- system.file("extdata", "68983.fcs", package="FlowSOM")
-#'    fsom <- FlowSOM(file, compensate = TRUE, transform = TRUE, scale = TRUE,
+#'    flowSOM.res <- FlowSOM(file, compensate = TRUE, transform = TRUE, 
+#'                   scale = TRUE,
 #'                   colsToUse = c(9, 12, 14:18), nClus = 10, silent = FALSE,
 #'                   xdim = 7, ydim = 7)
-#'    PlotDimRed(fsom, cTotal = 5000, seed = 1, title = "t-SNE")
-#'    PlotDimRed(fsom, cTotal = 5000, colorBy = "CD3", seed = 1, title = "t-SNE")
+#'    PlotDimRed(flowSOM.res, cTotal = 5000, seed = 1, title = "t-SNE")
+#'    PlotDimRed(flowSOM.res, cTotal = 5000, colorBy = "CD3", seed = 1, 
+#'               title = "t-SNE")
 #'    
 #' @import     ggplot2
 #' @importFrom Rtsne Rtsne
@@ -817,18 +819,18 @@ PlotDimRed <- function(fsom,
 #'         
 #' @examples 
 #'    file <- system.file("extdata", "68983.fcs", package="FlowSOM")
-#'    fsom <- FlowSOM(file, compensate = TRUE, transform = TRUE, scale = TRUE,
-#'                   colsToUse = c(9, 12, 14:18), nClus = 10, silent = FALSE,
-#'                   xdim = 7, ydim = 7)
+#'    flowSOM.res <- FlowSOM(file, compensate = TRUE, transform = TRUE, 
+#'                   scale = TRUE, colsToUse = c(9, 12, 14:18), nClus = 10, 
+#'                   silent = FALSE, xdim = 7, ydim = 7)
 #'    query <- c("CD3" = "high", #CD3
 #'               "CD4" = "low", #TCRb
 #'               "CD8" = "high") #CD8
-#'    query_res <- QueryStarPlot(fsom, query, equalNodeSize = TRUE)
+#'    query_res <- QueryStarPlot(flowSOM.res, query, equalNodeSize = TRUE)
 #'    
 #'    cellTypes <- factor(rep("Unlabeled", 49), 
 #'                        levels = c("Unlabeled", "CD8 T cells"))
 #'    cellTypes[query_res$selected] <- "CD8 T cells"
-#'    PlotStars(fsom,
+#'    PlotStars(flowSOM.res,
 #'              backgroundValues = cellTypes,
 #'              backgroundColors = c("#FFFFFF00", "#ca0020aa"))
 #'    
@@ -893,9 +895,9 @@ QueryStarPlot <- function(fsom,
 #' @examples
 #'    file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
 #'    ff <- flowCore::read.FCS(file)
-#'    # Use the wrapper function to build a flowSOM object (saved in fsom[[1]])
-#'    # and a metaclustering (saved in fsom[[2]])
-#'    fsom <- FlowSOM(ff, compensate = TRUE, transform = TRUE, scale = TRUE,
+#'    # Use the wrapper function to build a flowSOM object (saved in flowSOM.res)
+#'    # and a metaclustering (saved in flowSOM.res[["metaclustering"]])
+#'    flowSOM.res <- FlowSOM(ff, compensate = TRUE, transform = TRUE, scale = TRUE,
 #'                   colsToUse = c(9, 12, 14:18), nClus = 10, silent = FALSE,
 #'                   xdim = 7, ydim = 7)
 #'    cellTypes <- list("CD8 T cells" = c("PE-Cy7-A" = "high",
@@ -905,7 +907,7 @@ QueryStarPlot <- function(fsom,
 #'                        "NK cells" = c("PE-A" = "high",
 #'                                       "PE-Cy7-A" = "low",
 #'                                       "APC-Cy7-A" = "low"))
-#'    query_res <- QueryMultiple(fsom, cellTypes, "query_multiple.pdf")
+#'    query_res <- QueryMultiple(flowSOM.res, cellTypes, "query_multiple.pdf")
 #'    
 #' @export
 QueryMultiple <- function(fsom,
@@ -2544,6 +2546,25 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
 #' @param ...     Arguments passed to geom_text_repel
 #' 
 #' @return The updated plot
+#' 
+#' @examples
+#' 
+#' #' # Identify the files
+#' fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs", 
+#'                                       package = "FlowSOM"))
+#' # Build a FlowSOM object
+#' flowSOM.res <- FlowSOM(fcs, 
+#'                        scale = TRUE,
+#'                        compensate = TRUE, 
+#'                        transform = TRUE,
+#'                        toTransform = 8:18, 
+#'                        colsToUse = c(9, 12, 14:18),
+#'                        nClus = 10,
+#'                        seed = 1)
+#'                        
+#' p <- PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering,
+#'                list_insteadof_ggarrange = TRUE)
+#' AddAnnotation(p, flowSOM.res, cl = c(1, 2), mcl = c(3, 4))
 #' 
 #' @importFrom ggrepel geom_text_repel
 #' 

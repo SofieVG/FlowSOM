@@ -44,3 +44,23 @@ The updated plot
 \description{
 Add annotation to a FlowSOM plot
 }
+\examples{
+
+#' # Identify the files
+fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs", 
+                                      package = "FlowSOM"))
+# Build a FlowSOM object
+flowSOM.res <- FlowSOM(fcs, 
+                       scale = TRUE,
+                       compensate = TRUE, 
+                       transform = TRUE,
+                       toTransform = 8:18, 
+                       colsToUse = c(9, 12, 14:18),
+                       nClus = 10,
+                       seed = 1)
+                       
+p <- PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering,
+               list_insteadof_ggarrange = TRUE)
+AddAnnotation(p, flowSOM.res, cl = c(1, 2), mcl = c(3, 4))
+
+}

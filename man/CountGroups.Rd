@@ -24,18 +24,20 @@ Calculate differences in cell counts between groups
 \examples{
 set.seed(1)
 fileName <-  system.file("extdata", "68983.fcs", package="FlowSOM")
-fsom <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
+flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
                       scale = TRUE, colsToUse = c(9,12,14:18), nClus = 10)
 
 ff <- flowCore::read.FCS(fileName)
 # Make an additional file without cluster 7 and double amount of cluster 5
-selection <- c(which(GetClusters(fsom) \%in\% which(fsom$metaclustering != 7)),
-                 which(GetClusters(fsom) \%in\% which(fsom$metaclustering == 5)))
+selection <- c(which(GetClusters(flowSOM.res) \%in\% 
+                                 which(flowSOM.res$metaclustering != 7)),
+                 which(GetClusters(flowSOM.res) \%in\% 
+                                 which(flowSOM.res$metaclustering == 5)))
 ff_tmp <- ff[selection,]
 flowCore::write.FCS(ff_tmp, file="ff_tmp.fcs")
 
 # Compare only the file with the double amount of cluster 10
-features <- GetFeatures(fsom, 
+features <- GetFeatures(flowSOM.res, 
                         c(fileName, "ff_tmp.fcs"),
                         population = "clusters",
                         type = "percentages")
