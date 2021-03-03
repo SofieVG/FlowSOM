@@ -4,7 +4,15 @@
 \alias{AddLabels}
 \title{AddLabels}
 \usage{
-AddLabels(p, labels, hjust = 0.5, layout = NULL, textSize = 3.88, ...)
+AddLabels(
+  p,
+  labels,
+  hjust = 0.5,
+  layout = NULL,
+  textSize = 3.88,
+  textColor = "black",
+  ...
+)
 }
 \arguments{
 \item{p}{ggplot object}
@@ -17,6 +25,8 @@ AddLabels(p, labels, hjust = 0.5, layout = NULL, textSize = 3.88, ...)
 the ggplot object will be reused.}
 
 \item{textSize}{Size for geom_text. Default (=3.88) is from geom_text.}
+
+\item{textColor}{Color for geom_text. Default = black.}
 
 \item{...}{Additional parameters to pass to geom_text}
 }
