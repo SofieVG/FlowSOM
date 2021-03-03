@@ -662,6 +662,7 @@ PlotVariable <- function(fsom,
 #'                        flowSOM data for cTotal cells with the same seed).
 #' @param extractLayout   A function to extract the coordinates from the results
 #'                        of the dimred default = function(dimred){dimred$Y}.
+#' @param label           If label = TRUE (default), labels are added to plot.
 #' @param returnLayout    If TRUE, this function returns a dataframe with 
 #'                        the layout of dimred and the original IDs and the 
 #'                        plot. Default = FALSE.                     
@@ -691,6 +692,7 @@ PlotDimRed <- function(fsom,
                        cTotal = NULL,
                        dimred = Rtsne::Rtsne,
                        extractLayout  = function(dimred){dimred$Y},
+                       label = TRUE,
                        returnLayout = FALSE,
                        seed = NULL,
                        title = NULL,
@@ -763,17 +765,19 @@ PlotDimRed <- function(fsom,
                                                  col = .data$colors), 
                                     pointsize = 1) +
       ggplot2::theme_minimal() +
-      ggplot2::coord_fixed() +
-      ggrepel::geom_label_repel(aes(x = .data$x, 
-                                    y = .data$y, 
-                                    label = .data$label, 
-                                    color = .data$label),
-                                data = data.frame(x = median_x,
-                                                  y = median_y,
-                                                  label = names(median_x)),
-                                segment.color = "grey", force = 20, 
-                                segment.size = 0.2, point.padding = 0.5)+
-      labs(col = colorBy)
+      ggplot2::coord_fixed() 
+    if (label){
+      p <- p + ggrepel::geom_label_repel(aes(x = .data$x, 
+                                             y = .data$y, 
+                                             label = .data$label, 
+                                             color = .data$label),
+                                         data = data.frame(x = median_x,
+                                                           y = median_y,
+                                                           label = names(median_x)),
+                                         segment.color = "grey", force = 20, 
+                                         segment.size = 0.2, point.padding = 0.5)+
+        labs(col = colorBy)
+    }
   }
   if (!is.null(title)) p <- p + ggplot2::ggtitle(title)
   if (returnLayout) {

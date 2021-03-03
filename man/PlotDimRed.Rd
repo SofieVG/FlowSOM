@@ -11,6 +11,7 @@ PlotDimRed(
   cTotal = NULL,
   dimred = Rtsne::Rtsne,
   extractLayout = function(dimred) {     dimred$Y },
+  label = TRUE,
   returnLayout = FALSE,
   seed = NULL,
   title = NULL,
@@ -40,6 +41,8 @@ flowSOM data for cTotal cells with the same seed).}
 
 \item{extractLayout}{A function to extract the coordinates from the results
 of the dimred default = function(dimred){dimred$Y}.}
+
+\item{label}{If label = TRUE (default), labels are added to plot.}
 
 \item{returnLayout}{If TRUE, this function returns a dataframe with 
 the layout of dimred and the original IDs and the 
