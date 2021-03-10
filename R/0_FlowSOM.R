@@ -170,12 +170,16 @@ FlowSOM <- function(input, pattern = ".fcs",
 #' 
 #' @export
 print.FlowSOM <- function(x, ...){
-  cat("FlowSOM model trained on", nrow(x$data), "cells and", 
-      length(x$map$colsUsed), "markers, \n using a",
-     paste0(x$map$xdim,"x",x$map$ydim), paste0("grid (",NClusters(x)), "clusters) and",
-      NMetaclusters(x), "metaclusters.")
-
-  cat("\n\nMarkers used: ", paste(x$prettyColnames[x$map$colsUsed], collapse =", "))
+  if(!is.null(x$map)){
+    cat("FlowSOM model trained on", nrow(x$data), "cells and", 
+        length(x$map$colsUsed), "markers, \n using a",
+       paste0(x$map$xdim,"x",x$map$ydim), paste0("grid (",NClusters(x)), "clusters) and",
+        NMetaclusters(x), "metaclusters.")
+  
+    cat("\n\nMarkers used: ", paste(x$prettyColnames[x$map$colsUsed], collapse =", "))
+  } else {
+    cat("FlowSOM model to train on", nrow(x$data), "cells.")
+  }
   
   if(!is.null(x$metaclustering)){
     cat("\n\nMetacluster cell count:\n")
