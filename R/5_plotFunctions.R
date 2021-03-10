@@ -447,7 +447,7 @@ PlotLabels <- function(fsom,
 #' 
 #' # Plot the node IDs
 #' PlotNumbers(flowSOM.res)
-#' PlotNumbers(flowSOM.res, "Metaclusters")
+#' PlotNumbers(flowSOM.res, "metaclusters")
 #' 
 #' PlotNumbers(flowSOM.res,
 #'             view = "grid")
