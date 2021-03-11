@@ -569,7 +569,8 @@ GetClusterCVs <- function(fsom){
 #'                         nClus = 10)
 #'    
 #'  # Map new data
-#'  counts <- GetFeatures(fsom = flowSOM.res, population = "clusters",
+#'  counts <- GetFeatures(fsom = flowSOM.res, 
+#'                        level = "clusters",
 #'                        files = c(ff[1001:2000, ], ff[2001:3000, ]))
 #'  features <- GetFeatures(fsom = flowSOM.res, 
 #'                          files = c(ff[1001:2000, ], ff[2001:3000, ]),

@@ -39,7 +39,7 @@ flowCore::write.FCS(ff_tmp, file="ff_tmp.fcs")
 # Compare only the file with the double amount of cluster 10
 features <- GetFeatures(flowSOM.res, 
                         c(fileName, "ff_tmp.fcs"),
-                        population = "clusters",
+                        level = "clusters",
                         type = "percentages")
 stats <- GroupStats(features$cluster_percentages,                     
                     groups = list("AllCells" = c(fileName),
