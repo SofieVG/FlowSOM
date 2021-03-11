@@ -669,6 +669,8 @@ GetChannels <- function(object, markers, exact = TRUE) {
     stop("Object should be of class flowFrame or FlowSOM")
   }
   
+  if (is.logical(markers)) markers <- which(markers)
+  
   channelnames <- c()
   for (marker in markers){
     if(is.numeric(marker)) {
@@ -733,7 +735,9 @@ GetMarkers <- function(object, channels, exact = TRUE) {
   } else {
     stop("Object should be of class flowFrame or FlowSOM")
   }
-
+  
+  if (is.logical(channels)) channels <- which(channels)
+  
   markernames <- c()
   for (channel in channels){
     if (is.numeric(channel)) {
