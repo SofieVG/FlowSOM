@@ -284,3 +284,64 @@ GetMetaclusterCVs <- function(fsom){
                   }))
   return(CVs)
 }
+
+#' RelabelMetaclusters
+#' 
+#' Adapt the metacluster levels. Can be used to either give them new names,
+#' or potentially merge some metaclusters.
+#'
+#' @param fsom Result of calling the FlowSOM function
+#' @param labels Named vector, with the names the original metacluster names
+#'               and the values the replacement
+#' @return  Updated FlowSOM object
+#' @examples
+#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' ff <- flowCore::read.FCS(fileName)
+#' ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
+#' ff <- flowCore::transform(ff,
+#'          flowCore::transformList(colnames(flowCore::keyword(ff)[["SPILL"]]),
+#'                                 flowCore::logicleTransform()))
+#' flowSOM.res <- FlowSOM(ff,
+#'                        scale = TRUE,
+#'                        colsToUse = c(9, 12, 14:18), 
+#'                        nClus = 10,
+#'                        seed = 1)
+#'                        
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' GetCounts(flowSOM.res)
+#'
+#' # Include MC9 in MC8
+#' flowSOM.res <- RelabelMetaclusters(flowSOM.res, c("9" = "8")) 
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' GetCounts(flowSOM.res)
+#' 
+#' # Give different names
+#' 
+#' flowSOM.res <- RelabelMetaclusters(flowSOM.res, c("1" = "1: CD8+",
+#'                                                   "7" = "7: gd+",
+#'                                                   "8" = "8: CD19+"))
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' PlotNumbers(flowSOM.res, level = "metaclusters")
+#' GetCounts(flowSOM.res)
+#' 
+#' @export
+RelabelMetaclusters <- function(fsom, labels){
+    
+  currentLevels <- levels(fsom$metaclustering)
+  newLevels <- currentLevels
+  names(newLevels) <- currentLevels
+  
+  for(original in names(labels))
+    newLevels[currentLevels == original] <- labels[original]
+  
+  if(any(duplicated(newLevels))){
+    fsom$metaclustering <- newLevels[as.character(fsom$metaclustering)]
+    fsom$metaclustering <- factor(fsom$metaclustering, 
+                                  levels = unique(newLevels))
+    fsom$map$nMetaclusters <- length(unique(newLevels))
+  } else {
+    levels(fsom$metaclustering) <- newLevels
+  }
+  
+  fsom <- UpdateDerivedValues(fsom)
+}

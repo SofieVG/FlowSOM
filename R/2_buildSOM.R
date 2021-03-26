@@ -925,7 +925,7 @@ GetCounts <- function(fsom, level = "metaclusters"){
   fsom <- UpdateFlowSOM(fsom)
   if (!is.null(fsom$metaclustering) && level == "metaclusters"){
     counts <- rep(NA, NMetaclusters(fsom))
-    names(counts) <- paste0("MC", seq_len(NMetaclusters(fsom)))
+    names(counts) <- paste0("MC", levels(fsom$metaclustering))
     tmp <- table(GetMetaclusters(fsom))
     counts[paste0("MC", names(tmp))] <- tmp
   } else if (level == "clusters"){
