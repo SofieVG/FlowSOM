@@ -485,7 +485,7 @@ PlotFileScatters <- function(input,
       ncol <- ceiling(length(channels) / nrow)
     }
     png(plotFile, 
-        width = ncol * (15 + 10 * length(unique(file_values))), 
+        width = ncol * (60 + 15 * length(unique(file_values))), 
         height = 250 * nrow)
     p <- ggpubr::annotate_figure(ggarrange(plotlist = plots_list,
                                            common.legend = legend, 
