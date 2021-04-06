@@ -326,7 +326,9 @@ GetMetaclusterCVs <- function(fsom){
 #' 
 #' @export
 RelabelMetaclusters <- function(fsom, labels){
-    
+  if (is.null(fsom$metaclustering)) {
+    stop("Your fsom object does not have metaclustering available")
+  }
   currentLevels <- levels(fsom$metaclustering)
   newLevels <- currentLevels
   names(newLevels) <- currentLevels

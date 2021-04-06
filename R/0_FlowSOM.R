@@ -313,8 +313,10 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #' @param  channels   Vector of channels that need to be plotted, if NULL
 #'                    (default), all channels from the input will be 
 #'                    plotted
-#' @param  yMargin   Optional parameter to specify the margins of the 
+#' @param  yMargin    Optional parameter to specify the margins of the 
 #'                    y-axis
+#' @param  yLabel     Determines the label of the y-axis. Can be "marker" and\\or
+#'                    "channel". Default = "marker".
 #' @param  names      Optional parameter to provide filenames. If \code{NULL} 
 #'                    (default), the filenames will be numbers
 #' @param  groups     Optional parameter to specify groups of files, should have
@@ -361,6 +363,7 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 PlotFileScatters <- function(input, 
                              channels = NULL, 
                              yMargin = NULL, 
+                             yLabel = c("marker"),
                              names = NULL,
                              groups = NULL, 
                              color = NULL, 
@@ -433,15 +436,22 @@ PlotFileScatters <- function(input,
   #----Generate plots----
   plots_list <- list()
   for (channel in channels) {
+    if ("marker" %in% yLabel && length(yLabel) == 1) {
+      yLabs <- GetMarkers(ff, channel)
+    } else if ("channel" %in% yLabel && length(yLabel) == 1){
+      yLabs <- channel
+    } else if (all(c("channel", "marker") %in% yLabel && length(yLabel) == 2)){
+      yLabs <- paste0(GetMarkers(ff, channel), " (", channel, ")")
+    } else stop("yLabel should be \"marker\" and\\or \"channel\"")
     df <- data.frame("intensity" = data[, channel],
                      "names" = factor(names[file_values], 
                                       levels = unique(names)),
                      "group" = factor(groups[file_values], 
                                       levels = unique(groups)))
     p <- ggplot(df, aes(.data$names, .data$intensity)) +
-      geom_jitter(position = position_jitter(width=0.1), alpha = 0.5, 
+      geom_jitter(position = position_jitter(width = 0.1), alpha = 0.5, 
                   aes(colour = .data$group), shape = ".") +
-      ylab(GetMarkers(ff, channel)) +
+      ylab(yLabs) +
       theme_classic() +
       theme(axis.title.x=element_blank()) +
       theme(axis.text.x=element_text(angle = 90, vjust = 0.5)) +

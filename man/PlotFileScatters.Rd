@@ -8,6 +8,7 @@ PlotFileScatters(
   input,
   channels = NULL,
   yMargin = NULL,
+  yLabel = c("marker"),
   names = NULL,
   groups = NULL,
   color = NULL,
@@ -29,6 +30,9 @@ plotted}
 
 \item{yMargin}{Optional parameter to specify the margins of the 
 y-axis}
+
+\item{yLabel}{Determines the label of the y-axis. Can be "marker" and\\or
+"channel". Default = "marker".}
 
 \item{names}{Optional parameter to provide filenames. If \code{NULL} 
 (default), the filenames will be numbers}
