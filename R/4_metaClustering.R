@@ -326,22 +326,26 @@ GetMetaclusterCVs <- function(fsom){
 #' 
 #' @export
 RelabelMetaclusters <- function(fsom, labels){
+  
+  if(!is.null(fsom$metaclustering)){
+    currentLevels <- levels(fsom$metaclustering)
+    newLevels <- currentLevels
+    names(newLevels) <- currentLevels
     
-  currentLevels <- levels(fsom$metaclustering)
-  newLevels <- currentLevels
-  names(newLevels) <- currentLevels
-  
-  for(original in names(labels))
-    newLevels[currentLevels == original] <- labels[original]
-  
-  if(any(duplicated(newLevels))){
-    fsom$metaclustering <- newLevels[as.character(fsom$metaclustering)]
-    fsom$metaclustering <- factor(fsom$metaclustering, 
-                                  levels = unique(newLevels))
-    fsom$map$nMetaclusters <- length(unique(newLevels))
+    for(original in names(labels))
+      newLevels[currentLevels == original] <- labels[original]
+    
+    if(any(duplicated(newLevels))){
+      fsom$metaclustering <- newLevels[as.character(fsom$metaclustering)]
+      fsom$metaclustering <- factor(fsom$metaclustering, 
+                                    levels = unique(newLevels))
+      fsom$map$nMetaclusters <- length(unique(newLevels))
+    } else {
+      levels(fsom$metaclustering) <- newLevels
+    }
+    
+    fsom <- UpdateDerivedValues(fsom)
   } else {
-    levels(fsom$metaclustering) <- newLevels
+    stop("This FlowSOM object does not include a metaclustering.")
   }
-  
-  fsom <- UpdateDerivedValues(fsom)
 }
