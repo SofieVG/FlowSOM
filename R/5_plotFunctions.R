@@ -2057,6 +2057,8 @@ gg_color_hue <- function(n) {
 #' @param sizeBgPoints    Size of the background cells
 #' @param maxPoints        Maximum number of (meta)cluster cells to plot
 #' @param sizePoints       Size of the (meta)cluster cells
+#' @param xLim             A vector of a lower and upper limit of the x-axis
+#' @param yLim             A vector of a lower and upper limit of the y-axis
 #' @param density           Default is \code{TRUE} to color the (meta)cluster 
 #'                          points according to density. Set to \code{FALSE} to 
 #'                          use a plain color
@@ -2121,6 +2123,8 @@ Plot2DScatters <- function(fsom,
                            sizeBgPoints = 0.5,
                            maxPoints = 1000, 
                            sizePoints = 0.5,
+                           xLim = NULL,
+                           yLim = NULL,
                            density = TRUE, 
                            centers = TRUE, 
                            color = NULL,
@@ -2150,12 +2154,14 @@ Plot2DScatters <- function(fsom,
   # loop over all subsets at once
   subsets <- list("Cluster" = as.list(clusters),
                   "Metacluster" = as.list(metaclusters)) 
-  color_n <- 1
   plots_list <- list()
+  color_n <- 0
   for (group in names(subsets)){
     for (subset in subsets[[group]]){
+      color_n <- color_n + 1
       n <- as.numeric(unlist(subset))
       for (channelpair in channelpairs){
+        
         channelpair <- GetChannels(fsom, channelpair)
         #----background dataframe----
         df_bg <- data.frame(fsom$data[i, c(channelpair[1], channelpair[2])]) 
@@ -2210,6 +2216,8 @@ Plot2DScatters <- function(fsom,
           ggplot2::xlab(GetMarkers(fsom, channelpair[1])) +
           ggplot2::ylab(GetMarkers(fsom, channelpair[2])) + 
           ggplot2::theme(legend.position = "none")
+        if (!is.null(xLim)) p <- p + ggplot2::xlim(xLim)
+        if (!is.null(yLim)) p <- p + ggplot2::ylim(yLim)
         
         if (density) {
           # subset density plot
@@ -2227,8 +2235,9 @@ Plot2DScatters <- function(fsom,
             p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
                                          size = sizePoints) +
               ggplot2::scale_color_manual(values=color[[color_n]])
-            color_n <- color_n + 1
+            # color_n <- color_n + 1
           }
+          
         }
         
         #----add cluster centers----

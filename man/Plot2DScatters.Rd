@@ -13,6 +13,8 @@ Plot2DScatters(
   sizeBgPoints = 0.5,
   maxPoints = 1000,
   sizePoints = 0.5,
+  xLim = NULL,
+  yLim = NULL,
   density = TRUE,
   centers = TRUE,
   color = NULL,
@@ -38,6 +40,10 @@ one plot) with metaclusters of interest}
 \item{maxPoints}{Maximum number of (meta)cluster cells to plot}
 
 \item{sizePoints}{Size of the (meta)cluster cells}
+
+\item{xLim}{A vector of a lower and upper limit of the x-axis}
+
+\item{yLim}{A vector of a lower and upper limit of the y-axis}
 
 \item{density}{Default is \code{TRUE} to color the (meta)cluster 
 points according to density. Set to \code{FALSE} to 
