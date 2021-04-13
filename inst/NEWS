@@ -1,3 +1,7 @@
+CHANGES IN VERSION 2.1.15 (2021/04/13)
+--------------------------------------
+o Fixed warnings with ggtexttable in FlowSOMmary
+
 CHANGES IN VERSION 2.1.13 (2021/04/06)
 --------------------------------------
 o Added RelabelMetaclusters 

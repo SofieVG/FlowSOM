@@ -2435,6 +2435,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   
   datatable1 <- data.frame("Total number of cells" = nrow(fsom$data), 
                            check.names = FALSE)
+  rownames(datatable1) <- "FlowSOMmary"
   if (metaclustersPresent) {
     datatable1[, "Total number of metaclusters"] <- nMetaclusters
   }
@@ -2442,15 +2443,21 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   pattern <- paste0("(",
                     paste(rep("[^\\\t]*,\\\t", n_marker_columns), collapse = ""),
                     ")")
-  datatable1 <- cbind(datatable1,
+
+  markersInFlowSOM <- split(fsom$prettyColnames[fsom$map$colsUsed], 
+        rep(seq_len(ceiling(length(fsom$prettyColnames[fsom$map$colsUsed])/7)), 
+            each = 7)[seq_len(length(fsom$prettyColnames[fsom$map$colsUsed]))]) %>% 
+    sapply(paste, collapse =", ") %>% 
+    paste(collapse = ",\n")
+  
+  datatable1 <- cbind(datatable1, 
                       "Total number of clusters" = fsom$map$nNodes,
-                      "Markers used for FlowSOM" = 
-                        gsub(pattern, "\\1\n",
-                             paste(fsom$prettyColnames[fsom$map$colsUsed],
-                                   collapse = ",\t")))
+                      "Number of markers used for FlowSOM" = 
+                        length(fsom$prettyColnames[fsom$map$colsUsed]),
+                      "Markers used for FlowSOM" = markersInFlowSOM)
+  
   datatable1 <- format(datatable1, digits = 2)
-  t1 <- ggpubr::ggtexttable(datatable1, theme = ggpubr::ttheme("minimal"),
-                            rows = NULL)
+  t1 <- ggpubr::ggtexttable(t(datatable1), theme = ggpubr::ttheme("minimal"))
   
   if (metaclustersPresent){
     freqMetaclusters <- data.frame(metaclusters = 
