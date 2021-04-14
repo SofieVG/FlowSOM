@@ -345,7 +345,59 @@ RelabelMetaclusters <- function(fsom, labels){
     }
     
     fsom <- UpdateDerivedValues(fsom)
+    
+    return(fsom)
   } else {
     stop("This FlowSOM object does not include a metaclustering.")
   }
+}
+
+#' ReassignMetaclusters
+#' 
+#' Adapt the metaclustering. Can be used to either split up metaclusters,
+#' or potentially merge some metaclusters.
+#'
+#' @param fsom           Result of calling the FlowSOM function
+#' @param metaclustering Vector with the metacluster names for all clusters
+#' @return               Updated FlowSOM object
+#' @examples
+#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' ff <- flowCore::read.FCS(fileName)
+#' ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
+#' ff <- flowCore::transform(ff,
+#'          flowCore::transformList(colnames(flowCore::keyword(ff)[["SPILL"]]),
+#'                                 flowCore::logicleTransform()))
+#' flowSOM.res <- FlowSOM(ff,
+#'                        scale = TRUE,
+#'                        colsToUse = c(9, 12, 14:18), 
+#'                        nClus = 5,
+#'                        seed = 1)
+#'                        
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' 
+#' # Split up metacluster 3
+#' MC_or <- flowSOM.res$metaclustering
+#' MC_new <- c(MC_or)
+#' MC_new[c(81:86, 91:96)] <- "5b"
+#' 
+#' flowSOM.res <- ReassignMetaclusters(flowSOM.res, MC_new)
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' PlotNumbers(flowSOM.res, level = "metaclusters")
+#' GetCounts(flowSOM.res)
+#' 
+#' @export
+ReassignMetaclusters <- function(fsom, metaclustering){
+  
+  if (NClusters(fsom) == length(metaclustering)){
+    cl <- factor(metaclustering)
+    fsom$metaclustering <- cl
+    fsom$map$nMetaclusters <- length(levels(cl))
+    fsom <- FlowSOM:::UpdateDerivedValues(fsom)
+    return(fsom)
+  } else{
+    stop(paste0("Number of FlowSOM clusters (", NClusters(fsom), 
+                ") is inconsistent with the length of the metaclustering vector (", 
+                length(metaclustering), ")."))
+  }
+  
 }
