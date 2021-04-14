@@ -2396,8 +2396,8 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
                                           "call (perplexity = 30, cells = 5000)"))
   if (metaclustersPresent){
     plotList[["p7"]] <- PlotDimRed(fsom, dimred = dimred_res$layout, seed = 1,
-               title = paste0("t-SNE with markers used in FlowSOM ",
-                              "call (perplexity = 30, cells = 5000)"))
+                                   title = paste0("t-SNE with markers used in FlowSOM ",
+                                                  "call (perplexity = 30, cells = 5000)"))
   }
   plotList[["p8"]] <- dimred_res$plot
   
@@ -2444,22 +2444,25 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   
   datatable1 <- data.frame("Total number of cells" = nrow(fsom$data), 
                            check.names = FALSE)
+  rownames(datatable1) <- "FlowSOMmary"
   if (metaclustersPresent) {
     datatable1[, "Total number of metaclusters"] <- nMetaclusters
   }
-  n_marker_columns <- ceiling(length(fsom$map$colsUsed)/30)
-  pattern <- paste0("(",
-                    paste(rep("[^\\\t]*,\\\t", n_marker_columns), collapse = ""),
-                    ")")
-  datatable1 <- cbind(datatable1,
+
+  markersInFlowSOM <- split(fsom$prettyColnames[fsom$map$colsUsed], 
+                            rep(seq_len(ceiling(length(fsom$prettyColnames[
+                              fsom$map$colsUsed])/10)), 
+                                each = 10)[seq_len(length(fsom$prettyColnames[
+                                  fsom$map$colsUsed]))]) %>% 
+    sapply(paste, collapse =", ") %>% 
+    paste(collapse = ",\n")
+  
+  datatable1 <- cbind(datatable1, 
                       "Total number of clusters" = fsom$map$nNodes,
-                      "Markers used for FlowSOM" = 
-                        gsub(pattern, "\\1\n",
-                             paste(fsom$prettyColnames[fsom$map$colsUsed],
-                                   collapse = ",\t")))
+                      "Markers used for FlowSOM" = markersInFlowSOM)
+  
   datatable1 <- format(datatable1, digits = 2)
-  t1 <- ggpubr::ggtexttable(datatable1, theme = ggpubr::ttheme("minimal"),
-                            rows = NULL)
+  t1 <- ggpubr::ggtexttable(t(datatable1), theme = ggpubr::ttheme("minimal"))
   
   if (metaclustersPresent){
     freqMetaclusters <- data.frame(metaclusters = 
