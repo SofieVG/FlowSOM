@@ -392,7 +392,7 @@ ReassignMetaclusters <- function(fsom, metaclustering){
     cl <- factor(metaclustering)
     fsom$metaclustering <- cl
     fsom$map$nMetaclusters <- length(levels(cl))
-    fsom <- FlowSOM:::UpdateDerivedValues(fsom)
+    fsom <- UpdateDerivedValues(fsom)
     return(fsom)
   } else{
     stop(paste0("Number of FlowSOM clusters (", NClusters(fsom), 
