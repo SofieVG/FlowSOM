@@ -318,7 +318,8 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #' @param  yLabel     Determines the label of the y-axis. Can be "marker" and\\or
 #'                    "channel". Default = "marker".
 #' @param  names      Optional parameter to provide filenames. If \code{NULL} 
-#'                    (default), the filenames will be numbers
+#'                    (default), the filenames will be numbers. Duplicated 
+#'                    filenames will be made unique.
 #' @param  groups     Optional parameter to specify groups of files, should have
 #'                    the same length as the \code{input}. Id \code{NULL} 
 #'                    (default), all files will be plotted in the same color
@@ -400,6 +401,7 @@ PlotFileScatters <- function(input,
     ff <- input
     data <- flowCore::exprs(ff)
     file_values <- data[, "File"]
+    input <- unique(file_values)
   } else {
     ff <- AggregateFlowFrames(input,
                               cTotal = maxPoints, 
@@ -428,7 +430,9 @@ PlotFileScatters <- function(input,
   if (is.null(names)) { # if no names are provided, the files will be numbered
     names <- as.character(seq_len(length(input)))
   }
-  
+  if (any(duplicated(names))){
+    names <- make.unique(names)
+  }
   if (is.null(groups)) { # if there are no groups, all files will be labeled "1"
     groups <- rep("1", length(unique(file_values)))
   }
