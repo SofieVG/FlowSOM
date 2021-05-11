@@ -371,7 +371,8 @@ PlotFileScatters <- function(input,
                              maxPoints = 50000, 
                              ncol = NULL, 
                              nrow = NULL,
-                             plotFile = "FileScatters.png"){
+                             plotFile = "FileScatters.png",
+                             quantiles = NULL){
   
   #----Warnings----
   if (!is.null(color) & !is.null(groups) & 
@@ -416,6 +417,7 @@ PlotFileScatters <- function(input,
   file_values <- file_values[subset]
   channels <- colnames(data)
   
+  
   #----Additional warnings---
   if (!is.null(names) & length(unique(file_values)) != length(names)){
     stop("Names vector should have same length as number of files.")
@@ -432,6 +434,10 @@ PlotFileScatters <- function(input,
   if (is.null(groups)) { # if there are no groups, all files will be labeled "1"
     groups <- rep("1", length(unique(file_values)))
   }
+  
+  
+  print(table(file_values))
+  print(names)
   
   #----Generate plots----
   plots_list <- list()
@@ -467,6 +473,20 @@ PlotFileScatters <- function(input,
     
     if (!legend) { # if you don't want a legend on the plot
       p <- p + theme(legend.position = "none")
+    }
+    
+    if(!is.null(quantiles)){
+      my_quantile <- function(x, quantiles) {
+        dplyr::tibble(intensity = quantile(x, quantiles), 
+                      quantile = quantiles)
+      }
+      
+      quantile_intensities <- df %>%
+        dplyr::group_by(names) %>% 
+        dplyr::summarise(my_quantile(intensity, quantiles))
+      p <- p + geom_point(aes(x = names, y = intensity), 
+                          col = "black", 
+                          data = quantile_intensities)
     }
     
     plots_list[[length(plots_list) + 1]] <- p
