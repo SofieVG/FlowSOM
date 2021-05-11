@@ -35,7 +35,8 @@ y-axis}
 "channel". Default = "marker".}
 
 \item{names}{Optional parameter to provide filenames. If \code{NULL} 
-(default), the filenames will be numbers}
+(default), the filenames will be numbers. Duplicated 
+filenames will be made unique.}
 
 \item{groups}{Optional parameter to specify groups of files, should have
 the same length as the \code{input}. Id \code{NULL} 
