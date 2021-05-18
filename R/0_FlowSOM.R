@@ -334,6 +334,8 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #' @param  nrow       Number of rows in the final plot, optional
 #' @param  plotFile   Path to png file, default is "FileScatters.png". If 
 #'                    \code{NULL}, the output will be a list of ggplots 
+#' @param  quantiles  If provided (default NULL), a numeric vector with values
+#'                    between 0 and 1. These quantiles are indicated on the plot
 #' 
 #' @return List of ggplot objects if \code{plot} is \code{FALSE}, 
 #'         otherwise \code{filePlot} with plot is created.
@@ -439,10 +441,6 @@ PlotFileScatters <- function(input,
     groups <- rep("1", length(unique(file_values)))
   }
   
-  
-  print(table(file_values))
-  print(names)
-  
   #----Generate plots----
   plots_list <- list()
   for (channel in channels) {
@@ -490,6 +488,8 @@ PlotFileScatters <- function(input,
         dplyr::summarise(my_quantile(intensity, quantiles))
       p <- p + geom_point(aes(x = names, y = intensity), 
                           col = "black", 
+                          shape = 3, #95,
+                          size = 3,
                           data = quantile_intensities)
     }
     

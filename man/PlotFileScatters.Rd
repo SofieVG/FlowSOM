@@ -16,7 +16,8 @@ PlotFileScatters(
   maxPoints = 50000,
   ncol = NULL,
   nrow = NULL,
-  plotFile = "FileScatters.png"
+  plotFile = "FileScatters.png",
+  quantiles = NULL
 )
 }
 \arguments{
@@ -58,6 +59,9 @@ channel, default is 50000}
 
 \item{plotFile}{Path to png file, default is "FileScatters.png". If 
 \code{NULL}, the output will be a list of ggplots}
+
+\item{quantiles}{If provided (default NULL), a numeric vector with values
+between 0 and 1. These quantiles are indicated on the plot}
 }
 \value{
 List of ggplot objects if \code{plot} is \code{FALSE}, 
