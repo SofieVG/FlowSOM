@@ -21,8 +21,8 @@ to aggregate}
 
 \item{cTotal}{Total number of cells to write to the output file}
 
-\item{channels}{Channels to keep in the aggregate. Default NULL takes all
-channels of the first file.}
+\item{channels}{Channels/markers to keep in the aggregate. Default NULL 
+takes all channels of the first file.}
 
 \item{writeOutput}{Whether to write the resulting flowframe to a file. 
 Default FALSE}

@@ -154,6 +154,9 @@ FlowSOM <- function(input, pattern = ".fcs",
     dplyr::summarise_all(stats::median) %>% 
     dplyr::select(-.data$mcl) %>% 
     as.matrix()
+  fsom$info$parameters <- match.call()
+  fsom$info$date <- as.character(Sys.time())
+  fsom$info$version <- as.character(utils::packageVersion("FlowSOM"))
   if(!silent) message(t[3], "\n")
   return(fsom)
 }
@@ -212,8 +215,8 @@ print.FlowSOM <- function(x, ...){
 #' @param fileNames   Character vector containing full paths to the fcs files
 #'                    to aggregate
 #' @param cTotal      Total number of cells to write to the output file
-#' @param channels    Channels to keep in the aggregate. Default NULL takes all
-#'                    channels of the first file.
+#' @param channels    Channels/markers to keep in the aggregate. Default NULL 
+#'                    takes all channels of the first file.
 #' @param writeOutput Whether to write the resulting flowframe to a file. 
 #'                    Default FALSE
 #' @param outputFile  Full path to output file. Default "aggregate.fcs"
@@ -235,8 +238,13 @@ print.FlowSOM <- function(x, ...){
 #' # This example will sample 2 times 500 cells.
 #' ff_new <- AggregateFlowFrames(c(fileName, fileName), 1000)
 #' 
+#' @importFrom flowCore read.FCS fr_append_cols keyword colnames markernames 
+#'             exprs write.FCS
+#' @importFrom stats rnorm
+#' 
 #' @export
-AggregateFlowFrames <- function(fileNames, cTotal,
+AggregateFlowFrames <- function(fileNames, 
+                                cTotal,
                                 channels = NULL,
                                 writeOutput = FALSE, 
                                 outputFile  = "aggregate.fcs",
@@ -249,11 +257,12 @@ AggregateFlowFrames <- function(fileNames, cTotal,
   cFile <- ceiling(cTotal/nFiles)
   
   flowFrame <- NULL
+  diffNumberChannels <- FALSE
+  diffMarkers <- FALSE
   
   for(i in seq_len(nFiles)){
     if(!silent) {message("Reading ", fileNames[i])}
     f <- flowCore::read.FCS(fileNames[i], ...)
-    
     # Random sampling
     ids <- sample(seq_len(nrow(f)), min(nrow(f), cFile))
     
@@ -262,11 +271,11 @@ AggregateFlowFrames <- function(fileNames, cTotal,
     colnames <- c("File", "File_scattered", "Original_ID")
     prev_agg <- length(grep("File[0-9]*$", colnames(f)))
     if(prev_agg > 0){
-      colnames[c(1,2)] <- paste0(colnames[c(1,2)], prev_agg+1)
+      colnames[c(1, 2)] <- paste0(colnames[c(1, 2)], prev_agg + 1)
     }
     prev_ids <- length(grep("Original_ID[0-9]*$", colnames(f)))
     if(prev_ids > 0){
-      colnames[3] <- paste0(colnames[3], prev_ids+1)
+      colnames[3] <- paste0(colnames[3], prev_ids + 1)
     }
     
     file_ids <- rep(i, min(nrow(f), cFile))
@@ -280,20 +289,44 @@ AggregateFlowFrames <- function(fileNames, cTotal,
     
     if(is.null(flowFrame)){
       if(is.null(channels)){
+        channels <- colnames(f)
         flowFrame <- f
       } else {
-        flowFrame <- f[, c(channels, colnames(m))]
+        channels <- GetChannels(f, channels)
+        flowFrame <- f[, c(channels, colnames(m)), drop = FALSE]
       }
       flowCore::keyword(flowFrame)[["$FIL"]] <- basename(outputFile)
       flowCore::keyword(flowFrame)[["FILENAME"]] <- basename(outputFile)
-    }
-    else {
+    } else {
+      cols_f <- flowCore::colnames(f)
+      cols_flowFrame <- flowCore::colnames(flowFrame)
+      commonCols <- intersect(cols_f, cols_flowFrame)
+      
+      if (length(commonCols) == 0) stop("No common channels between files")
+      if (!diffNumberChannels && 
+          length(cols_flowFrame) != length(commonCols)){
+        diffNumberChannels <- TRUE
+      }
+      
+      if (!diffMarkers && 
+          any(!flowCore::markernames(f)[commonCols] %in% 
+              flowCore::markernames(flowFrame)[commonCols])){
+        diffMarkers <- TRUE
+      }
+  
       flowCore::exprs(flowFrame) <- 
-        rbind(flowCore::exprs(flowFrame), 
-              flowCore::exprs(f)[,
-                                 flowCore::colnames(
-                                   flowCore::exprs(flowFrame))])
+        rbind(flowCore::exprs(flowFrame)[, commonCols, drop = FALSE], 
+              flowCore::exprs(f)[, commonCols, drop = FALSE])
+      
     }
+  }
+  
+  if (diffNumberChannels){
+    warning("Files do not contain the same number of channels/markers")
+  }
+  
+  if (diffMarkers){ 
+    warning("Files do not contain the same markers")
   }
   
   if(writeOutput){
@@ -310,13 +343,15 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #' @param  input      Either a flowSet, a flowFrame (output from the 
 #'                    \code{\link{AggregateFlowFrames}} function) or a 
 #'                    vector of paths pointing to fcs files
-#' @param  channels   Vector of channels that need to be plotted, if NULL
-#'                    (default), all channels from the input will be 
+#' @param  channels   Vector of channels or markers that need to be plotted, 
+#'                    if NULL (default), all channels from the input will be 
 #'                    plotted
 #' @param  yMargin    Optional parameter to specify the margins of the 
 #'                    y-axis
 #' @param  yLabel     Determines the label of the y-axis. Can be "marker" and\\or
 #'                    "channel". Default = "marker".
+#' @param  quantiles  If provided (default NULL), a numeric vector with values
+#'                    between 0 and 1. These quantiles are indicated on the plot
 #' @param  names      Optional parameter to provide filenames. If \code{NULL} 
 #'                    (default), the filenames will be numbers. Duplicated 
 #'                    filenames will be made unique.
@@ -332,10 +367,10 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #'                    channel, default is 50000
 #' @param  ncol       Number of columns in the final plot, optional
 #' @param  nrow       Number of rows in the final plot, optional
+#' @param silent      If FALSE, prints an update every time it starts processing 
+#'                    a new file. Default = FALSE. 
 #' @param  plotFile   Path to png file, default is "FileScatters.png". If 
 #'                    \code{NULL}, the output will be a list of ggplots 
-#' @param  quantiles  If provided (default NULL), a numeric vector with values
-#'                    between 0 and 1. These quantiles are indicated on the plot
 #' 
 #' @return List of ggplot objects if \code{plot} is \code{FALSE}, 
 #'         otherwise \code{filePlot} with plot is created.
@@ -360,13 +395,19 @@ AggregateFlowFrames <- function(fileNames, cTotal,
 #'                               "PE-Cy7-A"), 
 #'                  maxPoints = 1000)
 #' 
+#' @import ggplot2
 #' @importFrom methods is
-#' 
+#' @importFrom flowCore fsApply exprs
+#' @importFrom dplyr tibble group_by summarise
+#' @importFrom ggpubr annotate_figure ggarrange text_grob
+#' @importFrom stats quantile
+#'  
 #' @export 
 PlotFileScatters <- function(input, 
                              channels = NULL, 
                              yMargin = NULL, 
                              yLabel = c("marker"),
+                             quantiles = NULL,
                              names = NULL,
                              groups = NULL, 
                              color = NULL, 
@@ -374,8 +415,8 @@ PlotFileScatters <- function(input,
                              maxPoints = 50000, 
                              ncol = NULL, 
                              nrow = NULL,
-                             plotFile = "FileScatters.png",
-                             quantiles = NULL){
+                             silent = FALSE,
+                             plotFile = "FileScatters.png"){
   
   #----Warnings----
   if (!is.null(color) & !is.null(groups) & 
@@ -406,21 +447,23 @@ PlotFileScatters <- function(input,
     file_values <- data[, "File"]
     input <- unique(file_values)
   } else {
+    channels <- GetChannels(read.FCS(input[1]), channels)
     ff <- AggregateFlowFrames(input,
                               cTotal = maxPoints, 
-                              channels = channels)
+                              channels = channels,
+                              silent = silent)
     data <- ff@exprs
     file_values <- data[, "File"]
   }
   
   subset <- sample(seq_len(nrow(data)), min(maxPoints, nrow(data)))
   if (is.null(channels)) {
-    data <- data[subset, ] } else {
-      data <- data[subset, channels]
-    }
+    data <- data[subset, , drop = FALSE] 
+  } else {
+    data <- data[subset, channels, drop = FALSE]
+  }
   file_values <- file_values[subset]
   channels <- colnames(data)
-  
   
   #----Additional warnings---
   if (!is.null(names) & length(unique(file_values)) != length(names)){
@@ -456,37 +499,38 @@ PlotFileScatters <- function(input,
                                       levels = unique(names)),
                      "group" = factor(groups[file_values], 
                                       levels = unique(groups)))
-    p <- ggplot(df, aes(.data$names, .data$intensity)) +
-      geom_jitter(position = position_jitter(width = 0.1), alpha = 0.5, 
-                  aes(colour = .data$group), shape = ".") +
-      ylab(yLabs) +
-      theme_classic() +
-      theme(axis.title.x=element_blank()) +
-      theme(axis.text.x=element_text(angle = 90, vjust = 0.5)) +
-      guides(colour = guide_legend(override.aes = list(size = 5, shape = 15, 
-                                                       alpha = 1)))
+    p <- ggplot2::ggplot(df, ggplot2::aes(.data$names, .data$intensity)) +
+      ggplot2::geom_jitter(position = position_jitter(width = 0.1), alpha = 0.5, 
+                  ggplot2::aes(colour = .data$group), shape = ".") +
+      ggplot2::ylab(yLabs) +
+      ggplot2::theme_classic() +
+      ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
+                                                         vjust = 0.5)) +
+      ggplot2::guides(colour = ggplot2::guide_legend(
+        override.aes = list(size = 5, shape = 15, alpha = 1)))
     if (!is.null(color)) { # if manual colors are provided
-      p <- p + scale_color_manual(values = color)
+      p <- p + ggplot2::scale_color_manual(values = color)
     }
     
     if (!is.null(yMargin)) { # if y margins are provided
-      p <- p + ylim(yMargin)
+      p <- p + ggplot2::ylim(yMargin)
     }
     
     if (!legend) { # if you don't want a legend on the plot
-      p <- p + theme(legend.position = "none")
+      p <- p + ggplot2::theme(legend.position = "none")
     }
     
     if(!is.null(quantiles)){
       my_quantile <- function(x, quantiles) {
-        dplyr::tibble(intensity = quantile(x, quantiles), 
+        dplyr::tibble(intensity = stats::quantile(x, quantiles), 
                       quantile = quantiles)
       }
       
       quantile_intensities <- df %>%
         dplyr::group_by(names) %>% 
         dplyr::summarise(my_quantile(intensity, quantiles))
-      p <- p + geom_point(aes(x = names, y = intensity), 
+      p <- p + ggplot2::geom_point(ggplot2::aes(x = names, y = intensity), 
                           col = "black", 
                           shape = 3, #95,
                           size = 3,
