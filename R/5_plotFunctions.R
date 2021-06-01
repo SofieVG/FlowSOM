@@ -1970,7 +1970,7 @@ PlotManualBars <- function(fsom, fcs = NULL,
   
   #----Relative barplots C----
   df_s <- data.frame(table(df[, c(1, 3)]))
-  df_s$MC <- fsom$metaclustering[df_s$C]
+  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
   p3 <- ggplot2::ggplot(data =
                           transform(df_s,
                                     C = factor(df_s$C,
