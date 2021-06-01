@@ -1999,7 +1999,7 @@ PlotManualBars <- function(fsom, fcs = NULL,
   for (c in seq_len(NClusters(fsom))){
     df_s$Freq[df_s$C == c] <- df_s$Freq[df_s$C == c]/sum(df_s$Freq[df_s$C == c])
   }
-  df_s$MC <- fsom$metaclustering[df_s$C]
+  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
   p4 <- ggplot2::ggplot(data = 
                           transform(df_s,
                                     C = factor(df_s$C,
