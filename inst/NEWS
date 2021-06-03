@@ -11,6 +11,9 @@ o Added silent parameter in PlotFileScatters to stop messages
 o PlotFileScatters supports channels and markers now
 o Add info to FlowSOM object: date when flowSOM object is made, FlowSOM verion 
   and arguments given to FlowSOM call
+o Fixed bug in PlotManualBars
+o Added silent parameter in NewData. GetFeatures' silent parameter now also
+  surpresses message from NewData (more concrete: ReadInput)
 
 CHANGES IN VERSION 2.1.17 (2021/04/16)
 --------------------------------------

@@ -21,7 +21,8 @@
 #' @param scale         logical, does the data needs to be rescaled
 #' @param scaled.center see \code{\link{scale}}
 #' @param scaled.scale  see \code{\link{scale}}
-#' @param silent        if \code{TRUE}, no progress updates will be printed
+#' @param silent        if \code{TRUE}, no progress updates will be printed. 
+#'                      Default = \code{FALSE}
 #'
 #' @return FlowSOM object containing the data, which can be used as input
 #' for the BuildSOM function

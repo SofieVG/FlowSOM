@@ -551,7 +551,8 @@ GetClusterCVs <- function(fsom){
 #' @param  filenames        An optional vector with filenames that will be used
 #'                          as rownames in the count matrices. If NULL (default)
 #'                          either the paths will be used or a numerical vector.
-#' @param  silent           Logical. If TRUE, print progress messages
+#' @param  silent           Logical. If \code{TRUE}, print progress messages.
+#'                          Default = \code{FALSE}.
 #' 
 #' @return matrix with features per population - type combination
 #'         
@@ -657,7 +658,8 @@ GetFeatures <- function(fsom,
       writeLines(paste0("Mapping file ", i, " of ", nfiles, "."))
     }
     fsom_tmp <- suppressWarnings(NewData(fsom = fsom,
-                                         input = file))
+                                         input = file,
+                                         silent = silent))
     
     counts_t <- table(GetClusters(fsom_tmp))
     C_counts[i, paste0("C", names(counts_t))] <- counts_t

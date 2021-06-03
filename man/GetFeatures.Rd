@@ -34,7 +34,8 @@ values must be returned when "MFIs" is in \code{type}}
 as rownames in the count matrices. If NULL (default)
 either the paths will be used or a numerical vector.}
 
-\item{silent}{Logical. If TRUE, print progress messages}
+\item{silent}{Logical. If \code{TRUE}, print progress messages.
+Default = \code{FALSE}.}
 }
 \value{
 matrix with features per population - type combination

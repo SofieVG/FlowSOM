@@ -49,7 +49,8 @@ of \code{$SPILL} description in fcs file will be used.}
 
 \item{scaled.scale}{see \code{\link{scale}}}
 
-\item{silent}{if \code{TRUE}, no progress updates will be printed}
+\item{silent}{if \code{TRUE}, no progress updates will be printed. 
+Default = \code{FALSE}}
 }
 \value{
 FlowSOM object containing the data, which can be used as input

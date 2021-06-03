@@ -16,7 +16,8 @@ NewData(
   transformList = NULL,
   scale = NULL,
   scaled.center = NULL,
-  scaled.scale = NULL
+  scaled.scale = NULL,
+  silent = FALSE
 )
 }
 \arguments{
@@ -63,6 +64,9 @@ the original FlowSOM call will be used.}
 
 \item{scaled.scale}{See \code{\link{scale}}. If NULL, the same value as in 
 the original FlowSOM call will be used.}
+
+\item{silent}{Logical. If \code{TRUE}, print progress messages. 
+Default = \code{FALSE}.}
 }
 \value{
 A new FlowSOM object

@@ -139,6 +139,8 @@ FlowSOMSubset <- function(fsom, ids){
 #'                      the original FlowSOM call will be used.
 #' @param scaled.scale  See \code{\link{scale}}. If NULL, the same value as in 
 #'                      the original FlowSOM call will be used.
+#' @param silent        Logical. If \code{TRUE}, print progress messages. 
+#'                      Default = \code{FALSE}.
 #'        
 #' @return A new FlowSOM object
 #' @seealso \code{\link{FlowSOMSubset}} if you want to get a subset of the
@@ -171,7 +173,8 @@ NewData <- function(fsom,
                     transformList = NULL,
                     scale = NULL, 
                     scaled.center = NULL, 
-                    scaled.scale = NULL){
+                    scaled.scale = NULL,
+                    silent = FALSE){
   fsom <- UpdateFlowSOM(fsom)
   if(is.null(compensate)){
     compensate <- fsom$compensate
@@ -207,7 +210,7 @@ NewData <- function(fsom,
                         transformFunction = transformFunction, 
                         transformList = transformList,
                         scale = scale, scaled.center = scaled.center,
-                        scaled.scale = scaled.scale)
+                        scaled.scale = scaled.scale, silent = silent)
   
   fsom_new$map <- fsom$map
   fsom_new$MST <- fsom$MST
