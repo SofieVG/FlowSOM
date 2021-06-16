@@ -118,7 +118,7 @@ PlotFlowSOM <- function(fsom,
     scaledNodeSize <- ParseNodeSize(nodeSizes, maxNodeSize, refNodeSize)
   }
   
-  if (any(isEmpty)) { scaledNodeSize[isEmpty] <- min(maxNodeSize, 0.05) }
+  if (any(isEmpty)) {scaledNodeSize[isEmpty] <- min(maxNodeSize, 0.05)}
   
   #----GGplot----
   plot_df <- data.frame(x = layout$x,
@@ -2321,7 +2321,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   fsom <- UpdateFlowSOM(fsom)
   metaclustersPresent <- !is.null(fsom$metaclustering)
   if (metaclustersPresent){
-    mfis <- GetMetaclusterMFIs(fsom)[, fsom$map$colsUsed]
+    mfis <- GetMetaclusterMFIs(fsom, colsUsed = TRUE)
     metaclusters <- GetMetaclusters(fsom)
     nMetaclusters <- NMetaclusters(fsom)
   }
@@ -2435,7 +2435,8 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
     plotList[["p10"]] <-
       pheatmap::pheatmap(mfis_scaled, scale = "none",
                          display_numbers = round(mfis, 2),
-                         main = "Median expression per metacluster")
+                         main = "Median expression per metacluster",
+                         silent = TRUE)
   }
   
   #----Table----

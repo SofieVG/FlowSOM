@@ -103,7 +103,7 @@ UpdateDerivedValues <- function(fsom){
   fsom$map$pctgs <- pctgs
   
   
-  if(! is.null(fsom$metaclustering)){
+  if(!is.null(fsom$metaclustering)){
     fsom$map$metaclusterMFIs <- 
       data.frame(fsom$data, 
                  mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
@@ -655,7 +655,7 @@ GetFeatures <- function(fsom,
   for (file in files){
     i <- i + 1
     if (isFALSE(silent)){
-      writeLines(paste0("Mapping file ", i, " of ", nfiles, "."))
+      message(paste0("Mapping file ", i, " of ", nfiles, "."))
     }
     fsom_tmp <- suppressWarnings(NewData(fsom = fsom,
                                          input = file,
