@@ -738,8 +738,8 @@ ManualVector <- function(manualMatrix, cellTypes){
 #' @export
 GetChannels <- function(object, markers, exact = TRUE) { 
   if (is(object, "flowFrame")) {
-    object_channels <- unname(object@parameters@data[["name"]])
-    object_markers <- unname(object@parameters@data[["desc"]])
+    object_channels <- unname(flowCore::parameters(object)@data[["name"]])
+    object_markers <- unname(flowCore::parameters(object)@data[["desc"]])
   } else if (is(object, "FlowSOM")) {
     object_channels <- names(object$prettyColnames)
     object_markers <- unname(gsub(" <.*", "", object$prettyColnames))
