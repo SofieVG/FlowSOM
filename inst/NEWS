@@ -1,3 +1,7 @@
+CHANGES IN VERSION 2.1.23 (2021/06/30)
+--------------------------------------
+o Added checkNames = FALSE in MetaclusterMFIs
+
 CHANGES IN VERSION 2.1.22 (2021/06/30)
 --------------------------------------
 o Reordered code in UpdateDerivedValues, RelabelMetaclusters, 
