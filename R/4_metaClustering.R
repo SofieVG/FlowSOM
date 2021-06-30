@@ -218,6 +218,7 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 #'                 build the SOM. Default = FALSE.
 #' @param prettyColnames    Logical. Should report pretty column names instead
 #'                          of standard column names. Default = FALSE.
+#'                          
 #' @return  Metacluster MFIs
 #' @examples
 #' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -235,7 +236,6 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
   fsom <- UpdateFlowSOM(fsom)
   MFIs <- fsom$map$metaclusterMFIs
-  rownames(MFIs) <- seq_len(nrow(MFIs))
   if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
   if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
   if(colsUsed && !prettyColnames){
@@ -254,6 +254,7 @@ GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
 #' Compute the coefficient of variation for the metaclusters
 #'
 #' @param fsom Result of calling the FlowSOM function
+#' 
 #' @return  Metacluster CVs
 #' @examples
 #' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -282,6 +283,7 @@ GetMetaclusterCVs <- function(fsom){
                               NA
                             }})
                   }))
+  
   return(CVs)
 }
 
@@ -293,6 +295,7 @@ GetMetaclusterCVs <- function(fsom){
 #' @param fsom Result of calling the FlowSOM function
 #' @param labels Named vector, with the names the original metacluster names
 #'               and the values the replacement
+#'               
 #' @return  Updated FlowSOM object
 #' @examples
 #' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -345,7 +348,6 @@ RelabelMetaclusters <- function(fsom, labels){
     }
     
     fsom <- UpdateDerivedValues(fsom)
-    
     return(fsom)
   } else {
     stop("This FlowSOM object does not include a metaclustering.")
@@ -359,6 +361,7 @@ RelabelMetaclusters <- function(fsom, labels){
 #'
 #' @param fsom           Result of calling the FlowSOM function
 #' @param metaclustering Vector with the metacluster names for all clusters
+#' 
 #' @return               Updated FlowSOM object
 #' @examples
 #' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
@@ -387,7 +390,6 @@ RelabelMetaclusters <- function(fsom, labels){
 #' 
 #' @export
 ReassignMetaclusters <- function(fsom, metaclustering){
-  
   if (NClusters(fsom) == length(metaclustering)){
     cl <- factor(metaclustering)
     fsom$metaclustering <- cl
@@ -400,4 +402,45 @@ ReassignMetaclusters <- function(fsom, metaclustering){
                 length(metaclustering), ")."))
   }
   
+}
+
+#' ReorderMetaclusters
+#' 
+#' Changes the order of the metaclusters in the FlowSOM object
+#'
+#' @param fsom   Result of calling the FlowSOM function
+#' @param order  Prefered order of the metaclusters
+#' 
+#' @return       Updated FlowSOM object
+#' @examples
+#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' ff <- flowCore::read.FCS(fileName)
+#' ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
+#' ff <- flowCore::transform(ff,
+#'          flowCore::transformList(colnames(flowCore::keyword(ff)[["SPILL"]]),
+#'                                 flowCore::logicleTransform()))
+#' flowSOM.res <- FlowSOM(ff,
+#'                        scale = TRUE,
+#'                        colsToUse = c(9, 12, 14:18), 
+#'                        nClus = 5,
+#'                        seed = 1)
+#'                        
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' 
+#' flowSOM.res <- ReorderMetaclusters(flowSOM.res, c(3, 2, 5, 1, 4))
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' 
+#' @export
+ReorderMetaclusters <- function(fsom, order){
+  if (!is.null(fsom$metaclustering)){
+    if(all(order %in% levels(fsom$metaclustering))){
+      fsom$metaclustering <- factor(fsom$metaclustering, levels = order)
+      fsom <- UpdateDerivedValues(fsom)
+      return(fsom)
+    } else {
+      stop("\"order\" does not have the same levels as metaclustering.")
+    }
+  } else {
+    stop("This FlowSOM object does not include a metaclustering.")
+  }
 }
