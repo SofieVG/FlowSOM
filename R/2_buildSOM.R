@@ -111,7 +111,7 @@ UpdateDerivedValues <- function(fsom){
       dplyr::group_by(.data$mcl, .drop = FALSE) %>% 
       dplyr::summarise_all(stats::median) %>% 
       dplyr::select(-.data$mcl) %>% 
-      as.matrix()
+      data.frame(., row.names = levels(fsom$metaclustering))
   }
   
   return(fsom)

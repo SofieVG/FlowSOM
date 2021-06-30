@@ -236,7 +236,6 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
   fsom <- UpdateFlowSOM(fsom)
   MFIs <- fsom$map$metaclusterMFIs
-  if(is.null(rownames(MFIs))) rownames(MFIs) <- seq_len(nrow(MFIs))
   if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
   if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
   if(colsUsed && !prettyColnames){
@@ -349,7 +348,6 @@ RelabelMetaclusters <- function(fsom, labels){
     }
     
     fsom <- UpdateDerivedValues(fsom)
-    rownames(fsom$map$metaclusterMFIs) <- levels(fsom$metaclustering)
     return(fsom)
   } else {
     stop("This FlowSOM object does not include a metaclustering.")
@@ -397,7 +395,6 @@ ReassignMetaclusters <- function(fsom, metaclustering){
     fsom$metaclustering <- cl
     fsom$map$nMetaclusters <- length(levels(cl))
     fsom <- UpdateDerivedValues(fsom)
-    rownames(fsom$map$metaclusterMFIs) <- levels(fsom$metaclustering)
     return(fsom)
   } else{
     stop(paste0("Number of FlowSOM clusters (", NClusters(fsom), 
@@ -438,7 +435,7 @@ ReorderMetaclusters <- function(fsom, order){
   if (!is.null(fsom$metaclustering)){
     if(all(order %in% levels(fsom$metaclustering))){
       fsom$metaclustering <- factor(fsom$metaclustering, levels = order)
-      fsom$map$metaclusterMFIs <- fsom$map$metaclusterMFIs[order, ]
+      fsom <- UpdateDerivedValues(fsom)
       return(fsom)
     } else {
       stop("\"order\" does not have the same levels as metaclustering.")

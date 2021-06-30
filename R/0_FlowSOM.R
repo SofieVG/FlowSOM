@@ -147,13 +147,7 @@ FlowSOM <- function(input, pattern = ".fcs",
   }
   fsom$map$nMetaclusters <- length(levels(cl))
   fsom$metaclustering <- cl
-  fsom$map$metaclusterMFIs <- data.frame(fsom$data, 
-                                         mcl = cl[fsom$map$mapping[, 1]],
-                                         check.names = FALSE) %>% 
-    dplyr::group_by(.data$mcl, .drop = FALSE) %>% 
-    dplyr::summarise_all(stats::median) %>% 
-    dplyr::select(-.data$mcl) %>% 
-    as.matrix()
+  fsom <- UpdateDerivedValues(fsom)
   fsom$info$parameters <- match.call()
   fsom$info$date <- as.character(Sys.time())
   fsom$info$version <- as.character(utils::packageVersion("FlowSOM"))

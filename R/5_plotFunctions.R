@@ -2451,8 +2451,8 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
 
   markersInFlowSOM <- split(fsom$prettyColnames[fsom$map$colsUsed], 
                             rep(seq_len(ceiling(length(fsom$prettyColnames[
-                              fsom$map$colsUsed])/10)), 
-                                each = 10)[seq_len(length(fsom$prettyColnames[
+                              fsom$map$colsUsed])/5)), 
+                                each = 5)[seq_len(length(fsom$prettyColnames[
                                   fsom$map$colsUsed]))]) %>% 
     sapply(paste, collapse =", ") %>% 
     paste(collapse = ",\n")
