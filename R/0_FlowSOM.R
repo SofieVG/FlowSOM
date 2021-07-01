@@ -523,8 +523,9 @@ PlotFileScatters <- function(input,
       
       quantile_intensities <- df %>%
         dplyr::group_by(names) %>% 
-        dplyr::summarise(my_quantile(intensity, quantiles))
-      p <- p + ggplot2::geom_point(ggplot2::aes(x = names, y = intensity), 
+        dplyr::summarise(my_quantile(.data$intensity, quantiles))
+      p <- p + ggplot2::geom_point(ggplot2::aes(x = .data$names, 
+                                                y = .data$intensity), 
                           col = "black", 
                           shape = 3, #95,
                           size = 3,

@@ -35,7 +35,7 @@ PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 
 # Split up metacluster 3
 MC_or <- flowSOM.res$metaclustering
-MC_new <- c(MC_or)
+MC_new <- as.character(MC_or)
 MC_new[c(81:86, 91:96)] <- "5b"
 
 flowSOM.res <- ReassignMetaclusters(flowSOM.res, MC_new)
