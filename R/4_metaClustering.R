@@ -287,14 +287,22 @@ GetMetaclusterCVs <- function(fsom){
   return(CVs)
 }
 
-#' RelabelMetaclusters
+#' UpdateMetaclusters
 #' 
-#' Adapt the metacluster levels. Can be used to either give them new names,
-#' or potentially merge some metaclusters.
+#' Adapt the metacluster levels. Can be used to rename the metaclusters, split 
+#' or merge existing metaclusters, add a metaclustering and/or reorder the levels 
+#' of the metaclustering. 
 #'
-#' @param fsom Result of calling the FlowSOM function
-#' @param labels Named vector, with the names the original metacluster names
-#'               and the values the replacement
+#' @param fsom Result of calling the FlowSOM function.
+#' @param newLabels Optional. Named vector, with the names the original 
+#'                  metacluster names and the values the replacement. Can be 
+#'                  used to rename or merge metaclusters.
+#' @param clusterAssignment Optional. Either a named vector, with the names 
+#'                          the cluster numbers (characters) or a vector of 
+#'                          length NClusters(fsom). Can be used to assign 
+#'                          clusters to existing or new metaclusters.
+#' @param levelOrder Optional. Vector showing the preferred order of the fsom 
+#'                   metacluster levels.
 #'               
 #' @return  Updated FlowSOM object
 #' @examples
@@ -313,134 +321,83 @@ GetMetaclusterCVs <- function(fsom){
 #' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 #' GetCounts(flowSOM.res)
 #'
-#' # Include MC9 in MC8
-#' flowSOM.res <- RelabelMetaclusters(flowSOM.res, c("9" = "8")) 
+#' # Merge MC8 and MC9
+#' flowSOM.res <- UpdateMetaclusters(flowSOM.res, newLabels = c("8" = "8+9",
+#'                                                              "9" = "8+9")) 
 #' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 #' GetCounts(flowSOM.res)
 #' 
-#' # Give different names
-#' 
-#' flowSOM.res <- RelabelMetaclusters(flowSOM.res, c("1" = "1: CD8+",
-#'                                                   "7" = "7: gd+",
-#'                                                   "8" = "8: CD19+"))
+#' # Split cluster 24 from metacluster 2 and order the metacluster levels
+#' flowSOM.res <- UpdateMetaclusters(flowSOM.res, 
+#'                                   clusterAssignment = c("24" = "debris?"),
+#'                                   levelOrder = c("debris?", as.character(c(1:7)),
+#'                                                   "8+9", "10"))
 #' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 #' PlotNumbers(flowSOM.res, level = "metaclusters")
+#' 
 #' GetCounts(flowSOM.res)
 #' 
 #' @export
-RelabelMetaclusters <- function(fsom, labels){
+UpdateMetaclusters <- function(fsom, newLabels = NULL, clusterAssignment = NULL, 
+                               levelOrder = NULL){
   
   if(!is.null(fsom$metaclustering)){
-    currentLevels <- levels(fsom$metaclustering)
-    newLevels <- currentLevels
-    names(newLevels) <- currentLevels
-    
-    for(original in names(labels))
-      newLevels[currentLevels == original] <- labels[original]
-    
-    if(any(duplicated(newLevels))){
-      fsom$metaclustering <- newLevels[as.character(fsom$metaclustering)]
-      fsom$metaclustering <- factor(fsom$metaclustering, 
-                                    levels = unique(newLevels))
-      fsom$map$nMetaclusters <- length(unique(newLevels))
-    } else {
-      levels(fsom$metaclustering) <- newLevels
+    # newLabels to relabel or merge some MCs
+    if(!is.null(newLabels)){
+      currentLevels <- levels(fsom$metaclustering)
+      newLevels <- currentLevels
+      names(newLevels) <- currentLevels
+      
+      for(original in names(newLabels)){
+        newLevels[currentLevels == original] <- newLabels[original]
+      }
+      
+      if(any(duplicated(newLevels))){
+        fsom$metaclustering <- newLevels[as.character(fsom$metaclustering)]
+        fsom$metaclustering <- factor(fsom$metaclustering, 
+                                      levels = unique(newLevels))
+        fsom$map$nMetaclusters <- length(unique(newLevels))
+      } else {
+        levels(fsom$metaclustering) <- newLevels
+      }
+      
     }
-    
-    fsom <- UpdateDerivedValues(fsom)
-    return(fsom)
-  } else {
-    stop("This FlowSOM object does not include a metaclustering.")
-  }
-}
-
-#' ReassignMetaclusters
-#' 
-#' Adapt the metaclustering. Can be used to either split up metaclusters,
-#' or potentially merge some metaclusters.
-#'
-#' @param fsom           Result of calling the FlowSOM function
-#' @param metaclustering Vector with the metacluster names for all clusters
-#' 
-#' @return               Updated FlowSOM object
-#' @examples
-#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
-#' ff <- flowCore::read.FCS(fileName)
-#' ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
-#' ff <- flowCore::transform(ff,
-#'          flowCore::transformList(colnames(flowCore::keyword(ff)[["SPILL"]]),
-#'                                 flowCore::logicleTransform()))
-#' flowSOM.res <- FlowSOM(ff,
-#'                        scale = TRUE,
-#'                        colsToUse = c(9, 12, 14:18), 
-#'                        nClus = 5,
-#'                        seed = 1)
-#'                        
-#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
-#' 
-#' # Split up metacluster 3
-#' MC_or <- flowSOM.res$metaclustering
-#' MC_new <- as.character(MC_or)
-#' MC_new[c(81:86, 91:96)] <- "5b"
-#' 
-#' flowSOM.res <- ReassignMetaclusters(flowSOM.res, MC_new)
-#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
-#' PlotNumbers(flowSOM.res, level = "metaclusters")
-#' GetCounts(flowSOM.res)
-#' 
-#' @export
-ReassignMetaclusters <- function(fsom, metaclustering){
-  if (NClusters(fsom) == length(metaclustering)){
-    cl <- factor(metaclustering)
-    fsom$metaclustering <- cl
-    fsom$map$nMetaclusters <- length(levels(cl))
-    fsom <- UpdateDerivedValues(fsom)
-    return(fsom)
-  } else{
-    stop(paste0("Number of FlowSOM clusters (", NClusters(fsom), 
-                ") is inconsistent with the length of the metaclustering vector (", 
-                length(metaclustering), ")."))
-  }
-  
-}
-
-#' ReorderMetaclusters
-#' 
-#' Changes the order of the metaclusters in the FlowSOM object
-#'
-#' @param fsom   Result of calling the FlowSOM function
-#' @param order  Prefered order of the metaclusters
-#' 
-#' @return       Updated FlowSOM object
-#' @examples
-#' fileName <- system.file("extdata", "68983.fcs", package = "FlowSOM")
-#' ff <- flowCore::read.FCS(fileName)
-#' ff <- flowCore::compensate(ff, flowCore::keyword(ff)[["SPILL"]])
-#' ff <- flowCore::transform(ff,
-#'          flowCore::transformList(colnames(flowCore::keyword(ff)[["SPILL"]]),
-#'                                 flowCore::logicleTransform()))
-#' flowSOM.res <- FlowSOM(ff,
-#'                        scale = TRUE,
-#'                        colsToUse = c(9, 12, 14:18), 
-#'                        nClus = 5,
-#'                        seed = 1)
-#'                        
-#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
-#' 
-#' flowSOM.res <- ReorderMetaclusters(flowSOM.res, c(3, 2, 5, 1, 4))
-#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
-#' 
-#' @export
-ReorderMetaclusters <- function(fsom, order){
-  if (!is.null(fsom$metaclustering)){
-    if(all(order %in% levels(fsom$metaclustering))){
-      fsom$metaclustering <- factor(fsom$metaclustering, levels = order)
-      fsom <- UpdateDerivedValues(fsom)
-      return(fsom)
-    } else {
-      stop("\"order\" does not have the same levels as metaclustering.")
+    if(!is.null(clusterAssignment)){
+      if (!is.null(names(clusterAssignment))){
+        # named clusterAssignment to reassign some Cs
+        currentLevels <- fsom$metaclustering
+        newLevels <- as.character(currentLevels)
+        names(newLevels) <- as.character(1:length(newLevels))
+        
+        for(original in names(clusterAssignment)){
+          newLevels[original] <- clusterAssignment[original]
+        }
+        
+        fsom$metaclustering <- factor(x = newLevels)
+        fsom$map$nMetaclusters <- length(unique(newLevels))
+        
+      } else if (length(clusterAssignment) == NClusters(fsom)){
+        # clusterAssignment of length nClusters to reassign Cs
+        new <- factor(clusterAssignment)
+        fsom$metaclustering <- new
+        fsom$map$nMetaclusters <- length(levels(new))
+      } else {
+        stop("The clusterAssignment vector should be named, or the the length 
+        should be equal to the number of fsom clusters.")
+      }
     }
+  } else if (length(clusterAssignment) == NClusters(fsom)){
+    new <- factor(clusterAssignment)
+    fsom$metaclustering <- new
+    fsom$map$nMetaclusters <- length(levels(new))
   } else {
-    stop("This FlowSOM object does not include a metaclustering.")
+    stop("This FlowSOM object does not include a metaclustering and the length 
+         of the clusterAssignment is not equal to the number of fsom clusters.")
   }
+  if (!is.null(levelOrder)){
+    fsom$metaclustering <- factor(fsom$metaclustering,
+                                  levels = levelOrder)
+  }
+  fsom <- UpdateDerivedValues(fsom)
+  return(fsom)
 }
