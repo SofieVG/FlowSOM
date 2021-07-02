@@ -51,17 +51,19 @@ PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 GetCounts(flowSOM.res)
 
 # Merge MC8 and MC9
-flowSOM.res <- UpdateMetaclusters(flowSOM.res, newLabels = c("9" = "8")) 
+flowSOM.res <- UpdateMetaclusters(flowSOM.res, newLabels = c("8" = "8+9",
+                                                             "9" = "8+9")) 
 PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 GetCounts(flowSOM.res)
 
-# Give different names
-
-flowSOM.res <- UpdateMetaclusters(flowSOM.res, c("1" = "1: CD8+",
-                                                  "7" = "7: gd+",
-                                                  "8" = "8: CD19+"))
+# Split cluster 24 from metacluster 2 and order the metacluster levels
+flowSOM.res <- UpdateMetaclusters(flowSOM.res, 
+                                  clusterAssignment = c("24" = "debris?"),
+                                  levelOrder = c("debris?", as.character(c(1:7)),
+                                                  "8+9", "10"))
 PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
 PlotNumbers(flowSOM.res, level = "metaclusters")
+
 GetCounts(flowSOM.res)
 
 }
