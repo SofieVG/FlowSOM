@@ -928,14 +928,14 @@ GetCounts <- function(fsom, level = "metaclusters"){
   fsom <- UpdateFlowSOM(fsom)
   if (!is.null(fsom$metaclustering) && level == "metaclusters"){
     counts <- rep(NA, NMetaclusters(fsom))
-    names(counts) <- paste0("MC", levels(fsom$metaclustering))
+    names(counts) <- paste("MC", levels(fsom$metaclustering))
     tmp <- table(GetMetaclusters(fsom))
-    counts[paste0("MC", names(tmp))] <- tmp
+    counts[paste("MC", names(tmp))] <- tmp
   } else if (level == "clusters"){
     counts <- rep(NA, NClusters(fsom))
-    names(counts) <- paste0("C", seq_len(NClusters(fsom)))
+    names(counts) <- paste("C", seq_len(NClusters(fsom)))
     tmp <- table(GetClusters(fsom))
-    counts[paste0("C", names(tmp))] <- tmp
+    counts[paste("C", names(tmp))] <- tmp
   } else stop("level should be \"clusters\" or \"metaclusters\"")
   return(counts)
 }

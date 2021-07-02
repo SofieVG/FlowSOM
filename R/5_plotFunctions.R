@@ -1368,13 +1368,15 @@ UpdateFlowSOM <- function(fsom){
     fsom$map$nMetaclusters <- length(levels(fsom$metaclustering))
   }
   if (is.null(fsom$map$metaclusterMFIs) && !is.null(fsom$metaclustering)){
-    fsom$map$metaclusterMFIs <- data.frame(fsom$data, 
-                                           mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
-                                           check.names = FALSE) %>% 
+    fsom$map$metaclusterMFIs <- 
+      data.frame(fsom$data, 
+                 mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
+                 check.names = FALSE) %>% 
       dplyr::group_by(.data$mcl, .drop = FALSE) %>% 
       dplyr::summarise_all(stats::median) %>% 
       dplyr::select(-.data$mcl) %>% 
-      as.matrix()
+      data.frame(row.names = levels(fsom$metaclustering),
+                 check.names = FALSE)
   }
   return(fsom)
 }
@@ -1675,7 +1677,7 @@ AddScale <- function(p,
         p <- p + scale_function(values = colors)
       } else {
         p <- p + scale_function(values = colors,
-                                guide = FALSE)
+                                guide = "none")
       }
       
     } else if (is.numeric(values)){ # Continuous values
@@ -1695,7 +1697,7 @@ AddScale <- function(p,
       } else {
         p <- p + scale_function(colors = colors, 
                                 limits = limits,
-                                guide = FALSE)
+                                guide = "none")
       }
     }
   }
