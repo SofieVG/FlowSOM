@@ -11,8 +11,8 @@
 #' @param spillover     spillover matrix to compensate with
 #'                      If NULL and compensate = TRUE, we will look for $SPILL 
 #'                      description in fcs file.
-#' @param transform     logical, does the data need to be transformed with a
-#'                      logicle transform
+#' @param transform     logical, does the data need to be transformed with the
+#'                      transformation given in \code{transformFunction}.
 #' @param toTransform   column names or indices that need to be transformed.
 #'                      Will be ignored if \code{transformList} is given.
 #'                      If \code{NULL} and transform = \code{TRUE}, column names

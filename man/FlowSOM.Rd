@@ -38,8 +38,8 @@ only files containing pattern}
 If NULL and compensate = TRUE, we will look for $SPILL 
 description in fcs file.}
 
-\item{transform}{logical, does the data need to be transformed with a
-logicle transform}
+\item{transform}{logical, does the data need to be transformed with the
+transformation given in \code{transformFunction}.}
 
 \item{toTransform}{column names or indices that need to be transformed.
 Will be ignored if \code{transformList} is given.
