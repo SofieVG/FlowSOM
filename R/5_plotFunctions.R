@@ -1945,7 +1945,7 @@ PlotManualBars <- function(fsom, fcs = NULL,
   
   #----MC composition----
   df_s <- data.frame(table(df[, 1:2]))
-  for (mc in as.character(seq_len(NMetaclusters(fsom)))){
+  for (mc in levels(fsom$metaclustering)){
     df_s$Freq[df_s$MC == mc] <- 
       df_s$Freq[df_s$MC == mc] / sum(df_s$Freq[df_s$MC == mc])
   }
