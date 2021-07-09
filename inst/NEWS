@@ -1,3 +1,7 @@
+CHANGES IN VERSION 2.1.25 (2021/07/09)
+--------------------------------------
+o Adapted PlotManualBars function so that it works after using UpdateMetaclusters
+
 CHANGES IN VERSION 2.1.24 (2021/07/02)
 --------------------------------------
 o Added UpdateMetaclusters function, removed RelabelMetaclusters, 
