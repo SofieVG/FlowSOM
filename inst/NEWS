@@ -2,6 +2,8 @@ CHANGES IN VERSION 2.1.24 (2021/07/02)
 --------------------------------------
 o Added UpdateMetaclusters function, removed RelabelMetaclusters, 
   ReassignMetaclusters and Reordermetaclusters functions.
+o Updated CheatSheet
+o Added code from UpdateDerivedValues for metaclustersMFIs to UpdateFlowSOM
 
 CHANGES IN VERSION 2.1.23 (2021/06/30)
 --------------------------------------
