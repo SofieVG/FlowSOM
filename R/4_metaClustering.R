@@ -254,6 +254,10 @@ GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
 #' Compute the coefficient of variation for the metaclusters
 #'
 #' @param fsom Result of calling the FlowSOM function
+#' @param colsUsed Logical. Should report only the columns used to 
+#'                 build the SOM. Default = FALSE.
+#' @param prettyColnames    Logical. Should report pretty column names instead
+#'                          of standard column names. Default = FALSE.
 #' 
 #' @return  Metacluster CVs
 #' @examples
