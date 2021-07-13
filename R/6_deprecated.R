@@ -451,7 +451,7 @@ PlotGroups <- function(fsom,
                        threshold = NULL, 
                        pThreshold = 0.05,
                        ...){
-  .Deprecated("GetFeatures and Groupstats")
+  .Deprecated("GetFeatures and GroupStats")
   fsom <- UpdateFlowSOM(fsom)
   
   groupnames <- rownames(groups$means)

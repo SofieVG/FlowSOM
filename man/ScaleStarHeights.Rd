@@ -7,7 +7,7 @@
 ScaleStarHeights(data, nodeSizes)
 }
 \arguments{
-\item{data}{MedianValues of relevant markers extraced from 
+\item{data}{MedianValues of relevant markers extracted from 
 FlowSOM object}
 
 \item{nodeSizes}{A vector that is returned from \code{ParseNodeSize}}

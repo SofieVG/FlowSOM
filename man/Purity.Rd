@@ -12,7 +12,7 @@ Purity(realClusters, predictedClusters, weighted = TRUE)
 \item{predictedClusters}{array with predicted cluster values}
 
 \item{weighted}{logical. Should the mean be weighted
-depending on the number of poins in the predicted 
+depending on the number of points in the predicted 
 clusters}
 }
 \value{

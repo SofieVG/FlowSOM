@@ -18,7 +18,7 @@ Otherwise, the maximum ratio is used.}
 A vector containing the SDs
 }
 \description{
-Calculates the  standard deviaton of a FlowSOM object
+Calculates the  standard deviation of a FlowSOM object
 }
 \seealso{
 \code{\link{PlotFlowSOM}}, \code{\link{ParseEdges}}, 

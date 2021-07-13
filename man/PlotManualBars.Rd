@@ -27,7 +27,7 @@ Default is NULL.}
 order the cell labels should be shown}
 
 \item{colors}{Optional color vector, should have the same length as
-the number of unque cell labels}
+the number of unique cell labels}
 
 \item{list_insteadof_plots}{If \code{FALSE} (default), it returns multiple 
 plots. If \code{TRUE}, it returns a list of 

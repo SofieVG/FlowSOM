@@ -17,10 +17,10 @@ AddBackground(
 \item{backgroundValues}{Vector of values to be plotted as background for 
 the nodes}
 
-\item{backgroundColors}{Colorpalette for backgroundcolors}
+\item{backgroundColors}{ColorPalette for backgroundcolors}
 
 \item{backgroundLim}{Background limits (can be used to ensure consistent
-colorpalette between plots). If NULL (default), will
+ColorPalette between plots). If NULL (default), will
 be automatically adapted to the data.}
 }
 \value{

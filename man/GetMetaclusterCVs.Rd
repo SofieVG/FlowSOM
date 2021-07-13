@@ -4,7 +4,7 @@
 \alias{GetMetaclusterCVs}
 \title{GetMetaclusterCVs}
 \usage{
-GetMetaclusterCVs(fsom)
+GetMetaclusterCVs(fsom, colsUsed = FALSE, prettyColnames = FALSE)
 }
 \arguments{
 \item{fsom}{Result of calling the FlowSOM function}

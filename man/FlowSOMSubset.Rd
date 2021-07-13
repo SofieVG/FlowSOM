@@ -12,7 +12,7 @@ FlowSOMSubset(fsom, ids)
 \item{ids}{Array containing the ids to keep}
 }
 \value{
-FlowSOM object containg updated data and medianvalues, 
+FlowSOM object containing updated data and medianvalues, 
    but with the same grid
 }
 \description{

@@ -317,7 +317,7 @@ Initialize_PCA <- function(data, xdim, ydim){
 #' @param realClusters      array with real cluster values
 #' @param predictedClusters array with predicted cluster values
 #' @param weighted          logical. Should the mean be weighted
-#'                          depending on the number of poins in the predicted 
+#'                          depending on the number of points in the predicted 
 #'                          clusters
 #'                           
 #' @return Mean purity score, worst score, number of clusters with score < 0.75

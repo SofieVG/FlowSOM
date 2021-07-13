@@ -236,13 +236,13 @@ FMeasure <- function(realClusters, predictedClusters,silent = FALSE){
 GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
   fsom <- UpdateFlowSOM(fsom)
   MFIs <- fsom$map$metaclusterMFIs
-  if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
-  if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
-  if(colsUsed && !prettyColnames){
+  if (is.null(fsom$map$colsUsed)) colsUsed <- FALSE
+  if (is.null(fsom$prettyColnames)) prettyColnames <- FALSE
+  if (colsUsed && !prettyColnames){
     MFIs <- MFIs[, fsom$map$colsUsed]
-  } else if(!colsUsed && prettyColnames) {
+  } else if (!colsUsed && prettyColnames) {
     colnames(MFIs) <- fsom$prettyColnames
-  } else if(colsUsed && prettyColnames) {
+  } else if (colsUsed && prettyColnames) {
     MFIs <- MFIs[, fsom$map$colsUsed]
     colnames(MFIs) <- fsom$prettyColnames[fsom$map$colsUsed]
   }
@@ -269,20 +269,32 @@ GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
 #'                        nClus = 10)
 #' cvs <- GetMetaclusterCVs(flowSOM.res)
 #' @export
-GetMetaclusterCVs <- function(fsom){
-  CVs <- t(sapply(seq_along(levels(fsom$metaclustering)), 
-                  function(i) {
-                    apply(subset(fsom$data, 
-                                 fsom$metaclustering[
-                                   GetClusters(fsom)] == i),
-                          2,
-                          function(y){
-                            if(length(y) > 0 && mean(y) != 0){
-                              stats::sd(y)/mean(y)
-                            } else {
-                              NA
-                            }})
-                  }))
+GetMetaclusterCVs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
+  CVs <- as.data.frame(t(sapply(levels(fsom$metaclustering), 
+                                function(i) {
+                                  apply(subset(fsom$data, 
+                                               fsom$metaclustering[
+                                                 GetClusters(fsom)] == i),
+                                        2,
+                                        function(y){
+                                          if(length(y) > 0 && mean(y) != 0){
+                                            stats::sd(y)/mean(y)
+                                          } else {
+                                            NA
+                                          }})
+                                })))
+  
+  if (is.null(fsom$map$colsUsed)) colsUsed <- FALSE
+  if (is.null(fsom$prettyColnames)) prettyColnames <- FALSE
+  
+  if (colsUsed && !prettyColnames){
+    CVs <- CVs[, fsom$map$colsUsed]
+  } else if (!colsUsed && prettyColnames) {
+    colnames(CVs) <- fsom$prettyColnames
+  } else if (colsUsed && prettyColnames) {
+    CVs <- CVs[, fsom$map$colsUsed]
+    colnames(CVs) <- fsom$prettyColnames[fsom$map$colsUsed]
+  }
   
   return(CVs)
 }
