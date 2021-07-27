@@ -24,7 +24,7 @@ PlotFileScatters(
 \arguments{
 \item{input}{Either a flowSet, a flowFrame (output from the 
 \code{\link{AggregateFlowFrames}} function) or a 
-vector of paths pointing to fcs files}
+vector of paths pointing to FCS files}
 
 \item{channels}{Vector of channels or markers that need to be plotted, 
 if NULL (default), all channels from the input will be 

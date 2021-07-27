@@ -9,7 +9,7 @@ PlotStarLegend(markers, colors, starHeight = 1)
 \arguments{
 \item{markers}{Vector of markers used in legend}
 
-\item{colors}{ColorPalette for the legend. Can be a vector or a 
+\item{colors}{Color palette for the legend. Can be a vector or a 
 function.}
 
 \item{starHeight}{Star height. Default = 1.}

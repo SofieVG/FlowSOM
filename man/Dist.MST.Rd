@@ -2,7 +2,7 @@
 % Please edit documentation in R/2_buildSOM.R
 \name{Dist.MST}
 \alias{Dist.MST}
-\title{Calculate distance matrix using a minimal spanning tree neighbourhood}
+\title{Calculate distance matrix using a minimal spanning tree neighborhood}
 \usage{
 Dist.MST(X)
 }
@@ -13,5 +13,5 @@ Dist.MST(X)
 Distance matrix
 }
 \description{
-Calculate distance matrix using a minimal spanning tree neighbourhood
+Calculate distance matrix using a minimal spanning tree neighborhood
 }

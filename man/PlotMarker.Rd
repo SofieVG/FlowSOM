@@ -26,7 +26,7 @@ clustering.}
 \item{title}{A vector with custom titles for the plot. Default is 
 the marker name.}
 
-\item{colorPalette}{Colorpalette to use. Can be a function or a vector.}
+\item{colorPalette}{Color palette to use. Can be a function or a vector.}
 
 \item{lim}{Limits for the scale}
 
@@ -41,7 +41,7 @@ A ggplot figure is returned in which every cluster is colored
 Plot comparison with other clustering
 }
 \details{
-Plot FlowSOM grid or tree, coloured by node values for a specific marker
+Plot FlowSOM grid or tree, colored by node values for a specific marker
 }
 \examples{
 # Build FlowSOM model
@@ -57,7 +57,7 @@ PlotMarker(flowSOM.res,
            
 PlotMarker(flowSOM.res, 
            "CD19",
-           colorPalette = c("grey", "red"))
+           colorPalette = c("gray", "red"))
            
 # Plot all markers
 PlotMarker(flowSOM.res,

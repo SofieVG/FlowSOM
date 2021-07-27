@@ -12,15 +12,17 @@ AddBackground(
 )
 }
 \arguments{
-\item{p}{GGplot object}
+\item{p}{ggplot object}
 
 \item{backgroundValues}{Vector of values to be plotted as background for 
 the nodes}
 
-\item{backgroundColors}{ColorPalette for backgroundcolors}
+\item{backgroundColors}{Color palette to be used for the background coloring.
+Can be either a function or an array specifying
+colors.}
 
 \item{backgroundLim}{Background limits (can be used to ensure consistent
-ColorPalette between plots). If NULL (default), will
+Color palette between plots). If NULL (default), will
 be automatically adapted to the data.}
 }
 \value{

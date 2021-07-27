@@ -2,7 +2,7 @@
 % Please edit documentation in R/0_FlowSOM.R
 \name{GetFlowJoLabels}
 \alias{GetFlowJoLabels}
-\title{Process a flowjo workspace file}
+\title{Process a FlowJo workspace file}
 \usage{
 GetFlowJoLabels(
   files,
@@ -14,7 +14,7 @@ GetFlowJoLabels(
 )
 }
 \arguments{
-\item{files}{The fcs files of interest}
+\item{files}{The FCS files of interest}
 
 \item{wspFile}{The FlowJo wsp file to read}
 
@@ -23,7 +23,7 @@ GetFlowJoLabels(
 \item{cellTypes}{Cell types to use for final labeling the cells. Should
 correspond with a subset of the gate names in FlowJo.}
 
-\item{getData}{If true, flowframes are returned as well.}
+\item{getData}{If true, flowFrames are returned as well.}
 
 \item{...}{Extra arguments to pass to CytoML::flowjo_to_gatingset}
 }
@@ -35,7 +35,7 @@ which assigns one label to each cell. If only one file is given, only one
 list is returned instead of a list of lists.
 }
 \description{
-Reads a flowjo workspace file using the \code{\link{flowWorkspace}} library 
+Reads a FlowJo workspace file using the \code{\link{flowWorkspace}} library 
 and returns a list with a matrix containing gating results and a vector with 
 a label for each cell from a set of specified gates
 }

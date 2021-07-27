@@ -7,11 +7,11 @@
 ParseNodeSize(nodeSizes, maxNodeSize, refNodeSize)
 }
 \arguments{
-\item{nodeSizes}{A vector with nodesizes}
+\item{nodeSizes}{A vector with node sizes}
 
-\item{maxNodeSize}{Determines the maximum nodesize.}
+\item{maxNodeSize}{Determines the maximum node size.}
 
-\item{refNodeSize}{Reference for nodesize against which the nodeSizes 
+\item{refNodeSize}{Reference for node size against which the nodeSizes 
 will be scaled. Default = max(nodeSizes)}
 }
 \value{

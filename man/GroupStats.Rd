@@ -34,7 +34,7 @@ output
                           nClus = 10)
    
 # Create new data
-# To illustrate the output, we here generate new fcs files (with more 
+# To illustrate the output, we here generate new FCS files (with more 
 # cells in metaclusters 1 and 9).
 # In practice you would not generate any new file but use your different
 # files from your different groups

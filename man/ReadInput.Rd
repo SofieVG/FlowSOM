@@ -2,7 +2,7 @@
 % Please edit documentation in R/1_readInput.R
 \name{ReadInput}
 \alias{ReadInput}
-\title{Read fcs-files or flowframes}
+\title{Read FCS-files or flowFrames}
 \usage{
 ReadInput(
   input,
@@ -30,14 +30,14 @@ select only files containing pattern}
 
 \item{spillover}{spillover matrix to compensate with
 If \code{NULL} and compensate = \code{TRUE}, we will
-look for \code{$SPILL} description in fcs file.}
+look for \code{$SPILL} description in FCS file.}
 
 \item{transform}{logical, does the data need to be transformed}
 
 \item{toTransform}{column names or indices that need to be transformed.
 Will be ignored if \code{transformList} is given.
 If \code{NULL} and transform = \code{TRUE}, column names
-of \code{$SPILL} description in fcs file will be used.}
+of \code{$SPILL} description in FCS file will be used.}
 
 \item{transformFunction}{Defaults to logicleTransform()}
 

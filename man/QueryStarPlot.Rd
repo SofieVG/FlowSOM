@@ -22,7 +22,7 @@ column names of the FlowSOM data.}
 \item{plot}{If true, a plot with a gradient of scores for the 
 nodes is shown.}
 
-\item{colorPalette}{ColorPalette to be used for colors for "stars", 
+\item{colorPalette}{Color palette to be used for colors for "stars", 
 "pies" or "marker". Can be either a function or an 
 array specifying colors.}
 

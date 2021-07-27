@@ -24,7 +24,7 @@ the first element of the list returned by
 \item{markers}{Array of markers to use. Default: the markers used to build 
 the tree}
 
-\item{colorPalette}{Colorpalette to be used for the markers}
+\item{colorPalette}{Color palette to be used for the markers}
 
 \item{main}{Title of the plot}
 }

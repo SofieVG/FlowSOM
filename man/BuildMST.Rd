@@ -11,7 +11,7 @@ BuildMST(fsom, silent = FALSE, tSNE = FALSE)
 
 \item{silent}{If \code{TRUE}, no progress updates will be printed}
 
-\item{tSNE}{If \code{TRUE}, an alternative tSNE layout is computed as well}
+\item{tSNE}{If \code{TRUE}, an alternative t-SNE layout is computed as well}
 }
 \value{
 FlowSOM object containing MST description

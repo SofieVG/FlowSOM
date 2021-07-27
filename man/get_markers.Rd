@@ -15,7 +15,7 @@ get_markers(ff, markers)
 Corresponding marker names
 }
 \description{
-Get marker names, given a flowframe. As available in "desc". If this is NA,
+Get marker names, given a flowFrame. As available in "desc". If this is NA,
 defaults to channel name.
 }
 \examples{

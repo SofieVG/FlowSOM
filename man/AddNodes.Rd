@@ -17,7 +17,7 @@ AddNodes(
 )
 }
 \arguments{
-\item{p}{GGplot object}
+\item{p}{ggplot object}
 
 \item{nodeInfo}{Dataframe with for every node an x, y and size value,
 if null the dataframe from the ggplot object will be 
@@ -28,7 +28,7 @@ in which case all nodes are filled in fillColor.}
 
 \item{lim}{The limits of the color scale, not used if values = NULL.}
 
-\item{colorPalette}{Colorpalette for color in nodes, not used if values = 
+\item{colorPalette}{Color palette for color in nodes, not used if values = 
 NULL. A vector of colors or a color function.}
 
 \item{fillColor}{Fixed fill for node colors, default = white.}

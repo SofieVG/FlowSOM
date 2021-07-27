@@ -36,7 +36,7 @@ flowSOM.res <- ReadInput(fileName, compensate = TRUE, transform = TRUE,
 
 # Build the Self-Organizing Map
 # E.g. with gridsize 5x5, presenting the dataset 20 times, 
-# no use of MST in neighbourhood calculations in between
+# no use of MST in neighborhood calculations in between
 flowSOM.res <- BuildSOM(flowSOM.res, colsToUse = c(9, 12, 14:18),
                         xdim = 5, ydim = 5, rlen = 20)
 

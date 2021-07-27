@@ -36,7 +36,7 @@ only files containing pattern}
 
 \item{spillover}{spillover matrix to compensate with
 If NULL and compensate = TRUE, we will look for $SPILL 
-description in fcs file.}
+description in FCS file.}
 
 \item{transform}{logical, does the data need to be transformed with the
 transformation given in \code{transformFunction}.}
@@ -44,7 +44,7 @@ transformation given in \code{transformFunction}.}
 \item{toTransform}{column names or indices that need to be transformed.
 Will be ignored if \code{transformList} is given.
 If \code{NULL} and transform = \code{TRUE}, column names
-of \code{$SPILL} description in fcs file will be used.}
+of \code{$SPILL} description in FCS file will be used.}
 
 \item{transformFunction}{Defaults to logicleTransform()}
 

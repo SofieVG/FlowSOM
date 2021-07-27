@@ -20,7 +20,7 @@ are possible.}
 Corresponding channel names
 }
 \description{
-Get channel names for an array of markers, given a flowframe or a FlowSOM
+Get channel names for an array of markers, given a flowFrame or a FlowSOM
 object. As available in "name". \code{\link{grep}} is used to look for the 
 markers. Other regex can be added.
 }

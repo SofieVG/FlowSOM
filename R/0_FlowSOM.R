@@ -10,13 +10,13 @@
 #' @param compensate    logical, does the data need to be compensated
 #' @param spillover     spillover matrix to compensate with
 #'                      If NULL and compensate = TRUE, we will look for $SPILL 
-#'                      description in fcs file.
+#'                      description in FCS file.
 #' @param transform     logical, does the data need to be transformed with the
 #'                      transformation given in \code{transformFunction}.
 #' @param toTransform   column names or indices that need to be transformed.
 #'                      Will be ignored if \code{transformList} is given.
 #'                      If \code{NULL} and transform = \code{TRUE}, column names
-#'                      of \code{$SPILL} description in fcs file will be used.
+#'                      of \code{$SPILL} description in FCS file will be used.
 #' @param transformFunction Defaults to logicleTransform()
 #' @param transformList transformList to apply on the samples.
 #' @param scale         logical, does the data needs to be rescaled. 
@@ -197,21 +197,21 @@ print.FlowSOM <- function(x, ...){
 }
 
 
-#' Aggregate multiple fcs files together
+#' Aggregate multiple FCS files together
 #' 
-#' Aggregate multiple fcs files to analyze them simultaneously. 
-#' A new fcs file is written, which contains about \code{cTotal} cells,
+#' Aggregate multiple FCS files to analyze them simultaneously. 
+#' A new FCS file is written, which contains about \code{cTotal} cells,
 #' with \code{ceiling(cTotal/nFiles)} cells from each file. Two new columns
 #' are added: a column indicating the original file by index, and a noisy 
 #' version of this for better plotting opportunities (index plus or minus a 
 #' value between 0 and 0.1).
 #' 
-#' @param fileNames   Character vector containing full paths to the fcs files
+#' @param fileNames   Character vector containing full paths to the FCS files
 #'                    to aggregate
 #' @param cTotal      Total number of cells to write to the output file
 #' @param channels    Channels/markers to keep in the aggregate. Default NULL 
 #'                    takes all channels of the first file.
-#' @param writeOutput Whether to write the resulting flowframe to a file. 
+#' @param writeOutput Whether to write the resulting flowFrame to a file. 
 #'                    Default FALSE
 #' @param outputFile  Full path to output file. Default "aggregate.fcs"
 #' @param keepOrder If TRUE, the random subsample will be ordered in the same
@@ -336,7 +336,7 @@ AggregateFlowFrames <- function(fileNames,
 #'
 #' @param  input      Either a flowSet, a flowFrame (output from the 
 #'                    \code{\link{AggregateFlowFrames}} function) or a 
-#'                    vector of paths pointing to fcs files
+#'                    vector of paths pointing to FCS files
 #' @param  channels   Vector of channels or markers that need to be plotted, 
 #'                    if NULL (default), all channels from the input will be 
 #'                    plotted
@@ -561,18 +561,18 @@ PlotFileScatters <- function(input,
   }
 }
 
-#' Process a flowjo workspace file
+#' Process a FlowJo workspace file
 #'
-#' Reads a flowjo workspace file using the \code{\link{flowWorkspace}} library 
+#' Reads a FlowJo workspace file using the \code{\link{flowWorkspace}} library 
 #' and returns a list with a matrix containing gating results and a vector with 
 #' a label for each cell from a set of specified gates
 #'
-#' @param files       The fcs files of interest
+#' @param files       The FCS files of interest
 #' @param wspFile    The FlowJo wsp file to read
 #' @param group       The FlowJo group to parse. Default "All Samples".
 #' @param cellTypes  Cell types to use for final labeling the cells. Should
 #'                    correspond with a subset of the gate names in FlowJo.
-#' @param getData    If true, flowframes are returned as well.
+#' @param getData    If true, flowFrames are returned as well.
 #' @param ...         Extra arguments to pass to CytoML::flowjo_to_gatingset
 #'
 #' @return This function returns a list, which for every file contains a list
@@ -677,7 +677,7 @@ GetFlowJoLabels <- function(files,
   return(result)
 }
 
-#' Summarise the gating matrix into one vector, only including the cell types of
+#' Summarize the gating matrix into one vector, only including the cell types of
 #' interest
 #'
 #' Extract the compensated and transformed data and all gate labels.
@@ -707,7 +707,7 @@ ManualVector <- function(manualMatrix, cellTypes){
 
 #' GetChannels
 #' 
-#' Get channel names for an array of markers, given a flowframe or a FlowSOM
+#' Get channel names for an array of markers, given a flowFrame or a FlowSOM
 #' object. As available in "name". \code{\link{grep}} is used to look for the 
 #' markers. Other regex can be added.
 #' 
@@ -774,7 +774,7 @@ GetChannels <- function(object, markers, exact = TRUE) {
 
 #' GetMarkers
 #' 
-#' Get marker names for an array of channels, given a flowframe or a FlowSOM 
+#' Get marker names for an array of channels, given a flowFrame or a FlowSOM 
 #' object. As available in "desc". If this is NA, defaults to channel name. 
 #' \code{\link{grep}} is used to look for the markers. Other regex can be added.
 #' 

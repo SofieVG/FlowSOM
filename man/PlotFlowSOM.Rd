@@ -21,16 +21,16 @@ PlotFlowSOM(
 \item{fsom}{FlowSOM object, as created by \code{\link{FlowSOM}}}
 
 \item{view}{Preferred view, options: "MST", "grid" or "matrix" 
-with a matrix/dataframe consisting of coordinates 
-given in coords. Default = "MST"}
+with a matrix/dataframe consisting of coordinates. 
+Default = "MST"}
 
-\item{nodeSizes}{A vector containing nodesizes. These will 
+\item{nodeSizes}{A vector containing node sizes. These will 
 automatically be scaled between 0 and maxNodeSize 
 and transformed with a sqrt. Default = fsom$MST$sizes}
 
-\item{maxNodeSize}{Determines the maximum nodesize. Default is 1.}
+\item{maxNodeSize}{Determines the maximum node size. Default is 1.}
 
-\item{refNodeSize}{Reference for nodesize against which the nodeSizes 
+\item{refNodeSize}{Reference for node size against which the nodeSizes 
 will be scaled. Default = max(nodeSizes)}
 
 \item{equalNodeSize}{If \code{TRUE}, the nodes will be equal to 
@@ -42,7 +42,7 @@ cluster}
 numerical values or something that can be made into
 a factor (e.g. a clustering)}
 
-\item{backgroundColors}{Colorpalette to be used for the background coloring.
+\item{backgroundColors}{Color palette to be used for the background coloring.
 Can be either a function or an array specifying
 colors.}
 

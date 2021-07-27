@@ -47,5 +47,5 @@ stats <- GroupStats(features$cluster_percentages,
 
 }
 \seealso{
-Groupstats
+GroupStats
 }

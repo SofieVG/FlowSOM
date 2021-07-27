@@ -62,7 +62,7 @@ of ggplot objects will be returned}
 }
 \value{
 If \code{plot} is \code{TRUE}, nothing is returned and a plot is 
-        drawn in which background cells are plotted in grey and the cells of
+        drawn in which background cells are plotted in gray and the cells of
         the selected nodes in color. If \code{plot} is \code{FALSE}, a ggplot
          objects list is returned.
 }
@@ -71,7 +71,7 @@ Function to draw 2D scatter plots of FlowSOM (meta)clusters
 }
 \details{
 Plot multiple 2D scatter plots in a png file. A subset of fsom$data is 
-plotted in grey, and those of the selected clusters and metaclusters are 
+plotted in gray, and those of the selected clusters and metaclusters are 
 plotted in color.
 }
 \examples{

@@ -27,13 +27,13 @@ ids. If NULL (default), no selection is made.}
 
 \item{silent}{If FALSE (default), print some extra output}
 
-\item{outputDir}{Directory to save the fcs files. Default to the
+\item{outputDir}{Directory to save the FCS files. Default to the
 current working directory (".")}
 
 \item{suffix}{Suffix added to the filename. Default _FlowSOM.fcs}
 }
 \value{
-Saves the extended fcs file as [originalName]_FlowSOM.fcs
+Saves the extended FCS file as [originalName]_FlowSOM.fcs
 }
 \description{
 Write FlowSOM clustering results to the original FCS files

@@ -1,3 +1,7 @@
+CHANGES IN VERSION 2.1.27 (2021/07/27)
+--------------------------------------
+o Fixed typos and more consistent spelling
+
 CHANGES IN VERSION 2.1.26 (2021/07/13)
 --------------------------------------
 o Adapted GetMetaclusterCVs function so that it works after using 

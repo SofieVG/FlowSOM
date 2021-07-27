@@ -15,7 +15,7 @@ get_channels(ff, markers)
 Corresponding channel names
 }
 \description{
-Get channel names for an array of markers, given a flowframe
+Get channel names for an array of markers, given a flowFrame
 }
 \examples{
 

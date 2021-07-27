@@ -2,7 +2,7 @@
 % Please edit documentation in R/0_FlowSOM.R
 \name{ManualVector}
 \alias{ManualVector}
-\title{Summarise the gating matrix into one vector, only including the cell types of
+\title{Summarize the gating matrix into one vector, only including the cell types of
 interest}
 \usage{
 ManualVector(manualMatrix, cellTypes)

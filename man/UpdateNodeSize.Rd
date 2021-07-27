@@ -30,7 +30,7 @@ correspond with area of node instead of radius}
 
 \item{scale}{Scaling of the counts, defaults to the maximum of the value
 minus the shift. With shift and scale set as default, the 
-largest node will be maxNodesize and an empty node will have
+largest node will be maxNodeSize and an empty node will have
 size 0}
 }
 \value{

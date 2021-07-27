@@ -18,7 +18,7 @@ PlotLabels(
 
 \item{labels}{A vector of labels for every node.}
 
-\item{maxNodeSize}{Determines the maximum nodesize. Default is 0.}
+\item{maxNodeSize}{Determines the maximum node size. Default is 0.}
 
 \item{textSize}{Size for geom_text. Default (=3.88) is from geom_text.}
 

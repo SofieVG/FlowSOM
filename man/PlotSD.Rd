@@ -16,10 +16,10 @@ shown. Otherwise, the maximum ratio is used.}
 }
 \value{
 Nothing is returned. A plot is drawn in which each node 
-        is coloured depending on its standard deviation
+        is colored depending on its standard deviation
 }
 \description{
-Plot FlowSOM grid or tree, coloured by standard deviaton.
+Plot FlowSOM grid or tree, colored by standard deviation.
 }
 \examples{
 # Read from file, build self-organizing map and minimal spanning tree

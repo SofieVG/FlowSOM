@@ -20,7 +20,7 @@ PlotVariable(
 
 \item{variableName}{Label to show on the legend}
 
-\item{colorPalette}{Colorpalette to use. Can be a function or a vector.}
+\item{colorPalette}{Color palette to use. Can be a function or a vector.}
 
 \item{lim}{Limits for the scale}
 
@@ -31,7 +31,7 @@ e.g. view, backgroundValues, equalNodeSize ...}
 Plot a variable for all nodes
 }
 \details{
-Plot FlowSOM grid or tree, coloured by node values given in variable
+Plot FlowSOM grid or tree, colored by node values given in variable
 }
 \examples{
 # Build FlowSOM model

@@ -76,10 +76,10 @@ Map new data to a FlowSOM grid
 }
 \details{
 New data is mapped to an existing FlowSOM object. The input is similar to the
-readInput function.
+\code{\link{ReadInput}} function.
 A new FlowSOM object is created, with the same grid, but a new
 mapping, node sizes and mean values. The same preprocessing steps
-(compensation, tranformation and scaling) will happen to this file as was 
+(compensation, transformation and scaling) will happen to this file as was 
 specified in the original FlowSOM call. The scaling parameters from the 
 original grid will be used.
 }

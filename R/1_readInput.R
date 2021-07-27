@@ -1,4 +1,4 @@
-#' Read fcs-files or flowframes
+#' Read FCS-files or flowFrames
 #' 
 #' Take some input and return FlowSOM object containing a matrix with 
 #' the preprocessed data (compensated, transformed, scaled)
@@ -10,12 +10,12 @@
 #' @param compensate    logical, does the data need to be compensated
 #' @param spillover     spillover matrix to compensate with
 #'                      If \code{NULL} and compensate = \code{TRUE}, we will
-#'                      look for \code{$SPILL} description in fcs file.
+#'                      look for \code{$SPILL} description in FCS file.
 #' @param transform     logical, does the data need to be transformed
 #' @param toTransform   column names or indices that need to be transformed.
 #'                      Will be ignored if \code{transformList} is given.
 #'                      If \code{NULL} and transform = \code{TRUE}, column names
-#'                      of \code{$SPILL} description in fcs file will be used.
+#'                      of \code{$SPILL} description in FCS file will be used.
 #' @param transformFunction Defaults to logicleTransform()
 #' @param transformList transformList to apply on the samples.
 #' @param scale         logical, does the data needs to be rescaled
