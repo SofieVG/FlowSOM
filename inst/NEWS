@@ -1,3 +1,8 @@
+CHANGES IN VERSION 2.1.28 (2021/07/30)
+--------------------------------------
+o Added height and width parameter to PlotFileScatters
+o Fixed bug in PlotFileScatters
+
 CHANGES IN VERSION 2.1.27 (2021/07/27)
 --------------------------------------
 o Fixed typos and more consistent spelling

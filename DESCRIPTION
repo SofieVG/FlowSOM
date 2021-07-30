@@ -1,6 +1,6 @@
 Package: FlowSOM
-Version: 2.1.27
-Date: 2021-07-27
+Version: 2.1.28
+Date: 2021-07-30
 Title: Using self-organizing maps for visualization and interpretation
     of cytometry data
 Authors@R: c(person("Sofie", "Van Gassen", role = c("aut", "cre"),

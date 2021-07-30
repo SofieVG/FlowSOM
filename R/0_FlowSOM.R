@@ -359,10 +359,15 @@ AggregateFlowFrames <- function(fileNames,
 #'                    should be displayed. Default is \code{FALSE}
 #' @param  maxPoints Total number of data points that will be plotted per 
 #'                    channel, default is 50000
+#' @param  silent     If FALSE, prints an update every time it starts processing 
+#'                    a new file. Default = FALSE. 
 #' @param  ncol       Number of columns in the final plot, optional
 #' @param  nrow       Number of rows in the final plot, optional
-#' @param silent      If FALSE, prints an update every time it starts processing 
-#'                    a new file. Default = FALSE. 
+#' @param  width      Width of png file. By default NULL the width parameter is 
+#'                    estimated based on the input.
+#' @param  height     Height of png file. By default NULL the width parameter is 
+#'                    estimated based on the input.
+#'  
 #' @param  plotFile   Path to png file, default is "FileScatters.png". If 
 #'                    \code{NULL}, the output will be a list of ggplots 
 #' 
@@ -409,6 +414,8 @@ PlotFileScatters <- function(input,
                              maxPoints = 50000, 
                              ncol = NULL, 
                              nrow = NULL,
+                             width = NULL,
+                             height = NULL,
                              silent = FALSE,
                              plotFile = "FileScatters.png"){
   
@@ -438,6 +445,7 @@ PlotFileScatters <- function(input,
   } else if (is(input, "flowFrame")) {
     ff <- input
     data <- flowCore::exprs(ff)
+    data <- data[,c(channels, "File")]
     file_values <- data[, "File"]
     input <- unique(file_values)
   } else {
@@ -458,6 +466,9 @@ PlotFileScatters <- function(input,
   }
   file_values <- file_values[subset]
   channels <- colnames(data)
+  if ("File" %in% channels){
+    channels <- channels[-grep("File", channels)]
+  }
   
   #----Additional warnings---
   if (!is.null(names) & length(unique(file_values)) != length(names)){
@@ -547,9 +558,15 @@ PlotFileScatters <- function(input,
     } else {
       ncol <- ceiling(length(channels) / nrow)
     }
-    png(plotFile, 
-        width = ncol * (60 + 15 * length(unique(file_values))), 
-        height = 250 * nrow)
+    if (is.null(width)){
+      width <-  ncol * (60 + 15 * length(unique(file_values)))
+    }
+    if (is.null(height)){
+      height <-  250 * nrow
+    }
+    png(plotFile,
+        width = width, 
+        height = height)
     p <- ggpubr::annotate_figure(ggarrange(plotlist = plots_list,
                                            common.legend = legend, 
                                            ncol = ncol, nrow = nrow),
