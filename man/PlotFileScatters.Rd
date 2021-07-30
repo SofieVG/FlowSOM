@@ -17,6 +17,8 @@ PlotFileScatters(
   maxPoints = 50000,
   ncol = NULL,
   nrow = NULL,
+  width = NULL,
+  height = NULL,
   silent = FALSE,
   plotFile = "FileScatters.png"
 )
@@ -60,6 +62,12 @@ channel, default is 50000}
 \item{ncol}{Number of columns in the final plot, optional}
 
 \item{nrow}{Number of rows in the final plot, optional}
+
+\item{width}{Width of png file. By default NULL the width parameter is 
+estimated based on the input.}
+
+\item{height}{Height of png file. By default NULL the width parameter is 
+estimated based on the input.}
 
 \item{silent}{If FALSE, prints an update every time it starts processing 
 a new file. Default = FALSE.}
