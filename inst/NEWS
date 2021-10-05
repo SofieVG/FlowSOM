@@ -1,3 +1,7 @@
+CHANGES IN VERSION 2.1.31 (2021/10/05)
+--------------------------------------
+o In NewData, the new FlowSOM object gets prettyColnames from the old one
+
 CHANGES IN VERSION 2.1.30 (2021/10/04)
 --------------------------------------
 o GetFeatures can now return % of positive cells per channel for each cluster
