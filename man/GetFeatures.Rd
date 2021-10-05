@@ -10,6 +10,7 @@ GetFeatures(
   level = c("clusters", "metaclusters"),
   type = "counts",
   MFI = NULL,
+  positive_cutoffs = NULL,
   filenames = NULL,
   silent = FALSE
 )
@@ -24,11 +25,16 @@ or the BuildSOM function}
 "metaclusters"), but can also be only one of them}
 
 \item{type}{Type of features to extract. Default is "counts", 
-can be a vector of "counts", "percentages" and/or 
-"MFIs"}
+can be a vector of "counts", "percentages", "MFIs"
+and/or "percentages_positive"}
 
 \item{MFI}{Vector with channels / markers for which the MFI 
 values must be returned when "MFIs" is in \code{type}}
+
+\item{positive_cutoffs}{Named vector with fluorescence-intensity values
+per channel / marker that are the upper bounds for
+a negative population when "percentages_positive" is
+in \code{type}}
 
 \item{filenames}{An optional vector with filenames that will be used
 as rownames in the count matrices. If NULL (default)
@@ -66,4 +72,16 @@ Map FCS files on an existing FlowSOM object
                          MFI = "APC-A", 
                          filenames = c("ff_1001-2000", "ff_2001-3000"))
 
+ # Get percentages of positive cells
+ positive_cutoffs <- c('CD8' = 1.5,
+                       'CD4' = 0.3,
+                       'CD19' = 1.3,
+                       'CD3' = -0.3)
+ 
+ perc_pos <- GetFeatures(fsom = flowSOM.res, 
+                         files = c(ff[1001:2000, ], ff[2001:3000, ]),
+                         type = c("percentages_positive"), 
+                         positive_cutoffs = positive_cutoffs,
+                         filenames = c("ff_1001-2000", "ff_2001-3000"))
+                         
 }
