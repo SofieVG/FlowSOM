@@ -213,6 +213,7 @@ NewData <- function(fsom,
                         scaled.scale = scaled.scale, silent = silent)
   
   fsom_new$map <- fsom$map
+  fsom_new$prettyColnames <- fsom$prettyColnames
   fsom_new$MST <- fsom$MST
   
   fsom_new$metaclustering <- fsom$metaclustering
