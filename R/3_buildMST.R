@@ -252,8 +252,10 @@ NewData <- function(fsom,
 #' @param plotFile If \code{NULL} (default), no plot will be created. If a 
 #'                 filepath is given for a pdf, the plot will be written in the
 #'                 corresponding file
-#'        
-#' @return A new FlowSOM object
+#' @param channels If channels are given, the number of outliers in the original
+#'                 space for those channels will be calculated and added to the
+#'                 final results table.      
+#' @return An outlier report
 #' @seealso \code{\link{FlowSOMSubset}} if you want to get a subset of the
 #'          current data instead of a new dataset
 #' @examples 
@@ -276,78 +278,126 @@ NewData <- function(fsom,
 TestOutliers <- function(fsom, 
                          madAllowed = 4,
                          fsomReference = NULL,
-                         plotFile = NULL){
+                         plotFile = NULL,
+                         channels = NULL){
   
   fsom <- UpdateFlowSOM(fsom)
-  
-  if(is.null(fsomReference)){
+  if (is.null(fsomReference)) {
     fsomReference <- fsom
   } else {
     fsomReference <- UpdateFlowSOM(fsomReference)
   }
-  
-  distances_median <- sapply(seq_len(fsomReference$map$nNodes),
-                             function(x){
+  distances_median <- sapply(seq_len(fsomReference$map$nNodes), 
+                             function(x) {
                                ids <- which(GetClusters(fsomReference) == x)
-                               if(length(ids) > 0){
-                                 m <- stats::median(
-                                   fsomReference$map$mapping[ids, 2])
-                               } else {
+                               if (length(ids) > 0) {
+                                 m <- stats::median(fsomReference$map$mapping[ids, 
+                                                                              2])
+                               }
+                               else {
                                  m <- 0
                                }
                                return(m)
                              })
-  
-  distances_mad <- sapply(seq_len(fsomReference$map$nNodes),
-                          function(x){
+  distances_mad <- sapply(seq_len(fsomReference$map$nNodes), 
+                          function(x) {
                             ids <- which(GetClusters(fsomReference) == x)
-                            if(length(ids) > 0){
-                              m <- stats::mad(
-                                fsomReference$map$mapping[ids, 2])
-                            } else {
+                            if (length(ids) > 0) {
+                              m <- stats::mad(fsomReference$map$mapping[ids, 
+                                                                        2])
+                            }
+                            else {
                               m <- 0
                             }
                             return(m)
                           })
-  
   thresholds <- distances_median + madAllowed * distances_mad
+  max_distances_new <- sapply(seq_len(fsom$map$nNodes), function(x) {
+    ids <- which(GetClusters(fsom) == x)
+    if (length(ids) > 0) {
+      m <- max(fsom$map$mapping[ids, 2])
+    }
+    else {
+      m <- 0
+    }
+    return(m)
+  })
+  outliers <- sapply(seq_len(fsom$map$nNodes), function(x) {
+    ids <- which(GetClusters(fsom) == x)
+    distances <- fsom$map$mapping[ids, 2]
+    return(sum(distances > thresholds[x]))
+  })
   
-  max_distances_new <- sapply(seq_len(fsom$map$nNodes),
-                              function(x){
-                                ids <- which(GetClusters(fsom) == x)
-                                if(length(ids) > 0){
-                                  m <- max(fsom$map$mapping[ids, 2])
-                                } else {
-                                  m <- 0
-                                }
-                                return(m)
-                              })
   
-  outliers <- sapply(seq_len(fsom$map$nNodes),
-                     function(x){
-                       ids <- which(GetClusters(fsom) == x)
-                       distances <- fsom$map$mapping[ids, 2]
-                       return(sum(distances > thresholds[x]))
-                     })
-  if(!is.null(plotFile)){
+  if (!is.null(channels)){
+    outliers_list <- list()
+    for (channel in channels){
+      distances_median_channel <- 
+        sapply(seq_len(fsomReference$map$nNodes), 
+               function(x) {
+                 ids <- which(GetClusters(fsomReference) == x)
+                 if (length(ids) > 0) {
+                   m <- stats::median(abs(fsomReference$data[ids, channel] - 
+                                            fsomReference$map$codes[x, channel]))
+                 }
+                 else {
+                   m <- 0
+                 }
+                 return(m)
+               })
+      distances_mad_channel <- 
+        sapply(seq_len(fsomReference$map$nNodes), 
+               function(x) {
+                 ids <- which(GetClusters(fsomReference) == x)
+                 if (length(ids) > 0) {
+                   m <- stats::mad(abs(fsomReference$data[ids, 
+                                                          channel] - 
+                                         fsomReference$map$codes[x, 
+                                                                 channel]))
+                                        }
+                                        else {
+                                          m <- 0
+                                        }
+                                        return(m)
+                                      })
+      
+      thresholds_channel <- distances_median_channel + madAllowed * distances_mad_channel
+      
+      outliers_channel <- sapply(seq_len(fsom$map$nNodes), function(x) {
+        ids <- which(GetClusters(fsom) == x)
+        distances <- abs(fsom$data[ids,channel] - fsomReference$map$codes[x,
+                                                                          channel])
+        return(sum(distances > thresholds_channel[x]))
+      })
+      
+      
+      outliers_list[[GetMarkers(fsom,channel)]] <- outliers_channel    
+    }
+  }
+  
+  
+  if (!is.null(plotFile)) {
     xdim <- fsom$map$xdim
     ydim <- fsom$map$ydim
-    graphics::layout(matrix(1:(xdim*ydim), nrow = xdim))
-    plotList <- lapply(seq_len(xdim * ydim), function(i){
+    graphics::layout(matrix(1:(xdim * ydim), nrow = xdim))
+    plotList <- lapply(seq_len(xdim * ydim), function(i) {
       ids <- which(GetClusters(fsom) == i)
       values <- fsom$map$mapping[ids, 2]
-      if(length(values) > 1){
+      if (length(values) > 1) {
         nOutliers <- sum(values > thresholds[i])
-        p <- suppressMessages(ggplot2::ggplot() +
-                                ggplot2::geom_histogram(ggplot2::aes(values), fill = "grey90",
-                                                        col = "black", size = 0.2) +
-                                ggplot2::geom_vline(ggplot2::aes(xintercept = distances_median[i]),
-                                                    col = "black") +
+        p <- suppressMessages(ggplot2::ggplot() + 
+                                ggplot2::geom_histogram(ggplot2::aes(values), 
+                                                        fill = "grey90", 
+                                                        col = "black", 
+                                                        size = 0.2) + 
+                                ggplot2::geom_vline(ggplot2::aes(xintercept = distances_median[i]), 
+                                                    col = "black") + 
                                 ggplot2::geom_vline(ggplot2::aes(xintercept = thresholds[i]), 
-                                                    col = "red") +
-                                ggplot2::ggtitle(paste0(i, " (", nOutliers, ")")) +
-                                ggplot2::theme_minimal() +
-                                ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
+                                                    col = "red") + 
+                                ggplot2::ggtitle(paste0(i, 
+                                                        " (", nOutliers, ")")) + 
+                                ggplot2::theme_minimal() + 
+                                ggplot2::theme(axis.title.x = ggplot2::element_blank()) + 
                                 ggplot2::ylab("Frequency"))
         return(p)
       }
@@ -357,15 +407,17 @@ TestOutliers <- function(fsom,
     print(p)
     grDevices::dev.off()
   }
-  result <- data.frame(
-    "Median_distance" = distances_median, 
-    "Median_absolute_deviation" = distances_mad, 
-    "Threshold" = thresholds, 
-    "Number_of_outliers" = outliers,
-    "Maximum_outlier_distance" = max_distances_new)[outliers > 0, ]
+  result <- data.frame(Median_distance = distances_median, 
+                       Median_absolute_deviation = distances_mad, 
+                       Threshold = thresholds, 
+                       Number_of_outliers = outliers, 
+                       Maximum_outlier_distance = max_distances_new)
   
-  result <- result[order(outliers[outliers > 0], decreasing = TRUE), ]
-  
+  if (!is.null(channels)){
+    result <- cbind(result, do.call(cbind, outliers_list))
+  }
+  result <- result[outliers > 
+                     0, ][order(outliers[outliers > 0], decreasing = TRUE),]
   return(result)
 }
 
