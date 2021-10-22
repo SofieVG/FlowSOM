@@ -96,6 +96,13 @@ UpdateDerivedValues <- function(fsom){
   fsom$map$sdValues[is.nan(fsom$map$sdValues)] <- 0 
   colnames(fsom$map$sdValues) <- colnames(fsom$data)
   
+  fsom$map$madValues <-
+    t(sapply(seq_len(fsom$map$nNodes), function(i) {
+      apply(subset(fsom$data, fsom$map$mapping[, 1] == i), 2, stats::mad)
+    }))
+  fsom$map$madValues[is.nan(fsom$map$madValues)] <- 0 
+  colnames(fsom$map$madValues) <- colnames(fsom$data)
+  
   pctgs <- rep(0, fsom$map$nNodes)
   names(pctgs) <- as.character(seq_len(fsom$map$nNodes))
   pctgs_tmp <- table(fsom$map$mapping[, 1]) / nrow(fsom$map$mapping)
