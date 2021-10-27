@@ -4,7 +4,13 @@
 \alias{TestOutliers}
 \title{TestOutliers}
 \usage{
-TestOutliers(fsom, madAllowed = 4, fsomReference = NULL, plotFile = NULL)
+TestOutliers(
+  fsom,
+  madAllowed = 4,
+  fsomReference = NULL,
+  plotFile = NULL,
+  channels = NULL
+)
 }
 \arguments{
 \item{fsom}{FlowSOM object}
@@ -17,9 +23,13 @@ the original fsom object is used.}
 \item{plotFile}{If \code{NULL} (default), no plot will be created. If a 
 filepath is given for a pdf, the plot will be written in the
 corresponding file}
+
+\item{channels}{If channels are given, the number of outliers in the original
+space for those channels will be calculated and added to the
+final results table.}
 }
 \value{
-A new FlowSOM object
+An outlier report
 }
 \description{
 Test if any cells are too far from their cluster centers

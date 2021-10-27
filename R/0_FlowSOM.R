@@ -496,7 +496,7 @@ PlotFileScatters <- function(input,
       yLabs <- GetMarkers(ff, channel)
     } else if ("channel" %in% yLabel && length(yLabel) == 1){
       yLabs <- channel
-    } else if (all(c("channel", "marker") %in% yLabel && length(yLabel) == 2)){
+    } else if (all(c("channel", "marker") %in% yLabel) && length(yLabel) == 2){
       yLabs <- paste0(GetMarkers(ff, channel), " (", channel, ")")
     } else stop("yLabel should be \"marker\" and\\or \"channel\"")
     df <- data.frame("intensity" = data[, channel],

@@ -2068,13 +2068,16 @@ gg_color_hue <- function(n) {
 #' @param sizePoints       Size of the (meta)cluster cells
 #' @param xLim             A vector of a lower and upper limit of the x-axis
 #' @param yLim             A vector of a lower and upper limit of the y-axis
+#' @param xyLabels         Determines the label of the x- and y-axis. Can be 
+#'                         "marker" and\\or "channel". Default = "marker".
 #' @param density           Default is \code{TRUE} to color the (meta)cluster 
 #'                          points according to density. Set to \code{FALSE} to 
 #'                          use a plain color
 #' @param centers           Default is \code{TRUE} to show the cluster centers
 #' @param color             Colors for all the cells in the selected nodes 
-#'                          (ordered list). If  \code{NULL} the default ggplot 
-#'                          colors, indexed by metacluster number are used.
+#'                          (ordered list). First the clusters are colored, 
+#'                          then the metaclusters. If \code{NULL}, the default 
+#'                          ggplot colors, indexed by metacluster number, are used.
 #' @param plotFile          If a filepath for a png is given (default = 
 #'                          2DScatterPlots.png), the plots will be plotted in 
 #'                          the corresponding png file. If \code{NULL}, a list 
@@ -2134,6 +2137,7 @@ Plot2DScatters <- function(fsom,
                            sizePoints = 0.5,
                            xLim = NULL,
                            yLim = NULL,
+                           xyLabels = c("marker"),
                            density = TRUE, 
                            centers = TRUE, 
                            color = NULL,
@@ -2208,10 +2212,21 @@ Plot2DScatters <- function(fsom,
         colnames(df_c) <- c("m1", "m2")
         
         #----ggplots----
-        s <- ""
-        if (length(subset) > 1){
-          s <- "s"
-        }
+        cl_or_mcl <- paste0(group, ifelse(length(subset) > 1, "s", ""), ": ")
+        subset_names <- ifelse(group == "Cluster", 
+               paste0(subset, collapse = ", "),
+               paste0(levels(fsom$metaclustering)[unlist(subset)],
+                      collapse = ", "))
+        title <- paste0(cl_or_mcl, subset_names)
+        
+        if ("marker" %in% xyLabels && length(xyLabels) == 1) {
+          xyLabs <- GetMarkers(fsom, channelpair)
+        } else if ("channel" %in% xyLabels && length(xyLabels) == 1){
+          xyLabs <- GetChannels(fsom, channelpair)
+        } else if (all(c("channel", "marker") %in% xyLabels) && length(xyLabels) == 2){
+          channels <- GetChannels(fsom, channelpair)
+          xyLabs <- paste0(GetMarkers(fsom, channelpair), " (", channels, ")")
+        } else stop("xyLabels should be \"marker\" and\\or \"channel\"")
         
         p <- ggplot2::ggplot(data = df_ss, 
                              ggplot2::aes(x = .data$m1, 
@@ -2220,12 +2235,9 @@ Plot2DScatters <- function(fsom,
                               color = "gray", 
                               size = sizeBgPoints) + # background dot plot
           ggplot2::theme_classic() +
-          ggplot2::ggtitle(paste0(group, s, " ", paste(ifelse(group == "Cluster", 
-                                                              subset,
-                                                              levels(fsom$metaclustering)[unlist(subset)]), 
-                                                       collapse = ", "))) +
-          ggplot2::xlab(GetMarkers(fsom, channelpair[1])) +
-          ggplot2::ylab(GetMarkers(fsom, channelpair[2])) + 
+          ggplot2::ggtitle(title) +
+          ggplot2::xlab(xyLabs[1]) +
+          ggplot2::ylab(xyLabs[2]) + 
           ggplot2::theme(legend.position = "none")
         if (!is.null(xLim)) p <- p + ggplot2::xlim(xLim)
         if (!is.null(yLim)) p <- p + ggplot2::ylim(yLim)
@@ -2243,10 +2255,14 @@ Plot2DScatters <- function(fsom,
               ggplot2::scale_color_manual(values = col) 
           } else {
             #subset plot, metacluster colors
+            if (length(color[[color_n]]) != nlevels(df_ss$Population)){
+              stop(paste0("For \"", title, "\", we expect ",  
+                          nlevels(df_ss$Population), " colors while only ",
+                          length(color[[color_n]]), " are given."))
+            }
             p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
                                          size = sizePoints) +
-              ggplot2::scale_color_manual(values=color[[color_n]])
-            # color_n <- color_n + 1
+              ggplot2::scale_color_manual(values = color[[color_n]])
           }
           
         }

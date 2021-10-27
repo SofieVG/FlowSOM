@@ -1,3 +1,12 @@
+CHANGES IN VERSION 2.1.33 (2021/10/27)
+--------------------------------------
+o Title of Plot2DScatters now gives all the (meta)clusters instead of just one
+o Added warning when wrong manual colors are used in Plot2DScatters
+o Added the ability to use markers and/or channels in Plot2DScatters
+o Added GetClusterPercentagesPositives and GetMetaclusterPercentagesPositives to
+  FlowSOM CheatSheet 
+o Edited text from GetFeatures on cheatsheet
+
 CHANGES IN VERSION 2.1.32 (2021/10/22)
 --------------------------------------
 o Add marker outliers in TestOUtliers function
