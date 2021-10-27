@@ -15,6 +15,7 @@ Plot2DScatters(
   sizePoints = 0.5,
   xLim = NULL,
   yLim = NULL,
+  xyLabels = c("marker"),
   density = TRUE,
   centers = TRUE,
   color = NULL,
@@ -45,6 +46,9 @@ one plot) with metaclusters of interest}
 
 \item{yLim}{A vector of a lower and upper limit of the y-axis}
 
+\item{xyLabels}{Determines the label of the x- and y-axis. Can be 
+"marker" and\\or "channel". Default = "marker".}
+
 \item{density}{Default is \code{TRUE} to color the (meta)cluster 
 points according to density. Set to \code{FALSE} to 
 use a plain color}
@@ -52,8 +56,9 @@ use a plain color}
 \item{centers}{Default is \code{TRUE} to show the cluster centers}
 
 \item{color}{Colors for all the cells in the selected nodes 
-(ordered list). If  \code{NULL} the default ggplot 
-colors, indexed by metacluster number are used.}
+(ordered list). First the clusters are colored, 
+then the metaclusters. If \code{NULL}, the default 
+ggplot colors, indexed by metacluster number, are used.}
 
 \item{plotFile}{If a filepath for a png is given (default = 
 2DScatterPlots.png), the plots will be plotted in 
