@@ -813,6 +813,7 @@ GetFeatures <- function(fsom,
     if ("percentages" %in% type){
       C_pctgs <- prop.table(C_counts, margin = 1)
       colnames(C_pctgs) <- paste0("%", colnames(C_pctgs))
+      attr(C_pctgs, "outliers") <- C_outliers
       matrices[["cluster_percentages"]] <- C_pctgs
     }
     if ("MFIs" %in% type){

@@ -2059,9 +2059,9 @@ gg_color_hue <- function(n) {
 #' @param channelpairs      List in which each element is a pair of channel
 #'                          or marker names
 #' @param clusters          Vector or list (to combine multiple clusters in one
-#'                          plot) with clusters of interest
+#'                          plot) with indices of clusters of interest
 #' @param metaclusters      Vector or list (to combine multiple metaclusters in 
-#'                          one plot) with metaclusters of interest
+#'                          one plot) with indices of metaclusters of interest
 #' @param maxBgPoints     Maximum number of background cells to plot
 #' @param sizeBgPoints    Size of the background cells
 #' @param maxPoints        Maximum number of (meta)cluster cells to plot

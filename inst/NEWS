@@ -1,3 +1,10 @@
+CHANGES IN VERSION 2.1.34 (2021/12/14)
+--------------------------------------
+o Happy Holidays!
+o Edited documentation of Plot2DScatters ("indices of clusters/metaclusters")
+o Outlier counts are also returned as attributes when extracting percentages
+  with GetFeatures
+
 CHANGES IN VERSION 2.1.33 (2021/10/27)
 --------------------------------------
 o Title of Plot2DScatters now gives all the (meta)clusters instead of just one

@@ -29,10 +29,10 @@ Plot2DScatters(
 or marker names}
 
 \item{clusters}{Vector or list (to combine multiple clusters in one
-plot) with clusters of interest}
+plot) with indices of clusters of interest}
 
 \item{metaclusters}{Vector or list (to combine multiple metaclusters in 
-one plot) with metaclusters of interest}
+one plot) with indices of metaclusters of interest}
 
 \item{maxBgPoints}{Maximum number of background cells to plot}
 
