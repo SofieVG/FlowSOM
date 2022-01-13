@@ -77,9 +77,12 @@ UpdateDerivedValues <- function(fsom){
   
   fsom$map$cvValues <-
     t(sapply(seq_len(fsom$map$nNodes), function(i) {
-      apply(subset(fsom$data, fsom$map$mapping[, 1] == i),
-            2,
-            function(y){
+      clusterSubset <- subset(fsom$data, fsom$map$mapping[, 1] == i)
+      sapply(colnames(clusterSubset), function(colY){
+        y <- clusterSubset[, colY]
+              if (any(is.na(y))) {
+                stop(paste0("NA value found in cluster ", i, " channel ", 
+                            colY, "."))}
               if(length(y) > 0 && mean(y) != 0){
                 stats::sd(y)/mean(y)
               } else {
