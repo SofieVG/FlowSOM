@@ -1,3 +1,10 @@
+CHANGES IN VERSION 2.1.36 (2022/01/13)
+--------------------------------------
+o Added a warning when using "backgroundColor" instead of "backgroundColors"
+  in PlotStars
+o Clusters centers in Plot2DScatters is now colored the same as the cluster 
+  cells when using manual colors
+
 CHANGES IN VERSION 2.1.35 (2022/01/13)
 --------------------------------------
 o Added a warning in UpdateDerivedValue when using FlowSOM on an FCS with NA value

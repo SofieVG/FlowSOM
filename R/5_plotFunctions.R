@@ -102,6 +102,12 @@ PlotFlowSOM <- function(fsom,
                 length(backgroundValues), " backgroundValues)."))
   }
   
+  if (deparse(substitute(backgroundColors)) == "backgroundColor"){
+    warning(paste0("In the new FlowSOM version \"backgroundColors\"",
+                   " is used instead of \"backgroundColor\""))
+  }
+    
+  
   #---- Layout----
   layout <- ParseLayout(fsom, view)
   if(is.matrix(view) || is.data.frame(view)) view <- "matrix"
@@ -221,8 +227,12 @@ PlotStars <- function(fsom,
                       ...){
   fsom <- UpdateFlowSOM(fsom)
   
-  channels <- GetChannels(fsom, markers)
+  if (length(names(list(...))) > 0 && "backgroundColor" %in% names(list(...))){
+    warning(paste0("\"backgroundColor\" is deprecated, ",
+                       "please use \"backgroundColors\" instead."))
+  }
   
+  channels <- GetChannels(fsom, markers)
   p <- PlotFlowSOM(fsom = fsom, 
                    ...)
   
@@ -1598,7 +1608,6 @@ AddBackground <- function(p,
   if(is.character(backgroundValues)) {
     backgroundValues <- factor(backgroundValues)
   }
-  
   p <- AddScale(p,
                 backgroundValues,
                 backgroundColors,
@@ -2128,20 +2137,20 @@ gg_color_hue <- function(n) {
 #' @export
 #' 
 Plot2DScatters <- function(fsom, 
-                           channelpairs, 
-                           clusters = NULL, 
-                           metaclusters = NULL, 
-                           maxBgPoints = 3000, 
-                           sizeBgPoints = 0.5,
-                           maxPoints = 1000, 
-                           sizePoints = 0.5,
-                           xLim = NULL,
-                           yLim = NULL,
-                           xyLabels = c("marker"),
-                           density = TRUE, 
-                           centers = TRUE, 
-                           color = NULL,
-                           plotFile = "2DScatterPlots.png"){
+                            channelpairs, 
+                            clusters = NULL, 
+                            metaclusters = NULL, 
+                            maxBgPoints = 3000, 
+                            sizeBgPoints = 0.5,
+                            maxPoints = 1000, 
+                            sizePoints = 0.5,
+                            xLim = NULL,
+                            yLim = NULL,
+                            xyLabels = c("marker"),
+                            density = TRUE, 
+                            centers = TRUE, 
+                            color = NULL,
+                            plotFile = "2DScatterPlots.png"){
   if(!is.null(fsom$metaclustering)){
     metacluster <- as.numeric(fsom$metaclustering)
     nMetaclusters <- NMetaclusters(fsom)
@@ -2178,8 +2187,7 @@ Plot2DScatters <- function(fsom,
         channelpair <- GetChannels(fsom, channelpair)
         #----background dataframe----
         df_bg <- data.frame(fsom$data[i, c(channelpair[1], channelpair[2])]) 
-        colnames(df_bg) <- c("m1", "m2")
-        
+
         #----(meta)cluster dataframe----
         if(group == "Cluster") {
           # dataframe with cluster's points
@@ -2190,7 +2198,8 @@ Plot2DScatters <- function(fsom,
           # dataframe with centers
           df_c <- data.frame(medianValues[n, 
                                           c(channelpair[1], channelpair[2]),
-                                          drop = FALSE])
+                                          drop = FALSE],
+                             "Population" = factor(n, levels = n))
           col <- gg_color_hue(nMetaclusters)[metacluster[n]]
         } else {
           df_ss <- data.frame(fsom$data[which(metacluster[cellCluster] %in% n), 
@@ -2199,24 +2208,30 @@ Plot2DScatters <- function(fsom,
                               "Population" =
                                 metacluster[cellCluster[ 
                                   which(metacluster[cellCluster] %in% n)]])
-          df_c <- data.frame(medianValues[which(metacluster
-                                                [1:nrow(medianValues)] %in% n), 
-                                          c(channelpair[1], channelpair[2]),
-                                          drop = FALSE])
+          df_c_Population <- metacluster[
+            which(metacluster[1:nrow(medianValues)] %in% n),
+            drop = FALSE]
+          
+          df_c <- data.frame(
+            medianValues[which(metacluster[1:nrow(medianValues)] %in% n), 
+                         c(channelpair[1], channelpair[2]),
+                         drop = FALSE],
+            "Population" = factor(df_c_Population, 
+                                  levels = unique(df_c_Population)))
           col <- gg_color_hue(nMetaclusters)[n]
         }
         df_ss <- data.frame(df_ss[sample(nrow(df_ss), 
                                          min(nrow(df_ss), maxPoints)), ])
         df_ss$Population <- factor(df_ss$Population, levels = subset)
-        colnames(df_ss)[1:2] <- c("m1", "m2")
-        colnames(df_c) <- c("m1", "m2")
-        
+        colnames(df_c) <- c("m1", "m2", "Population")
+        colnames(df_ss)[1:2] <- colnames(df_bg) <- c("m1", "m2")
+
         #----ggplots----
         cl_or_mcl <- paste0(group, ifelse(length(subset) > 1, "s", ""), ": ")
         subset_names <- ifelse(group == "Cluster", 
-               paste0(subset, collapse = ", "),
-               paste0(levels(fsom$metaclustering)[unlist(subset)],
-                      collapse = ", "))
+                               paste0(subset, collapse = ", "),
+                               paste0(levels(fsom$metaclustering)[unlist(subset)],
+                                      collapse = ", "))
         title <- paste0(cl_or_mcl, subset_names)
         
         if ("marker" %in% xyLabels && length(xyLabels) == 1) {
@@ -2269,11 +2284,22 @@ Plot2DScatters <- function(fsom,
         
         #----add cluster centers----
         if (centers) { 
+          if (!density){
+            if (!is.null(color)){
+              col_c <- color[[color_n]]
+            } else {
+              col_c <- col
+            }
+          } else {
+            col_c <- rep("white", nrow(df_c))
+          }
           p <- p + ggplot2::geom_point(data = df_c, 
                                        shape = 21, 
-                                       fill = "white", 
+                                       ggplot2::aes(fill = Population), 
                                        color = "black", 
-                                       size = 3)
+                                       size = 3,
+                                       stroke = 1) +
+            ggplot2::scale_fill_manual(values = col_c)
         }
         plots_list[[length(plots_list) + 1]] <- p
       }
@@ -2291,7 +2317,7 @@ Plot2DScatters <- function(fsom,
   } else {
     return(plots_list)
   }
-} 
+}
 
 #' FlowSOMmary 
 #' 
