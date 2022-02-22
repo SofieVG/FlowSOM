@@ -6,6 +6,7 @@
 \usage{
 PlotFileScatters(
   input,
+  fileID = "File",
   channels = NULL,
   yMargin = NULL,
   yLabel = c("marker"),
@@ -24,9 +25,13 @@ PlotFileScatters(
 )
 }
 \arguments{
-\item{input}{Either a flowSet, a flowFrame (output from the 
-\code{\link{AggregateFlowFrames}} function) or a 
-vector of paths pointing to FCS files}
+\item{input}{Either a flowSet, a flowFrame with a file ID column (e.g. 
+output from the \code{\link{AggregateFlowFrames}} includes
+a "File" column) or a vector of paths pointing to FCS files}
+
+\item{fileID}{Name of the file ID column when the input is a flowFrame, 
+default to "File" (File ID column in the 
+\code{\link{AggregateFlowFrames}} flowFrame output).}
 
 \item{channels}{Vector of channels or markers that need to be plotted, 
 if NULL (default), all channels from the input will be 

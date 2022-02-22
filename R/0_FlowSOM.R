@@ -334,9 +334,12 @@ AggregateFlowFrames <- function(fileNames,
 #' 
 #' Make a scatter plot per channel for all provided files
 #'
-#' @param  input      Either a flowSet, a flowFrame (output from the 
-#'                    \code{\link{AggregateFlowFrames}} function) or a 
-#'                    vector of paths pointing to FCS files
+#' @param  input      Either a flowSet, a flowFrame with a file ID column (e.g. 
+#'                    output from the \code{\link{AggregateFlowFrames}} includes
+#'                    a "File" column) or a vector of paths pointing to FCS files
+#' @param  fileID     Name of the file ID column when the input is a flowFrame, 
+#'                    default to "File" (File ID column in the 
+#'                    \code{\link{AggregateFlowFrames}} flowFrame output).
 #' @param  channels   Vector of channels or markers that need to be plotted, 
 #'                    if NULL (default), all channels from the input will be 
 #'                    plotted
@@ -403,6 +406,7 @@ AggregateFlowFrames <- function(fileNames,
 #'  
 #' @export 
 PlotFileScatters <- function(input, 
+                             fileID = "File",
                              channels = NULL, 
                              yMargin = NULL, 
                              yLabel = c("marker"),
@@ -445,8 +449,8 @@ PlotFileScatters <- function(input,
   } else if (is(input, "flowFrame")) {
     ff <- input
     data <- flowCore::exprs(ff)
-    data <- data[,c(channels, "File")]
-    file_values <- data[, "File"]
+    data <- data[,c(channels, fileID)]
+    file_values <- data[, fileID]
     input <- unique(file_values)
   } else {
     channels <- GetChannels(read.FCS(input[1]), channels)
@@ -455,7 +459,7 @@ PlotFileScatters <- function(input,
                               channels = channels,
                               silent = silent)
     data <- ff@exprs
-    file_values <- data[, "File"]
+    file_values <- data[, fileID]
   }
   
   subset <- sample(seq_len(nrow(data)), min(maxPoints, nrow(data)))
@@ -466,8 +470,8 @@ PlotFileScatters <- function(input,
   }
   file_values <- file_values[subset]
   channels <- colnames(data)
-  if ("File" %in% channels){
-    channels <- channels[-grep("File", channels)]
+  if (fileID %in% channels){
+    channels <- channels[-grep(fileID, channels)]
   }
   
   #----Additional warnings---

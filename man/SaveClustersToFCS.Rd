@@ -11,7 +11,8 @@ SaveClustersToFCS(
   selectionColumn = NULL,
   silent = FALSE,
   outputDir = ".",
-  suffix = "_FlowSOM.fcs"
+  suffix = "_FlowSOM.fcs",
+  ...
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ ids. If NULL (default), no selection is made.}
 current working directory (".")}
 
 \item{suffix}{Suffix added to the filename. Default _FlowSOM.fcs}
+
+\item{...}{Options to pass on to the read.FCS function (e.g.
+truncate_max_range)}
 }
 \value{
 Saves the extended FCS file as [originalName]_FlowSOM.fcs

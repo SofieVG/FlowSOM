@@ -380,6 +380,8 @@ Dist.MST <- function(X){
 #' @param  outputDir         Directory to save the FCS files. Default to the
 #'                           current working directory (".")
 #' @param  suffix            Suffix added to the filename. Default _FlowSOM.fcs
+#' @param ...                Options to pass on to the read.FCS function (e.g.
+#'                           truncate_max_range)
 #'
 #' @return Saves the extended FCS file as [originalName]_FlowSOM.fcs
 #'
@@ -397,7 +399,8 @@ SaveClustersToFCS <- function(fsom,
                               selectionColumn = NULL, 
                               silent = FALSE,
                               outputDir = ".",
-                              suffix = "_FlowSOM.fcs"){
+                              suffix = "_FlowSOM.fcs",
+                              ...){
   if (length(preprocessedFiles) != 0 & length(preprocessedFiles)!= length(originalFiles)){ 
     stop("The vector of preprocessedFiles should be the same length as ",
          "the originalFiles when provided.")
@@ -406,9 +409,9 @@ SaveClustersToFCS <- function(fsom,
   for(i in seq_along(originalFiles)){
     if(!silent){message("Mapping ", originalFiles[i])}
     
-    ff_o <- flowCore::read.FCS(originalFiles[i])
+    ff_o <- flowCore::read.FCS(originalFiles[i], ...)
     if(!is.null(preprocessedFiles)){
-      ff <- flowCore::read.FCS(preprocessedFiles[i])
+      ff <- flowCore::read.FCS(preprocessedFiles[i], ...)
     } else {
       ff <- ff_o
     }
