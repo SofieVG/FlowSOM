@@ -1,3 +1,8 @@
+CHANGES IN VERSION 2.1.38 (2022/02/24)
+--------------------------------------
+o Added possibility to provide a seed when using metaClustering_hclust,
+  metaClustering_kmeans or metaClustering_som
+
 CHANGES IN VERSION 2.1.37 (2022/02/22)
 --------------------------------------
 o Added possibility to provide additional arguments to the read.FCS function in 

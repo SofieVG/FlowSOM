@@ -134,7 +134,7 @@ metaClustering_consensus <- function(data, k = 7, seed = NULL){
   results[[k]]$consensusClass
 }
 
-consensus <- function(data, max, seed = NULL, ...){
+consensus <- function(data, max, seed = NULL){
   results <- suppressMessages(ConsensusClusterPlus::ConsensusClusterPlus(
     t(data),
     maxK = max, reps = 100, pItem = 0.9, pFeature = 1,
@@ -146,18 +146,21 @@ consensus <- function(data, max, seed = NULL, ...){
   ))
 }
 
-metaClustering_hclust <- function(data, k = 7){
+metaClustering_hclust <- function(data, k = 7, seed = NULL){
+  set.seed(seed)
   d <- stats::dist(data, method = "minkowski")
   fit <- stats::hclust(d, method = "ward.D2")
   stats::cutree(fit, k = k)
 }
 
-metaClustering_kmeans <- function(data, k = 7){
+metaClustering_kmeans <- function(data, k = 7, seed = NULL){
+  set.seed(seed)
   stats::kmeans(data, centers = k)$cluster
 }
 
-metaClustering_som <- function(data, k = 7){
-  s <- SOM(data,xdim = k,ydim = 1,rlen = 100)
+metaClustering_som <- function(data, k = 7, seed = NULL){
+  set.seed(seed)
+  s <- SOM(data, xdim = k, ydim = 1, rlen = 100)
   s$unit.classif
 }
 
