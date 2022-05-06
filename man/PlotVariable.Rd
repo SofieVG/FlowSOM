@@ -47,6 +47,11 @@ rand <- runif(flowSOM.res$map$nNodes)
 PlotVariable(flowSOM.res, 
              variable = rand,
              variableName = "Random")
+             
+PlotVariable(flowSOM.res, 
+             variable = flowSOM.res$metaclustering,
+             variableName = "Metaclustering") \%>\% 
+  AddLabels(labels = flowSOM.res$metaclustering)             
    
 }
 \seealso{

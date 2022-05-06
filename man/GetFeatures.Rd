@@ -22,11 +22,12 @@ or the BuildSOM function}
 \item{files}{Either a vector of FCS files or paths to FCS files}
 
 \item{level}{Level(s) of interest. Default is c("clusters",
-"metaclusters"), but can also be only one of them}
+"metaclusters"), but can also be only one of them. 
+Can be abbreviated.}
 
 \item{type}{Type of features to extract. Default is "counts", 
 can be a vector of "counts", "percentages", "MFIs"
-and/or "percentages_positive"}
+and/or "percentages_positive" or abbreviations.}
 
 \item{MFI}{Vector with channels / markers for which the MFI 
 values must be returned when "MFIs" is in \code{type}}

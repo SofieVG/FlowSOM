@@ -308,8 +308,8 @@ PlotOverview2D <- function(fsom,
   graphics::layout(matrix(seq_len(length(markerlist) * length(metaclusters)), 
                           nrow = length(metaclusters)))
   if(is.null(colors)){
-    colors <- RColorBrewer::brewer.pal(12,
-                                       "Paired")
+    colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", 
+                "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928")
     colors <- rep(colors, length.out = length(metaclusters))
     names(colors) <- as.character(metaclusters)
   }
@@ -548,7 +548,7 @@ PlotGroups <- function(fsom,
 CountGroups <- function (fsom, groups, plot = TRUE, silent = FALSE) 
 {
   .Deprecated("GetFeatures and Groupstats")
-  if (class(groups[[1]]) == "character") {
+  if (is(groups[[1]], "character")) {
     files <- unlist(groups)
     counts <- matrix(0, nrow = length(files), ncol = fsom$map$nNodes, 
                      dimnames = list(files, as.character(1:fsom$map$nNodes)))
@@ -763,6 +763,10 @@ PlotNode <- function(fsom, id,
 #'                   clusters = list(seq_len(NClusters(flowSOM.res))),
 #'                   maxPoints = 0,
 #'                   plotFile = NULL)
+#'                   
+#' @importFrom igraph get.edges E
+#' @importFrom stats dist
+#' @importFrom graphics lines
 #'
 #' @export
 PlotCenters <- function(fsom, marker1, marker2, MST=TRUE){
@@ -773,7 +777,7 @@ PlotCenters <- function(fsom, marker1, marker2, MST=TRUE){
   
   if(MST==1){
     g <- fsom$MST$graph
-    e <- get.edges(g, E(g))
+    e <- igraph::get.edges(g, E(g))
   } else {
     e <- which(as.matrix(
       stats::dist(fsom$map$grid,method = "manhattan"))==1,

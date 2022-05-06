@@ -35,7 +35,7 @@ which assigns one label to each cell. If only one file is given, only one
 list is returned instead of a list of lists.
 }
 \description{
-Reads a FlowJo workspace file using the \code{\link{flowWorkspace}} library 
+Reads a FlowJo workspace file using the flowWorkspace library 
 and returns a list with a matrix containing gating results and a vector with 
 a label for each cell from a set of specified gates
 }

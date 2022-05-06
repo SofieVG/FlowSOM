@@ -42,12 +42,13 @@ one plot) with indices of metaclusters of interest}
 
 \item{sizePoints}{Size of the (meta)cluster cells}
 
-\item{xLim}{A vector of a lower and upper limit of the x-axis}
+\item{xLim}{Optional vector of a lower and upper limit of the x-axis}
 
-\item{yLim}{A vector of a lower and upper limit of the y-axis}
+\item{yLim}{Optional vector of a lower and upper limit of the y-axis}
 
 \item{xyLabels}{Determines the label of the x- and y-axis. Can be 
-"marker" and\\or "channel". Default = "marker".}
+"marker" and\\or "channel" or abbrevations.
+ Default = "marker".}
 
 \item{density}{Default is \code{TRUE} to color the (meta)cluster 
 points according to density. Set to \code{FALSE} to 

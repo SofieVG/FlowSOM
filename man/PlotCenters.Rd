@@ -39,7 +39,7 @@ Plot FlowSOM nodes on a 2D scatter plot of the data
                   clusters = list(seq_len(NClusters(flowSOM.res))),
                   maxPoints = 0,
                   plotFile = NULL)
-
+                  
 }
 \seealso{
 \code{\link{PlotStars}},\code{\link{PlotPies}},

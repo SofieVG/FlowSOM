@@ -45,7 +45,14 @@ flowSOM.res <- FlowSOM(fileName, compensate = TRUE, transform = TRUE,
                        scale = TRUE, colsToUse = c(9, 12, 14:18))
 
 # Plot stars indicating the MFI of the cells present in the nodes
-PlotStars(flowSOM.res)
+PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+
+newLayout <- igraph::layout_with_fr(flowSOM.res[["MST"]][["graph"]])
+PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering, 
+          view = newLayout)
+          
+PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering, 
+          view = "grid")
 
 }
 \seealso{

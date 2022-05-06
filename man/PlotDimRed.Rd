@@ -25,8 +25,8 @@ PlotDimRed(
 Default = fsom$map$colsUsed.}
 
 \item{colorBy}{Defines how the dimensionality reduction will be 
-colored. Can be "metaclusters" (default), "clusters"
-or a marker/channel/index.}
+colored. Can be "metaclusters" (default), "clusters" 
+(or abbreviations) or a marker/channel/index.}
 
 \item{cTotal}{The total amount of cells to be used in the 
 dimensionality reduction. Default is all the cells.}

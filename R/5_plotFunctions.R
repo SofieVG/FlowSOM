@@ -54,19 +54,9 @@
 #'                        
 #' # Plot with background coloring
 #' PlotFlowSOM(flowSOM.res,
-#'             backgroundValues = flowSOM.res$metaclustering)
+#'             backgroundValues = flowSOM.res$metaclustering) %>% 
+#'             AddLabels(seq(100))
 #'
-#' # Own layout
-#' mfis <- GetClusterMFIs(flowSOM.res)[,GetChannels(flowSOM.res, c("CD3", "CD4"))]
-#' PlotFlowSOM(flowSOM.res,
-#'             view = mfis,
-#'             maxNodeSize = 0.1,
-#'             backgroundValues = flowSOM.res$metaclustering)
-#'             
-#' # Adapted node sizes
-#' PlotFlowSOM(flowSOM.res,
-#'               nodeSizes = 1:100,
-#'               view = "grid")
 #' 
 #' @importFrom ggplot2 ggplot coord_fixed theme_void ggtitle
 #' 
@@ -214,7 +204,14 @@ FlowSOM_colors <- function(n){
 #'                        scale = TRUE, colsToUse = c(9, 12, 14:18))
 #' 
 #' # Plot stars indicating the MFI of the cells present in the nodes
-#' PlotStars(flowSOM.res)
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering)
+#' 
+#' newLayout <- igraph::layout_with_fr(flowSOM.res[["MST"]][["graph"]])
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering, 
+#'           view = newLayout)
+#'           
+#' PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering, 
+#'           view = "grid")
 #' 
 #' @importFrom ggpubr get_legend ggarrange
 #' @importFrom ggforce geom_circle
@@ -293,19 +290,18 @@ PlotStars <- function(fsom,
 #' @examples 
 #' # Identify the files
 #' fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
-#' wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
+#' gating_file <- system.file("extdata", "gatingResult.csv", package = "FlowSOM")
 #' 
 #' # Specify the cell types of interest for assigning one label per cell
 #' cellTypes <- c("B cells",
-#'                 "gd T cells", "CD4 T cells", "CD8 T cells",
-#'                 "NK cells", "NK T cells")
+#'                "gd T cells", "CD4 T cells", "CD8 T cells",
+#'                "NK cells", "NK T cells")
+#'                 
+#' # Load manual labels (e.g. GetFlowJoLabels can be used to extract labels from
+#' # an fcs file)
+#'  
+#' gatingResult <- as.factor(read.csv(gating_file, header = FALSE)[, 1])
 #'
-#' # Parse the FlowJo workspace     
-#' gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
-#'                                 cellTypes = cellTypes)
-#'
-#' # Check the number of cells assigned to each gate
-#' colSums(gatingResult$matrix)
 #' 
 #' # Build a FlowSOM tree
 #' flowSOM.res <- FlowSOM(fcs_file,
@@ -319,7 +315,7 @@ PlotStars <- function(fsom,
 #'    
 #'  # Plot pies indicating the percentage of cell types present in the nodes
 #'  PlotPies(flowSOM.res,
-#'           gatingResult$manual,
+#'           gatingResult,
 #'           backgroundValues = flowSOM.res$metaclustering)
 #'           
 #' @importFrom grDevices colorRampPalette
@@ -428,7 +424,7 @@ PlotLabels <- function(fsom,
 #'
 #' @param fsom        FlowSOM object
 #' @param level       Character string, should be either "clusters" or 
-#'                    "metaclusters"
+#'                    "metaclusters". Can be abbreviated.
 #' @param maxNodeSize Determines the maximum node size. Default is 0. 
 #'                    See \code{\link{PlotFlowSOM}} for more options.
 #' @param ...         Additional arguments to pass to \code{\link{PlotLabels}} 
@@ -471,20 +467,25 @@ PlotNumbers <- function(fsom,
                         level = "clusters",
                         maxNodeSize = 0,
                         ...){
-  if (level == "clusters"){
-    numbers <- seq_len(NClusters(fsom))
-  } else if (level == "metaclusters") {
-    numbers <- fsom$metaclustering
-  } else {
+  level <- pmatch(level, c("clusters", "metaclusters"))
+  if (any(is.na(level)) | length(level) > 2){
     stop("level should be \"clusters\" or \"metaclusters\"")
+  } else {
+    level <- c("clusters", "metaclusters")[level]
+    if (level == "clusters"){
+      numbers <- seq_len(NClusters(fsom))
+    } else if (level == "metaclusters") {
+      numbers <- fsom$metaclustering
+    }
   }
+  
   p <- PlotLabels(fsom =  fsom,
                   labels = numbers, 
                   maxNodeSize = maxNodeSize,
                   ...)
   return(p)
 }
-
+  
 #' PlotMarker 
 #' 
 #' Plot comparison with other clustering
@@ -622,6 +623,11 @@ PlotMarker <- function(fsom,
 #' PlotVariable(flowSOM.res, 
 #'              variable = rand,
 #'              variableName = "Random")
+#'              
+#' PlotVariable(flowSOM.res, 
+#'              variable = flowSOM.res$metaclustering,
+#'              variableName = "Metaclustering") %>% 
+#'   AddLabels(labels = flowSOM.res$metaclustering)             
 #'    
 #' @export
 PlotVariable <- function(fsom,
@@ -659,8 +665,8 @@ PlotVariable <- function(fsom,
 #' @param colsToUse       The columns used for the dimensionality reduction. 
 #'                        Default = fsom$map$colsUsed.
 #' @param colorBy         Defines how the dimensionality reduction will be 
-#'                        colored. Can be "metaclusters" (default), "clusters"
-#'                        or a marker/channel/index.
+#'                        colored. Can be "metaclusters" (default), "clusters" 
+#'                        (or abbreviations) or a marker/channel/index.
 #' @param cTotal          The total amount of cells to be used in the 
 #'                        dimensionality reduction. Default is all the cells.
 #' @param dimred          A dimensionality reduction function. 
@@ -694,7 +700,6 @@ PlotVariable <- function(fsom,
 #'    
 #' @import     ggplot2
 #' @importFrom Rtsne Rtsne
-#' @importFrom scattermore geom_scattermore
 #' @importFrom tidyr pivot_longer
 #'        
 #' @export
@@ -710,19 +715,34 @@ PlotDimRed <- function(fsom,
                        title = NULL,
                        ...){
   dimred_data <- fsom$data
-  if (length(colorBy) == 1 && colorBy == "metaclusters") {
-    if (is.null(fsom$metaclustering)) stop("No metaclustering present")
-    dimred_col <- as.data.frame(GetMetaclusters(fsom))
-  } else if (length(colorBy) == 1 && colorBy == "clusters") {
-    dimred_col <- as.data.frame(as.factor(GetClusters(fsom)))
-  } else if (all(colorBy %in% colnames(dimred_data)) ||
-             all(colorBy %in% GetMarkers(fsom, colnames(dimred_data))) ||
-             all(colorBy %in% seq_len(ncol(dimred_data)))){
-    dimred_col <- fsom$data[, GetChannels(fsom, colorBy), drop = FALSE]
-    colnames(dimred_col) <- GetMarkers(fsom, colnames(dimred_col))
-    colorBy <- "marker"
-  } else stop(paste0("colorBy should be \"metaclusters\", \"clusters\" or a ",
-                     "vector of channels, markers or indices"))
+  colorBy_pmatch <- pmatch(colorBy, c("metaclusters", "clusters"))
+  
+  if (any(is.na(colorBy_pmatch))){
+    if (all(colorBy %in% colnames(dimred_data)) ||
+        all(colorBy %in% GetMarkers(fsom, colnames(dimred_data))) ||
+        all(colorBy %in% seq_len(ncol(dimred_data)))){
+      dimred_col <- fsom$data[, GetChannels(fsom, colorBy), drop = FALSE]
+      colnames(dimred_col) <- GetMarkers(fsom, colnames(dimred_col))
+      colorBy <- "marker"
+    } else {
+      stop(paste0("\"colorBy\" should be \"metaclusters\", \"clusters\" or a ",
+                  "vector of channels, markers or indices"))
+    }
+  } else {
+    if (length(colorBy) > 1){
+      stop(paste0("\"colorBy\" should be \"metaclusters\", \"clusters\" or a ",
+                  "vector of channels, markers or indices"))
+    } 
+    
+    colorBy <- c("metaclusters", "clusters")[colorBy_pmatch]
+    if (length(colorBy) == 1 && colorBy == "metaclusters") {
+      if (is.null(fsom$metaclustering)) stop("No metaclustering present")
+      dimred_col <- as.data.frame(GetMetaclusters(fsom))
+    } else if (length(colorBy) == 1 && colorBy == "clusters") {
+      dimred_col <- as.data.frame(as.factor(GetClusters(fsom)))
+    }
+  }
+   
   if (!is.null(colsToUse)) dimred_data <- dimred_data[, GetChannels(fsom, 
                                                                     colsToUse)]
   if (!is.null(seed)) set.seed(seed)
@@ -757,14 +777,14 @@ PlotDimRed <- function(fsom,
     dimred_plot <- dimred_plot %>% tidyr::pivot_longer(3:ncol(dimred_plot), 
                                                        names_to = "markers")
     p <- ggplot2::ggplot(dimred_plot) + 
-      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
-                                                 y = .data$dimred_2, 
-                                                 col = .data$value), 
-                                    pointsize = 1) +
+      ggplot2::geom_hex(ggplot2::aes(x = .data$dimred_1, 
+                                     y = .data$dimred_2, 
+                                     weight = .data$value), 
+                                    bins = 200, size = 2) +
       ggplot2::facet_wrap(~markers) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
-      ggplot2::scale_color_gradientn(colors = FlowSOM_colors(9))
+      ggplot2::scale_fill_gradientn(colors = FlowSOM_colors(9))
   } else {
     colnames(dimred_plot) <- c("dimred_1", "dimred_2", "colors")
     
@@ -772,23 +792,37 @@ PlotDimRed <- function(fsom,
     median_y <- tapply(dimred_plot[,"dimred_2"], dimred_plot[,"colors"], median)
     
     p <- ggplot2::ggplot(dimred_plot) +
-      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
-                                                 y = .data$dimred_2, 
-                                                 col = .data$colors), 
-                                    pointsize = 1) +
+      ggplot2::geom_hex(ggplot2::aes(x = .data$dimred_1, 
+                                     y = .data$dimred_2, 
+                                     fill = .data$colors), 
+                        size = 2, bins = 200) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() 
     if (label){
-      p <- p + ggrepel::geom_label_repel(aes(x = .data$x, 
-                                             y = .data$y, 
-                                             label = .data$label, 
-                                             color = .data$label),
-                                         data = data.frame(x = median_x,
-                                                           y = median_y,
-                                                           label = names(median_x)),
-                                         segment.color = "gray", force = 20, 
-                                         segment.size = 0.2, point.padding = 0.5)+
-        labs(col = colorBy)
+      if (requireNamespace("ggrepel", quietly = TRUE)) {
+        p <- p + ggrepel::geom_label_repel(ggplot2::aes(x = .data$x, 
+                                               y = .data$y, 
+                                               label = .data$label, 
+                                               color = .data$label),
+                                           data = data.frame(x = median_x,
+                                                             y = median_y,
+                                                             label = names(median_x)),
+                                           segment.color = "gray", force = 20, 
+                                           segment.size = 0.2, point.padding = 0.5) +
+          labs(col = colorBy)
+        
+      } else {
+        message("For better labels, please install \"ggrepel\"")
+        p <- p + ggplot2::geom_label(ggplot2::aes(x = .data$x, 
+                                        y = .data$y, 
+                                        label = .data$label, 
+                                        color = .data$label),
+                                    data = data.frame(x = median_x,
+                                                      y = median_y,
+                                                      label = names(median_x))) +
+          labs(col = colorBy)
+      }
+      
     }
   }
   if (!is.null(title)) p <- p + ggplot2::ggtitle(title)
@@ -800,6 +834,497 @@ PlotDimRed <- function(fsom,
   } else return(p)
 }
 
+#' PlotManualBars 
+#' 
+#' Function to plot the manual labels per FlowSOM (meta)cluster in a barplot
+#' 
+#' @param fsom          FlowSOM object, as generated by \code{\link{FlowSOM}} or 
+#'                      by \code{\link{NewData}}. The clusters and metaclusters 
+#'                      will be plotted in the order of the factor levels.
+#' @param fcs           FCS file that should be mapped on the FlowSOM object.
+#'                      Default is NULL. 
+#' @param manualVector Vector with cell labels, e.g. obtained by manual gating
+#' @param manualOrder  Optional vector with unique cell labels to fix in which
+#'                      order the cell labels should be shown
+#' @param colors        Optional color vector, should have the same length as
+#'                      the number of unique cell labels 
+#' @param list_insteadof_plots If \code{FALSE} (default), it returns multiple 
+#'                             plots. If \code{TRUE}, it returns a list of 
+#'                             ggplot objects
+#'                          
+#' @return Either a plot or a ggplot objects list is returned.
+#' 
+#' @examples 
+#' # Identify the files
+#' fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
+#' gating_file <- system.file("extdata", "gatingResult.csv", package = "FlowSOM")
+#' 
+#' # Specify the cell types of interest for assigning one label per cell
+#' cellTypes <- c("B cells",
+#'                 "gd T cells", "CD4 T cells", "CD8 T cells",
+#'                 "NK cells", "NK T cells")
+#'                 
+#' # Load manual labels (e.g. GetFlowJoLabels can be used to extract labels from
+#' # an fcs file)
+#'  
+#' gatingResult <- as.factor(read.csv(gating_file, header = FALSE)[, 1])
+#' 
+#' # Build a FlowSOM object
+#' flowSOM.res <- FlowSOM(fcs_file,
+#'                        scale = TRUE,
+#'                        compensate = TRUE, 
+#'                        transform = TRUE,
+#'                        toTransform = 8:18, 
+#'                        colsToUse = c(9, 12, 14:18),
+#'                        nClus = 10,
+#'                        seed = 1)
+#' 
+#' # Make the barplot of the manual labels
+#' pdf("PlotManualBars.pdf")
+#' PlotManualBars(fsom = flowSOM.res,
+#'                fcs = fcs_file,
+#'                manualVector = gatingResult,
+#'                manualOrder = c(cellTypes, "Unlabeled"),
+#'                colors = c("#F8766D", "#B79F00", "#00BA38", "#00BFC4", 
+#'                           "#619CFF", "#F564E3", "#D3D3D3"))
+#' dev.off()
+#' 
+#' @import     ggplot2
+#' 
+#' @export
+#' 
+PlotManualBars <- function(fsom, fcs = NULL, 
+                           manualVector, manualOrder = NULL, 
+                           colors = NULL, list_insteadof_plots = FALSE){
+  #----Warnings----
+  if (!is.null(manualOrder) & 
+      !length(manualOrder) == length(unique(manualVector))){
+    stop(paste0("Length of the manualOrder vector (", length(manualOrder), 
+                ") should have the same length as the number of unique labels",
+                "in manualVector (", length(unique(manualVector)), ")."))
+  } 
+  if (!is.null(colors) & !length(colors) >= length(unique(manualVector))){
+    stop(paste0("Length of the colors vector (", length(colors),") should have",
+                "at least the same length as the number of unique labels in ",
+                "manualVector (", length(unique(manualVector)), ")."))
+  } 
+  
+  #----Map FCS on fsom----
+  C_counts <- matrix(0,
+                     nrow = 1,
+                     ncol = fsom$map$nNodes,
+                     dimnames = 
+                       list("fcs",
+                            paste0("C", seq_len(fsom$map$nNodes))))
+  if (!is.null(fcs)){
+    fsom_tmp <- NewData(fsom, fcs)
+  } else {
+    fsom_tmp <- fsom
+  }
+  
+  cluster_table <- table(GetClusters(fsom_tmp))
+  
+  C_counts["fcs", paste0("C", names(cluster_table))] <- cluster_table
+  C_perc <- 100 * prop.table(C_counts, margin = 1)
+  MC_counts <- t(apply(C_counts,
+                       1,
+                       function(x){
+                         tapply(x, fsom$metaclustering, sum)
+                       }))
+  colnames(MC_counts) <- paste0("MC", colnames(MC_counts))
+  MC_perc <- 100 * prop.table(MC_counts, margin  = 1)
+  
+  df <- data.frame("Manual" = manualVector, 
+                   "MC" = GetMetaclusters(fsom_tmp),
+                   "C" = GetClusters(fsom_tmp), 
+                   stringsAsFactors = FALSE)
+  if(is.null(manualOrder)) {
+    manualOrder <- unique(manualVector)
+  }
+  
+  #----Relative barplots MC----
+  df_s <- data.frame(table(df[, 1:2]))
+  p1 <- ggplot2::ggplot(data = 
+                          transform(df_s,
+                                    MC = factor(df_s$MC,
+                                                levels = levels(fsom$metaclustering)),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)),
+                        ggplot2::aes(fill = .data$Manual, 
+                                     y = .data$Freq, 
+                                     x = .data$MC)) +
+    ggplot2::geom_bar(position = "stack", stat = "identity") +
+    ggplot2::theme_minimal() +
+    ggplot2::ggtitle("Manual labels per MC") +
+    ggplot2::ylab("size") +
+    ggplot2::theme(axis.text.y = ggplot2::element_blank()) 
+  
+  if(!is.null(colors)) {
+    p1 <- p1 + ggplot2::scale_fill_manual(values = colors)
+  }
+  
+  #----MC composition----
+  df_s <- data.frame(table(df[, 1:2]))
+  for (mc in levels(fsom$metaclustering)){
+    df_s$Freq[df_s$MC == mc] <- 
+      df_s$Freq[df_s$MC == mc] / sum(df_s$Freq[df_s$MC == mc])
+  }
+  p2 <- ggplot2::ggplot(data = 
+                          transform(df_s,
+                                    MC = factor(df_s$MC,
+                                                levels = levels(fsom$metaclustering)),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)), 
+                        ggplot2::aes(fill = .data$Manual, 
+                                     y = .data$Freq, 
+                                     x = .data$MC)) +
+    ggplot2::geom_bar(position = "stack", stat = "identity") +
+    ggplot2::theme_minimal() +
+    ggplot2::ylab("") +
+    ggplot2::ggtitle("Manual labels per MC") +
+    ggplot2::theme(axis.text.y = ggplot2::element_blank())
+  if(!is.null(colors)) {
+    p2 <- p2 + ggplot2::scale_fill_manual(values = colors)
+  }
+  
+  #----Relative barplots C----
+  df_s <- data.frame(table(df[, c(1, 3)]))
+  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
+  p3 <- ggplot2::ggplot(data =
+                          transform(df_s,
+                                    C = factor(df_s$C,
+                                               levels = seq_len(NClusters(fsom))),
+                                    MC = factor(df_s$MC,
+                                                levels = levels(fsom$metaclustering)),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)),
+                        ggplot2::aes(fill = .data$Manual, 
+                                     y = .data$Freq, 
+                                     x = .data$C)) +
+    ggplot2::geom_bar(position = "stack", stat = "identity") +
+    ggplot2::theme_minimal() +
+    ggplot2::ggtitle("Manual labels per C") +
+    ggplot2::facet_wrap(~.data$MC, scales = "free_x") +
+    ggplot2::ylab("size") +
+    ggplot2::theme(axis.text.y = ggplot2:: element_blank(), 
+                   strip.text = ggplot2::element_text(color = "gray"))
+  if(!is.null(colors)) {
+    p3 <- p3 + ggplot2::scale_fill_manual(values = colors)
+  }
+  
+  #----C composition----
+  df_s <- data.frame(table(df[, c(1, 3)]))
+  for (c in seq_len(NClusters(fsom))){
+    df_s$Freq[df_s$C == c] <- df_s$Freq[df_s$C == c]/sum(df_s$Freq[df_s$C == c])
+  }
+  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
+  p4 <- ggplot2::ggplot(data = 
+                          transform(df_s,
+                                    C = factor(df_s$C,
+                                               levels = seq_len(
+                                                 NClusters(fsom))),
+                                    MC = factor(df_s$MC,
+                                                levels = levels(fsom$metaclustering)),
+                                    Manual = factor(df_s$Manual,
+                                                    levels = manualOrder)), 
+                        ggplot2::aes(fill = .data$Manual, 
+                                     y = .data$Freq, 
+                                     x = .data$C)) +
+    ggplot2::geom_bar(position = "stack", stat = "identity") +
+    ggplot2::theme_minimal() +
+    ggplot2::ylab("") +
+    ggplot2::ggtitle("Main labels per C") +
+    ggplot2::facet_wrap(~.data$MC, scales = "free_x") +
+    ggplot2::theme(axis.text.y = ggplot2::element_blank())
+  if(!is.null(colors)) {
+    p4 <- p4 + ggplot2::scale_fill_manual(values = colors)
+  }
+  
+  #----Print plot or return list----
+  if (!list_insteadof_plots) {
+    print(p1)
+    print(p2)
+    print(p3)
+    print(p4)
+  } else {
+    return(list(p1, p2, p3, p4))
+  }
+}
+
+#' Plot2DScatters 
+#' 
+#' Function to draw 2D scatter plots of FlowSOM (meta)clusters
+#' 
+#' Plot multiple 2D scatter plots in a png file. A subset of fsom$data is 
+#' plotted in gray, and those of the selected clusters and metaclusters are 
+#' plotted in color.
+#' 
+#' @param fsom              FlowSOM object, as created by \code{\link{FlowSOM}}
+#' @param channelpairs      List in which each element is a pair of channel
+#'                          or marker names
+#' @param clusters          Vector or list (to combine multiple clusters in one
+#'                          plot) with indices of clusters of interest
+#' @param metaclusters      Vector or list (to combine multiple metaclusters in 
+#'                          one plot) with indices of metaclusters of interest
+#' @param maxBgPoints       Maximum number of background cells to plot
+#' @param sizeBgPoints      Size of the background cells
+#' @param maxPoints         Maximum number of (meta)cluster cells to plot
+#' @param sizePoints        Size of the (meta)cluster cells
+#' @param xLim              Optional vector of a lower and upper limit of the x-axis
+#' @param yLim              Optional vector of a lower and upper limit of the y-axis
+#' @param xyLabels          Determines the label of the x- and y-axis. Can be 
+#'                         "marker" and\\or "channel" or abbrevations.
+#'                          Default = "marker".
+#' @param density           Default is \code{TRUE} to color the (meta)cluster 
+#'                          points according to density. Set to \code{FALSE} to 
+#'                          use a plain color
+#' @param centers           Default is \code{TRUE} to show the cluster centers
+#' @param color             Colors for all the cells in the selected nodes 
+#'                          (ordered list). First the clusters are colored, 
+#'                          then the metaclusters. If \code{NULL}, the default 
+#'                          ggplot colors, indexed by metacluster number, are used.
+#' @param plotFile          If a filepath for a png is given (default = 
+#'                          2DScatterPlots.png), the plots will be plotted in 
+#'                          the corresponding png file. If \code{NULL}, a list 
+#'                          of ggplot objects will be returned
+#'                          
+#'                          
+#' @return If \code{plot} is \code{TRUE}, nothing is returned and a plot is 
+#'         drawn in which background cells are plotted in gray and the cells of
+#'         the selected nodes in color. If \code{plot} is \code{FALSE}, a ggplot
+#'          objects list is returned.
+#' 
+#' 
+#' @examples 
+#' # Identify the files
+#' fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs", 
+#'                                       package = "FlowSOM"))
+#' 
+#' # Build a FlowSOM object
+#' flowSOM.res <- FlowSOM(fcs, 
+#'                        scale = TRUE,
+#'                        compensate = TRUE, 
+#'                        transform = TRUE,
+#'                        toTransform = 8:18, 
+#'                        colsToUse = c(9, 12, 14:18),
+#'                        nClus = 10,
+#'                        seed = 1)
+#' 
+#' # Make the 2D scatter plots of the clusters and metaclusters of interest
+#' Plot2DScatters(fsom = flowSOM.res,
+#'                channelpairs = list(c("PE-Cy7-A", "PE-Cy5-A"),
+#'                                    c("PE-Texas Red-A", "Pacific Blue-A")),
+#'                clusters = c(1, 48, 49, 82, 95),
+#'                metaclusters = list(c(1, 4), 9),
+#'                density = FALSE)
+#'                
+#' Plot2DScatters(fsom = flowSOM.res,
+#'                channelpairs = list(c("PE-Texas Red-A", "Pacific Blue-A")),
+#'                metaclusters = list(c(1, 4)),
+#'                density = FALSE,
+#'                color = list(c("red", "green")))
+#' 
+#' @import     ggplot2
+#' @importFrom colorRamps matlab.like2
+#' @importFrom grDevices png dev.off
+#' @importFrom ggpubr ggarrange
+#' 
+#' @export
+#' 
+Plot2DScatters <- function(fsom, 
+                           channelpairs, 
+                           clusters = NULL, 
+                           metaclusters = NULL, 
+                           maxBgPoints = 3000, 
+                           sizeBgPoints = 0.5,
+                           maxPoints = 1000, 
+                           sizePoints = 0.5,
+                           xLim = NULL,
+                           yLim = NULL,
+                           xyLabels = c("marker"),
+                           density = TRUE, 
+                           centers = TRUE, 
+                           color = NULL,
+                           plotFile = "2DScatterPlots.png"){
+  if(!is.null(fsom$metaclustering)){
+    metacluster <- as.numeric(fsom$metaclustering)
+    nMetaclusters <- NMetaclusters(fsom)
+  } else {
+    metacluster <- rep(1, NClusters(fsom))
+    nMetaclusters <- 1
+  }
+  
+  medianValues <- fsom$map$medianValues
+  cellCluster <- GetClusters(fsom)
+  xyLabels <- pmatch(xyLabels, c("marker", "channel"))
+  #----Warnings----
+  if (density == FALSE & 
+      !is.null(color) & 
+      !((length(clusters) + length(metaclusters)) == length(color))){
+    stop("Length of color list should be equal to the joined length ",
+         "of the clusters and metaclusters")
+  } 
+  
+  #----Join the clusters and metaclusters of interest----
+  i <- sample(nrow(fsom$data), 
+              min(nrow(fsom$data), maxBgPoints))
+  # loop over all subsets at once
+  subsets <- list("Cluster" = as.list(clusters),
+                  "Metacluster" = as.list(metaclusters)) 
+  plots_list <- list()
+  color_n <- 0
+  
+  if (any(is.na(xyLabels)) | length(xyLabels) > 2){
+    stop("xyLabels should be \"marker\" and\\or \"channel\"")
+  } else {
+    xyLabels <- c("marker", "channel")[xyLabels]
+  }
+  
+  for (group in names(subsets)){
+    for (subset in subsets[[group]]){
+      color_n <- color_n + 1
+      n <- as.numeric(unlist(subset))
+      for (channelpair in channelpairs){
+        
+        channelpair <- GetChannels(fsom, channelpair)
+        #----background dataframe----
+        df_bg <- data.frame(fsom$data[i, c(channelpair[1], channelpair[2])]) 
+        
+        #----(meta)cluster dataframe----
+        if(group == "Cluster") {
+          # dataframe with cluster's points
+          df_ss <- data.frame(fsom$data[cellCluster %in% n,
+                                        c(channelpair[1], channelpair[2]),
+                                        drop = FALSE],
+                              "Population" = cellCluster[cellCluster %in% n])
+          # dataframe with centers
+          df_c <- data.frame(medianValues[n, 
+                                          c(channelpair[1], channelpair[2]),
+                                          drop = FALSE],
+                             "Population" = factor(n, levels = n))
+          col <- gg_color_hue(nMetaclusters)[metacluster[n]]
+        } else {
+          df_ss <- data.frame(fsom$data[which(metacluster[cellCluster] %in% n), 
+                                        c(channelpair[1], channelpair[2]),
+                                        drop = FALSE],
+                              "Population" =
+                                metacluster[cellCluster[ 
+                                  which(metacluster[cellCluster] %in% n)]])
+          df_c_Population <- metacluster[
+            which(metacluster[1:nrow(medianValues)] %in% n),
+            drop = FALSE]
+          
+          df_c <- data.frame(
+            medianValues[which(metacluster[1:nrow(medianValues)] %in% n), 
+                         c(channelpair[1], channelpair[2]),
+                         drop = FALSE],
+            "Population" = factor(df_c_Population, 
+                                  levels = unique(df_c_Population)))
+          col <- gg_color_hue(nMetaclusters)[n]
+        }
+        df_ss <- data.frame(df_ss[sample(nrow(df_ss), 
+                                         min(nrow(df_ss), maxPoints)), ])
+        df_ss$Population <- factor(df_ss$Population, levels = subset)
+        colnames(df_c) <- c("m1", "m2", "Population")
+        colnames(df_ss)[1:2] <- colnames(df_bg) <- c("m1", "m2")
+        
+        #----ggplots----
+        cl_or_mcl <- paste0(group, ifelse(length(subset) > 1, "s", ""), ": ")
+        subset_names <- ifelse(group == "Cluster", 
+                               paste0(subset, collapse = ", "),
+                               paste0(levels(fsom$metaclustering)[unlist(subset)],
+                                      collapse = ", "))
+        title <- paste0(cl_or_mcl, subset_names)
+        
+        if ("marker" %in% xyLabels && length(xyLabels) == 1) {
+          xyLabs <- GetMarkers(fsom, channelpair)
+        } else if ("channel" %in% xyLabels && length(xyLabels) == 1){
+          xyLabs <- GetChannels(fsom, channelpair)
+        } else if (all(c("channel", "marker") %in% xyLabels) && length(xyLabels) == 2){
+          channels <- GetChannels(fsom, channelpair)
+          xyLabs <- paste0(GetMarkers(fsom, channelpair), " (", channels, ")")
+        }
+        
+        p <- ggplot2::ggplot(data = df_ss, 
+                             ggplot2::aes(x = .data$m1, 
+                                          y = .data$m2)) +
+          ggplot2::geom_point(data = df_bg, 
+                              color = "gray", 
+                              size = sizeBgPoints) + # background dot plot
+          ggplot2::theme_classic() +
+          ggplot2::ggtitle(title) +
+          ggplot2::xlab(xyLabs[1]) +
+          ggplot2::ylab(xyLabs[2]) + 
+          ggplot2::theme(legend.position = "none")
+        if (!is.null(xLim)) p <- p + ggplot2::xlim(xLim)
+        if (!is.null(yLim)) p <- p + ggplot2::ylim(yLim)
+        
+        if (density) {
+          if (requireNamespace("ggpointdensity", quietly = TRUE)) {
+            # subset density plot
+            p <- p  + ggpointdensity::geom_pointdensity(size = sizePoints) + 
+              ggplot2::scale_color_gradientn(colors = 
+                                               colorRamps::matlab.like2(10))
+          } else {
+            message("\"ggpointdensity\" not available. Please install.")
+          }
+        } else {
+          # if no colors are given, the default colors of ggplot are used
+          if (is.null(color)){ 
+            p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
+                                         size = sizePoints) +
+              ggplot2::scale_color_manual(values = col) 
+          } else {
+            #subset plot, metacluster colors
+            if (length(color[[color_n]]) != nlevels(df_ss$Population)){
+              stop(paste0("For \"", title, "\", we expect ",  
+                          nlevels(df_ss$Population), " colors while only ",
+                          length(color[[color_n]]), " are given."))
+            }
+            p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
+                                         size = sizePoints) +
+              ggplot2::scale_color_manual(values = color[[color_n]])
+          }
+          
+        }
+        
+        #----add cluster centers----
+        if (centers) { 
+          if (!density){
+            if (!is.null(color)){
+              col_c <- color[[color_n]]
+            } else {
+              col_c <- col
+            }
+          } else {
+            col_c <- rep("white", nrow(df_c))
+          }
+          p <- p + ggplot2::geom_point(data = df_c, 
+                                       shape = 21, 
+                                       ggplot2::aes(fill = .data$Population), 
+                                       color = "black", 
+                                       size = 3,
+                                       stroke = 1) +
+            ggplot2::scale_fill_manual(values = col_c)
+        }
+        plots_list[[length(plots_list) + 1]] <- p
+      }
+    }
+  }
+  if (!is.null(plotFile)) {
+    grDevices::png(plotFile, 
+                   width = 400 * length(channelpairs), 
+                   height = 400 * (length(clusters) + length(metaclusters)))
+    print(ggpubr::ggarrange(plotlist = plots_list, 
+                            ncol = length(channelpairs), 
+                            nrow = (length(clusters) + length(metaclusters)),
+                            common.legend = FALSE))
+    grDevices::dev.off()
+  } else {
+    return(plots_list)
+  }
+}
+
 #' QueryStarPlot 
 #' 
 #' Query a certain cell type
@@ -808,8 +1333,8 @@ PlotDimRed <- function(fsom,
 #' or "low" marker expressions.
 #'
 #' @param fsom            FlowSOM object, as generated by \code{\link{BuildMST}}
-#' @param query           Array containing "high" or "low" for the specified 
-#'                        column names of the FlowSOM data.
+#' @param query           Array containing "high" or "low" (or abbreviations)
+#'                        for the specified column names of the FlowSOM data.
 #' @param plot            If true, a plot with a gradient of scores for the 
 #'                        nodes is shown.
 #' @param colorPalette    Color palette to be used for colors for "stars", 
@@ -857,7 +1382,7 @@ QueryStarPlot <- function(fsom,
   fsom <- UpdateFlowSOM(fsom)
   names(query) <- GetChannels(fsom, names(query))
   markers <- names(query)
-  lowMarkers <- which(query == "low")
+  lowMarkers <- pmatch("l", query)
   query <- ParseQuery(fsom, query)
   if (plot){
     fP <- PlotStars(fsom = fsom,
@@ -1170,6 +1695,7 @@ ParseLayout <- function(fsom, layout){
 #' 
 #' @importFrom dplyr count mutate pull
 #' 
+#' @export
 ParseNodeSize <- function(nodeSizes, maxNodeSize, refNodeSize){
   if(any(is.na(nodeSizes))) nodeSizes[is.na(nodeSizes)] <- 0
   nNodes <- length(nodeSizes)
@@ -1236,12 +1762,16 @@ ParseQuery <- function(fsom, query){
                    dimnames = list(NULL, names(query)))
   for (marker in names(query)) {
     data <- fsom$map$medianValues[, marker]
-    if (query[marker] == "high") {
-      scores[, marker] = (max(data, na.rm = TRUE) - data) ^ 2
-    } else if (query[marker] == "low") {
-      scores[, marker] = (data - min(data, na.rm = TRUE)) ^ 2
-    } else {
+    highOrLow <- pmatch(query[marker], c("high", "low"))
+    if (any(is.na(highOrLow)) | length(highOrLow) > 1){
       stop("Only high or low marker expressions are supported at the moment")
+    } else {
+      highOrLow <- c("high", "low")[highOrLow]
+      if (highOrLow == "high") {
+        scores[, marker] = (max(data, na.rm = TRUE) - data) ^ 2
+      } else if (highOrLow == "low") {
+        scores[, marker] = (data - min(data, na.rm = TRUE)) ^ 2
+      }
     }
   }
   scores <- apply(scores, 2, function(x) {
@@ -1338,57 +1868,6 @@ AutoMaxNodeSize <- function(layout, overlap){
   overlap <- 1 + overlap
   minDistance <- min(stats::dist(layout[, c(1, 2)]))
   return(minDistance / 2 * overlap)
-}
-
-#' UpdateFlowSOM 
-#' 
-#' Update old FlowSOM object to a new one and checks if it is a flowSOM object
-#' 
-#' Determines whether or not the fsom input is of class "FlowSOM" and returns  
-#' the FlowSOM object and metaclustering object inside fsom
-#' 
-#' @param fsom  FlowSOM object, as generated by \code{\link{BuildMST}} or
-#'              \code{\link{FlowSOM}}
-#'                          
-#' @return A FlowSOM object
-#' 
-#' @seealso \code{\link{PlotFlowSOM}}
-#' 
-#' @importFrom dplyr group_by summarise_all select
-#' @importFrom stats  median
-#' 
-#' @export
-UpdateFlowSOM <- function(fsom){
-  if (is(fsom,"list") && !is.null(fsom$FlowSOM)) {
-    fsom$FlowSOM$metaclustering <- fsom$metaclustering
-    fsom <- fsom$FlowSOM
-  }
-  if (!is(fsom,"FlowSOM")) {
-    stop("fsom should be a FlowSOM object.")
-  }
-  fsom$prettyColnames <- gsub("\\((.*)\\)", "<\\1>", fsom$prettyColnames)
-  if (is.null(fsom$map$pctgs)){
-    pctgs <- rep(0, fsom$map$nNodes)
-    names(pctgs) <- as.character(seq_len(fsom$map$nNodes))
-    pctgs_tmp <- table(fsom$map$mapping[, 1]) / nrow(fsom$map$mapping)
-    pctgs[names(pctgs_tmp)] <- pctgs_tmp
-    fsom$map$pctgs <- pctgs
-  } 
-  if (is.null(fsom$map$nMetaclusters)){
-    fsom$map$nMetaclusters <- length(levels(fsom$metaclustering))
-  }
-  if (is.null(fsom$map$metaclusterMFIs) && !is.null(fsom$metaclustering)){
-    fsom$map$metaclusterMFIs <- 
-      data.frame(fsom$data, 
-                 mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
-                 check.names = FALSE) %>% 
-      dplyr::group_by(.data$mcl, .drop = FALSE) %>% 
-      dplyr::summarise_all(stats::median) %>% 
-      dplyr::select(-.data$mcl) %>% 
-      data.frame(row.names = levels(fsom$metaclustering),
-                 check.names = FALSE)
-  }
-  return(fsom)
 }
 
 #' AddMST 
@@ -1826,223 +2305,6 @@ AddStars <- function(p,
   return(p)
 }
 
-#' PlotManualBars 
-#' 
-#' Function to plot the manual labels per FlowSOM (meta)cluster in a barplot
-#' 
-#' @param fsom          FlowSOM object, as generated by \code{\link{FlowSOM}} or 
-#'                      by \code{\link{NewData}}. The clusters and metaclusters 
-#'                      will be plotted in the order of the factor levels.
-#' @param fcs           FCS file that should be mapped on the FlowSOM object.
-#'                      Default is NULL. 
-#' @param manualVector Vector with cell labels, e.g. obtained by manual gating
-#' @param manualOrder  Optional vector with unique cell labels to fix in which
-#'                      order the cell labels should be shown
-#' @param colors        Optional color vector, should have the same length as
-#'                      the number of unique cell labels 
-#' @param list_insteadof_plots If \code{FALSE} (default), it returns multiple 
-#'                             plots. If \code{TRUE}, it returns a list of 
-#'                             ggplot objects
-#'                          
-#' @return Either a plot or a ggplot objects list is returned.
-#' 
-#' @examples 
-#' # Identify the files
-#' fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
-#' wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
-#' 
-#' # Specify the cell types of interest for assigning one label per cell
-#' cellTypes <- c("B cells",
-#'                 "gd T cells", "CD4 T cells", "CD8 T cells",
-#'                 "NK cells", "NK T cells")
-#'                 
-#' # Parse the FlowJo workspace   
-#' library(flowWorkspace)             
-#' gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
-#'                                 cellTypes = cellTypes)               
-#' 
-#' # Build a FlowSOM object
-#' flowSOM.res <- FlowSOM(fcs_file,
-#'                        scale = TRUE,
-#'                        compensate = TRUE, 
-#'                        transform = TRUE,
-#'                        toTransform = 8:18, 
-#'                        colsToUse = c(9, 12, 14:18),
-#'                        nClus = 10,
-#'                        seed = 1)
-#' 
-#' # Make the barplot of the manual labels
-#' pdf("PlotManualBars.pdf")
-#' PlotManualBars(fsom = flowSOM.res,
-#'                fcs = fcs_file,
-#'                manualVector = gatingResult$manual,
-#'                manualOrder = c(cellTypes, "Unlabeled"),
-#'                colors = c("#F8766D", "#B79F00", "#00BA38", "#00BFC4", 
-#'                           "#619CFF", "#F564E3", "#D3D3D3"))
-#' dev.off()
-#' 
-#' @import     ggplot2
-#' 
-#' @export
-#' 
-PlotManualBars <- function(fsom, fcs = NULL, 
-                           manualVector, manualOrder = NULL, 
-                           colors = NULL, list_insteadof_plots = FALSE){
-  #----Warnings----
-  if (!is.null(manualOrder) & 
-      !length(manualOrder) == length(unique(manualVector))){
-    stop(paste0("Length of the manualOrder vector (", length(manualOrder), 
-                ") should have the same length as the number of unique labels",
-                "in manualVector (", length(unique(manualVector)), ")."))
-  } 
-  if (!is.null(colors) & !length(colors) >= length(unique(manualVector))){
-    stop(paste0("Length of the colors vector (", length(colors),") should have",
-                "at least the same length as the number of unique labels in ",
-                "manualVector (", length(unique(manualVector)), ")."))
-  } 
-  
-  #----Map FCS on fsom----
-  C_counts <- matrix(0,
-                     nrow = 1,
-                     ncol = fsom$map$nNodes,
-                     dimnames = 
-                       list("fcs",
-                            paste0("C", seq_len(fsom$map$nNodes))))
-  if (!is.null(fcs)){
-    fsom_tmp <- NewData(fsom, fcs)
-  } else {
-    fsom_tmp <- fsom
-  }
-  
-  cluster_table <- table(GetClusters(fsom_tmp))
-  
-  C_counts["fcs", paste0("C", names(cluster_table))] <- cluster_table
-  C_perc <- 100 * prop.table(C_counts, margin = 1)
-  MC_counts <- t(apply(C_counts,
-                       1,
-                       function(x){
-                         tapply(x, fsom$metaclustering, sum)
-                       }))
-  colnames(MC_counts) <- paste0("MC", colnames(MC_counts))
-  MC_perc <- 100 * prop.table(MC_counts, margin  = 1)
-  
-  df <- data.frame("Manual" = manualVector, 
-                   "MC" = GetMetaclusters(fsom_tmp),
-                   "C" = GetClusters(fsom_tmp), 
-                   stringsAsFactors = FALSE)
-  if(is.null(manualOrder)) {
-    manualOrder <- unique(manualVector)
-  }
-  
-  #----Relative barplots MC----
-  df_s <- data.frame(table(df[, 1:2]))
-  p1 <- ggplot2::ggplot(data = 
-                          transform(df_s,
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)),
-                        ggplot2::aes(fill = .data$Manual, 
-                                     y = .data$Freq, 
-                                     x = .data$MC)) +
-    ggplot2::geom_bar(position = "stack", stat = "identity") +
-    ggplot2::theme_minimal() +
-    ggplot2::ggtitle("Manual labels per MC") +
-    ggplot2::ylab("size") +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank()) 
-  
-  if(!is.null(colors)) {
-    p1 <- p1 + ggplot2::scale_fill_manual(values = colors)
-  }
-  
-  #----MC composition----
-  df_s <- data.frame(table(df[, 1:2]))
-  for (mc in levels(fsom$metaclustering)){
-    df_s$Freq[df_s$MC == mc] <- 
-      df_s$Freq[df_s$MC == mc] / sum(df_s$Freq[df_s$MC == mc])
-  }
-  p2 <- ggplot2::ggplot(data = 
-                          transform(df_s,
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)), 
-                        ggplot2::aes(fill = .data$Manual, 
-                                     y = .data$Freq, 
-                                     x = .data$MC)) +
-    ggplot2::geom_bar(position = "stack", stat = "identity") +
-    ggplot2::theme_minimal() +
-    ggplot2::ylab("") +
-    ggplot2::ggtitle("Manual labels per MC") +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank())
-  if(!is.null(colors)) {
-    p2 <- p2 + ggplot2::scale_fill_manual(values = colors)
-  }
-  
-  #----Relative barplots C----
-  df_s <- data.frame(table(df[, c(1, 3)]))
-  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
-  p3 <- ggplot2::ggplot(data =
-                          transform(df_s,
-                                    C = factor(df_s$C,
-                                               levels = seq_len(NClusters(fsom))),
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)),
-                        ggplot2::aes(fill = .data$Manual, 
-                                     y = .data$Freq, 
-                                     x = .data$C)) +
-    ggplot2::geom_bar(position = "stack", stat = "identity") +
-    ggplot2::theme_minimal() +
-    ggplot2::ggtitle("Manual labels per C") +
-    ggplot2::facet_wrap(~.data$MC, scales = "free_x") +
-    ggplot2::ylab("size") +
-    ggplot2::theme(axis.text.y = ggplot2:: element_blank(), 
-                   strip.text = ggplot2::element_text(color = "gray"))
-  if(!is.null(colors)) {
-    p3 <- p3 + ggplot2::scale_fill_manual(values = colors)
-  }
-  
-  #----C composition----
-  df_s <- data.frame(table(df[, c(1, 3)]))
-  for (c in seq_len(NClusters(fsom))){
-    df_s$Freq[df_s$C == c] <- df_s$Freq[df_s$C == c]/sum(df_s$Freq[df_s$C == c])
-  }
-  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
-  p4 <- ggplot2::ggplot(data = 
-                          transform(df_s,
-                                    C = factor(df_s$C,
-                                               levels = seq_len(
-                                                 NClusters(fsom))),
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)), 
-                        ggplot2::aes(fill = .data$Manual, 
-                                     y = .data$Freq, 
-                                     x = .data$C)) +
-    ggplot2::geom_bar(position = "stack", stat = "identity") +
-    ggplot2::theme_minimal() +
-    ggplot2::ylab("") +
-    ggplot2::ggtitle("Main labels per C") +
-    ggplot2::facet_wrap(~.data$MC, scales = "free_x") +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank())
-  if(!is.null(colors)) {
-    p4 <- p4 + ggplot2::scale_fill_manual(values = colors)
-  }
-  
-  #----Print plot or return list----
-  if (!list_insteadof_plots) {
-    print(p1)
-    print(p2)
-    print(p3)
-    print(p4)
-  } else {
-    return(list(p1, p2, p3, p4))
-  }
-}
-
 #' gg_color_hue 
 #' 
 #' Helper function to get the ggplot colors
@@ -2054,269 +2316,6 @@ PlotManualBars <- function(fsom, fcs = NULL,
 gg_color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
   hcl(h = hues, l = 65, c = 100)[1:n]
-}
-
-#' Plot2DScatters 
-#' 
-#' Function to draw 2D scatter plots of FlowSOM (meta)clusters
-#' 
-#' Plot multiple 2D scatter plots in a png file. A subset of fsom$data is 
-#' plotted in gray, and those of the selected clusters and metaclusters are 
-#' plotted in color.
-#' 
-#' @param fsom              FlowSOM object, as created by \code{\link{FlowSOM}}
-#' @param channelpairs      List in which each element is a pair of channel
-#'                          or marker names
-#' @param clusters          Vector or list (to combine multiple clusters in one
-#'                          plot) with indices of clusters of interest
-#' @param metaclusters      Vector or list (to combine multiple metaclusters in 
-#'                          one plot) with indices of metaclusters of interest
-#' @param maxBgPoints     Maximum number of background cells to plot
-#' @param sizeBgPoints    Size of the background cells
-#' @param maxPoints        Maximum number of (meta)cluster cells to plot
-#' @param sizePoints       Size of the (meta)cluster cells
-#' @param xLim             A vector of a lower and upper limit of the x-axis
-#' @param yLim             A vector of a lower and upper limit of the y-axis
-#' @param xyLabels         Determines the label of the x- and y-axis. Can be 
-#'                         "marker" and\\or "channel". Default = "marker".
-#' @param density           Default is \code{TRUE} to color the (meta)cluster 
-#'                          points according to density. Set to \code{FALSE} to 
-#'                          use a plain color
-#' @param centers           Default is \code{TRUE} to show the cluster centers
-#' @param color             Colors for all the cells in the selected nodes 
-#'                          (ordered list). First the clusters are colored, 
-#'                          then the metaclusters. If \code{NULL}, the default 
-#'                          ggplot colors, indexed by metacluster number, are used.
-#' @param plotFile          If a filepath for a png is given (default = 
-#'                          2DScatterPlots.png), the plots will be plotted in 
-#'                          the corresponding png file. If \code{NULL}, a list 
-#'                          of ggplot objects will be returned
-#'                          
-#'                          
-#' @return If \code{plot} is \code{TRUE}, nothing is returned and a plot is 
-#'         drawn in which background cells are plotted in gray and the cells of
-#'         the selected nodes in color. If \code{plot} is \code{FALSE}, a ggplot
-#'          objects list is returned.
-#' 
-#' 
-#' @examples 
-#' # Identify the files
-#' fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs", 
-#'                                       package = "FlowSOM"))
-#' 
-#' # Build a FlowSOM object
-#' flowSOM.res <- FlowSOM(fcs, 
-#'                        scale = TRUE,
-#'                        compensate = TRUE, 
-#'                        transform = TRUE,
-#'                        toTransform = 8:18, 
-#'                        colsToUse = c(9, 12, 14:18),
-#'                        nClus = 10,
-#'                        seed = 1)
-#' 
-#' # Make the 2D scatter plots of the clusters and metaclusters of interest
-#' Plot2DScatters(fsom = flowSOM.res,
-#'                channelpairs = list(c("PE-Cy7-A", "PE-Cy5-A"),
-#'                                    c("PE-Texas Red-A", "Pacific Blue-A")),
-#'                clusters = c(1, 48, 49, 82, 95),
-#'                metaclusters = list(c(1, 4), 9),
-#'                density = FALSE)
-#'                
-#' Plot2DScatters(fsom = flowSOM.res,
-#'                channelpairs = list(c("PE-Texas Red-A", "Pacific Blue-A")),
-#'                metaclusters = list(c(1, 4)),
-#'                density = FALSE,
-#'                color = list(c("red", "green")))
-#' 
-#' @import     ggplot2
-#' @importFrom colorRamps matlab.like2
-#' @importFrom ggpointdensity geom_pointdensity
-#' @importFrom grDevices png dev.off
-#' @importFrom ggpubr ggarrange
-#' 
-#' @export
-#' 
-Plot2DScatters <- function(fsom, 
-                            channelpairs, 
-                            clusters = NULL, 
-                            metaclusters = NULL, 
-                            maxBgPoints = 3000, 
-                            sizeBgPoints = 0.5,
-                            maxPoints = 1000, 
-                            sizePoints = 0.5,
-                            xLim = NULL,
-                            yLim = NULL,
-                            xyLabels = c("marker"),
-                            density = TRUE, 
-                            centers = TRUE, 
-                            color = NULL,
-                            plotFile = "2DScatterPlots.png"){
-  if(!is.null(fsom$metaclustering)){
-    metacluster <- as.numeric(fsom$metaclustering)
-    nMetaclusters <- NMetaclusters(fsom)
-  } else {
-    metacluster <- rep(1, NClusters(fsom))
-    nMetaclusters <- 1
-  }
-  
-  medianValues <- fsom$map$medianValues
-  cellCluster <- GetClusters(fsom)
-  
-  #----Warnings----
-  if (density == FALSE & 
-      !is.null(color) & 
-      !((length(clusters) + length(metaclusters)) == length(color))){
-    stop("Length of color list should be equal to the joined length ",
-         "of the clusters and metaclusters")
-  } 
-  
-  #----Join the clusters and metaclusters of interest----
-  i <- sample(nrow(fsom$data), 
-              min(nrow(fsom$data), maxBgPoints))
-  # loop over all subsets at once
-  subsets <- list("Cluster" = as.list(clusters),
-                  "Metacluster" = as.list(metaclusters)) 
-  plots_list <- list()
-  color_n <- 0
-  for (group in names(subsets)){
-    for (subset in subsets[[group]]){
-      color_n <- color_n + 1
-      n <- as.numeric(unlist(subset))
-      for (channelpair in channelpairs){
-        
-        channelpair <- GetChannels(fsom, channelpair)
-        #----background dataframe----
-        df_bg <- data.frame(fsom$data[i, c(channelpair[1], channelpair[2])]) 
-
-        #----(meta)cluster dataframe----
-        if(group == "Cluster") {
-          # dataframe with cluster's points
-          df_ss <- data.frame(fsom$data[cellCluster %in% n,
-                                        c(channelpair[1], channelpair[2]),
-                                        drop = FALSE],
-                              "Population" = cellCluster[cellCluster %in% n])
-          # dataframe with centers
-          df_c <- data.frame(medianValues[n, 
-                                          c(channelpair[1], channelpair[2]),
-                                          drop = FALSE],
-                             "Population" = factor(n, levels = n))
-          col <- gg_color_hue(nMetaclusters)[metacluster[n]]
-        } else {
-          df_ss <- data.frame(fsom$data[which(metacluster[cellCluster] %in% n), 
-                                        c(channelpair[1], channelpair[2]),
-                                        drop = FALSE],
-                              "Population" =
-                                metacluster[cellCluster[ 
-                                  which(metacluster[cellCluster] %in% n)]])
-          df_c_Population <- metacluster[
-            which(metacluster[1:nrow(medianValues)] %in% n),
-            drop = FALSE]
-          
-          df_c <- data.frame(
-            medianValues[which(metacluster[1:nrow(medianValues)] %in% n), 
-                         c(channelpair[1], channelpair[2]),
-                         drop = FALSE],
-            "Population" = factor(df_c_Population, 
-                                  levels = unique(df_c_Population)))
-          col <- gg_color_hue(nMetaclusters)[n]
-        }
-        df_ss <- data.frame(df_ss[sample(nrow(df_ss), 
-                                         min(nrow(df_ss), maxPoints)), ])
-        df_ss$Population <- factor(df_ss$Population, levels = subset)
-        colnames(df_c) <- c("m1", "m2", "Population")
-        colnames(df_ss)[1:2] <- colnames(df_bg) <- c("m1", "m2")
-
-        #----ggplots----
-        cl_or_mcl <- paste0(group, ifelse(length(subset) > 1, "s", ""), ": ")
-        subset_names <- ifelse(group == "Cluster", 
-                               paste0(subset, collapse = ", "),
-                               paste0(levels(fsom$metaclustering)[unlist(subset)],
-                                      collapse = ", "))
-        title <- paste0(cl_or_mcl, subset_names)
-        
-        if ("marker" %in% xyLabels && length(xyLabels) == 1) {
-          xyLabs <- GetMarkers(fsom, channelpair)
-        } else if ("channel" %in% xyLabels && length(xyLabels) == 1){
-          xyLabs <- GetChannels(fsom, channelpair)
-        } else if (all(c("channel", "marker") %in% xyLabels) && length(xyLabels) == 2){
-          channels <- GetChannels(fsom, channelpair)
-          xyLabs <- paste0(GetMarkers(fsom, channelpair), " (", channels, ")")
-        } else stop("xyLabels should be \"marker\" and\\or \"channel\"")
-        
-        p <- ggplot2::ggplot(data = df_ss, 
-                             ggplot2::aes(x = .data$m1, 
-                                          y = .data$m2)) +
-          ggplot2::geom_point(data = df_bg, 
-                              color = "gray", 
-                              size = sizeBgPoints) + # background dot plot
-          ggplot2::theme_classic() +
-          ggplot2::ggtitle(title) +
-          ggplot2::xlab(xyLabs[1]) +
-          ggplot2::ylab(xyLabs[2]) + 
-          ggplot2::theme(legend.position = "none")
-        if (!is.null(xLim)) p <- p + ggplot2::xlim(xLim)
-        if (!is.null(yLim)) p <- p + ggplot2::ylim(yLim)
-        
-        if (density) {
-          # subset density plot
-          p <- p  + ggpointdensity::geom_pointdensity(size = sizePoints) + 
-            ggplot2::scale_color_gradientn(colors = 
-                                             colorRamps::matlab.like2(10))
-        } else {
-          # if no colors are given, the default colors of ggplot are used
-          if (is.null(color)){ 
-            p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
-                                         size = sizePoints) +
-              ggplot2::scale_color_manual(values = col) 
-          } else {
-            #subset plot, metacluster colors
-            if (length(color[[color_n]]) != nlevels(df_ss$Population)){
-              stop(paste0("For \"", title, "\", we expect ",  
-                          nlevels(df_ss$Population), " colors while only ",
-                          length(color[[color_n]]), " are given."))
-            }
-            p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
-                                         size = sizePoints) +
-              ggplot2::scale_color_manual(values = color[[color_n]])
-          }
-          
-        }
-        
-        #----add cluster centers----
-        if (centers) { 
-          if (!density){
-            if (!is.null(color)){
-              col_c <- color[[color_n]]
-            } else {
-              col_c <- col
-            }
-          } else {
-            col_c <- rep("white", nrow(df_c))
-          }
-          p <- p + ggplot2::geom_point(data = df_c, 
-                                       shape = 21, 
-                                       ggplot2::aes(fill = Population), 
-                                       color = "black", 
-                                       size = 3,
-                                       stroke = 1) +
-            ggplot2::scale_fill_manual(values = col_c)
-        }
-        plots_list[[length(plots_list) + 1]] <- p
-      }
-    }
-  }
-  if (!is.null(plotFile)) {
-    grDevices::png(plotFile, 
-                   width = 400 * length(channelpairs), 
-                   height = 400 * (length(clusters) + length(metaclusters)))
-    print(ggpubr::ggarrange(plotlist = plots_list, 
-                            ncol = length(channelpairs), 
-                            nrow = (length(clusters) + length(metaclusters)),
-                            common.legend = FALSE))
-    grDevices::dev.off()
-  } else {
-    return(plots_list)
-  }
 }
 
 #' FlowSOMmary 
@@ -2355,9 +2354,7 @@ Plot2DScatters <- function(fsom,
 #' @import ggplot2
 #' @importFrom ggpubr ggarrange ttheme ggtexttable
 #' @importFrom dplyr count mutate group_by filter pull arrange
-#' @importFrom pheatmap pheatmap
 #' @importFrom grDevices pdf
-#' @importFrom scattermore geom_scattermore
 #' 
 #' @export
 FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
@@ -2437,7 +2434,8 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   dimred_res <- PlotDimRed(fsom, cTotal = 5000, colorBy = fsom$map$colsUsed,
                            seed = 1, returnLayout = TRUE,
                            title = paste0("t-SNE with markers used in FlowSOM ",
-                                          "call (perplexity = 30, cells = 5000)"))
+                                          "call (perplexity = 30, cells = 5000)"),
+                           check_duplicates = FALSE)
   if (metaclustersPresent){
     plotList[["p7"]] <- PlotDimRed(fsom, dimred = dimred_res$layout, seed = 1,
                                    title = paste0("t-SNE with markers used in FlowSOM ",
@@ -2477,11 +2475,15 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
     mfis_scaled <- scale(mfis)
     mfis_scaled[is.na(mfis_scaled)] <- 0
     plotList[["empty"]] <- ggplot2::ggplot() + ggplot2::theme_minimal()
-    plotList[["p10"]] <-
-      pheatmap::pheatmap(mfis_scaled, scale = "none",
-                         display_numbers = round(mfis, 2),
-                         main = "Median expression per metacluster",
-                         silent = TRUE)
+    if (requireNamespace("pheatmap", quietly = TRUE)) {
+      plotList[["p10"]] <-
+        pheatmap::pheatmap(mfis_scaled, scale = "none",
+                           display_numbers = round(mfis, 2),
+                           main = "Median expression per metacluster",
+                           silent = TRUE)
+    } else {
+      message("Please install \"pheatmap\" to add a heatmap to the FlowSOMmary")
+    }
   }
   
   #----Table----
@@ -2618,7 +2620,7 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
 #' 
 #' @examples
 #' 
-#' #' # Identify the files
+#' # Identify the files
 #' fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs", 
 #'                                       package = "FlowSOM"))
 #' # Build a FlowSOM object
@@ -2635,7 +2637,9 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
 #'                list_insteadof_ggarrange = TRUE)
 #' AddAnnotation(p, flowSOM.res, cl = c(1, 2), mcl = c(3, 4))
 #' 
-#' @importFrom ggrepel geom_text_repel
+#' @importFrom dplyr group_by filter row_number
+#' @importFrom ggplot2 geom_text
+#' @importFrom ggpubr ggarrange
 #' 
 #' @export
 AddAnnotation <- function(p, fsom, layout = fsom$MST$l, cl = NULL, mcl = NULL, 
@@ -2682,12 +2686,22 @@ AddAnnotation <- function(p, fsom, layout = fsom$MST$l, cl = NULL, mcl = NULL,
     labels[["clusters"]] <- clusterLabels
   }
   labels <- do.call(rbind, labels)
-  p <- p + ggrepel::geom_text_repel(data = labels, 
-                                    ggplot2::aes(x = .data$V1, y = .data$V2, 
-                                                 label = .data$label), 
-                                    segment.color = "gray", force = 20, 
-                                    segment.size = 0.2, point.padding = 0.5,
-                                    ...)
+  
+  if (requireNamespace("ggrepel", quietly = TRUE)) {
+    p <- p + ggrepel::geom_text_repel(data = labels, 
+                                      ggplot2::aes(x = .data$V1, y = .data$V2, 
+                                                   label = .data$label), 
+                                      segment.color = "gray", force = 20, 
+                                      segment.size = 0.2, point.padding = 0.5,
+                                      ...)
+  } else {
+    p <- p + ggplot2::geom_text(data = labels, 
+                                ggplot2::aes(x = .data$V1, y = .data$V2, 
+                                             label = .data$label), nudge_y = 0.5,
+                                nudge_x = 0.5, ...)
+    message("Please install \"ggrepel\" for more clear annotation.")
+  }
+
   if (listOrGGplot){
     p <- ggpubr::ggarrange(p, ggpubr::ggarrange(l1, l2, ncol = 1), NULL,
                            ncol = 3, widths = c(3, 1, 0.3), legend = "none")

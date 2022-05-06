@@ -81,16 +81,13 @@
 #' @importFrom ConsensusClusterPlus ConsensusClusterPlus
 #' @importFrom flowCore read.FCS compensate transform logicleTransform exprs 
 #'             transformList write.FCS 'exprs<-' keyword fr_append_cols
-#' @importFrom flowWorkspace gs_get_pop_paths gh_pop_get_indices gh_pop_get_data
-#'             gs_get_leaf_nodes
-#' @importFrom CytoML open_flowjo_xml flowjo_to_gatingset
 #' @importFrom igraph graph.adjacency minimum.spanning.tree layout.kamada.kawai
 #'             plot.igraph add.vertex.shape get.edges shortest.paths E V 'V<-'
 #'             igraph.shape.noclip
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom rlang .data
 #' @importFrom stats prcomp
-#' @importFrom utils capture.output
+#' @importFrom utils capture.output packageVersion
 #' @importFrom XML xmlToList xmlParse
 #' @importFrom dplyr group_by summarise_all select
 #' @importFrom stats median
@@ -170,9 +167,9 @@ print.FlowSOM <- function(x, ...){
   if(!is.null(x$map)){
     cat("FlowSOM model trained on", nrow(x$data), "cells and", 
         length(x$map$colsUsed), "markers, \n using a",
-       paste0(x$map$xdim,"x",x$map$ydim), paste0("grid (",NClusters(x)), "clusters) and",
+        paste0(x$map$xdim,"x",x$map$ydim), paste0("grid (",NClusters(x)), "clusters) and",
         NMetaclusters(x), "metaclusters.")
-  
+    
     cat("\n\nMarkers used: ", paste(x$prettyColnames[x$map$colsUsed], collapse =", "))
   } else {
     cat("FlowSOM model to train on", nrow(x$data), "cells.")
@@ -190,8 +187,8 @@ print.FlowSOM <- function(x, ...){
                       x$outliers[1,"Median_distance"]) / 
                      x$outliers[1,"Median_absolute_deviation"])
     cat("\n", n_outliers, paste0("cells (",
-                                   round(100*n_outliers/nrow(x$data),2),
-                                   "%)"),
+                                 round(100*n_outliers/nrow(x$data),2),
+                                 "%)"),
         "are further than", n_mad,"MAD from their cluster center.")
   }
 }
@@ -307,7 +304,7 @@ AggregateFlowFrames <- function(fileNames,
               flowCore::markernames(flowFrame)[commonCols])){
         diffMarkers <- TRUE
       }
-  
+      
       flowCore::exprs(flowFrame) <- 
         rbind(flowCore::exprs(flowFrame)[, commonCols, drop = FALSE], 
               flowCore::exprs(f)[, commonCols, drop = FALSE])
@@ -343,10 +340,9 @@ AggregateFlowFrames <- function(fileNames,
 #' @param  channels   Vector of channels or markers that need to be plotted, 
 #'                    if NULL (default), all channels from the input will be 
 #'                    plotted
-#' @param  yMargin    Optional parameter to specify the margins of the 
-#'                    y-axis
+#' @param  yLim       Optional vector of a lower and upper limit of the y-axis
 #' @param  yLabel     Determines the label of the y-axis. Can be "marker" and\\or
-#'                    "channel". Default = "marker".
+#'                    "channel" or abbrevations. Default = "marker".
 #' @param  quantiles  If provided (default NULL), a numeric vector with values
 #'                    between 0 and 1. These quantiles are indicated on the plot
 #' @param  names      Optional parameter to provide filenames. If \code{NULL} 
@@ -408,8 +404,8 @@ AggregateFlowFrames <- function(fileNames,
 PlotFileScatters <- function(input, 
                              fileID = "File",
                              channels = NULL, 
-                             yMargin = NULL, 
-                             yLabel = c("marker"),
+                             yLim = NULL, 
+                             yLabel = "marker",
                              quantiles = NULL,
                              names = NULL,
                              groups = NULL, 
@@ -495,6 +491,12 @@ PlotFileScatters <- function(input,
   
   #----Generate plots----
   plots_list <- list()
+  yLabel <- pmatch(yLabel, c("channel", "marker"))
+  if (length(yLabel) > 2 | any(is.na(yLabel))){
+    stop("\"yLabel\" should be \"marker\" and\\or \"channel\"")
+  } else {
+    yLabel <- c("channel", "marker")[yLabel]
+  }
   for (channel in channels) {
     if ("marker" %in% yLabel && length(yLabel) == 1) {
       yLabs <- GetMarkers(ff, channel)
@@ -502,7 +504,9 @@ PlotFileScatters <- function(input,
       yLabs <- channel
     } else if (all(c("channel", "marker") %in% yLabel) && length(yLabel) == 2){
       yLabs <- paste0(GetMarkers(ff, channel), " (", channel, ")")
-    } else stop("yLabel should be \"marker\" and\\or \"channel\"")
+    }
+    
+    
     df <- data.frame("intensity" = data[, channel],
                      "names" = factor(names[file_values], 
                                       levels = unique(names)),
@@ -510,7 +514,7 @@ PlotFileScatters <- function(input,
                                       levels = unique(groups)))
     p <- ggplot2::ggplot(df, ggplot2::aes(.data$names, .data$intensity)) +
       ggplot2::geom_jitter(position = position_jitter(width = 0.1), alpha = 0.5, 
-                  ggplot2::aes(colour = .data$group), shape = ".") +
+                           ggplot2::aes(colour = .data$group), shape = ".") +
       ggplot2::ylab(yLabs) +
       ggplot2::theme_classic() +
       ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
@@ -522,8 +526,8 @@ PlotFileScatters <- function(input,
       p <- p + ggplot2::scale_color_manual(values = color)
     }
     
-    if (!is.null(yMargin)) { # if y margins are provided
-      p <- p + ggplot2::ylim(yMargin)
+    if (!is.null(yLim)) { # if y margins are provided
+      p <- p + ggplot2::ylim(yLim)
     }
     
     if (!legend) { # if you don't want a legend on the plot
@@ -541,10 +545,10 @@ PlotFileScatters <- function(input,
         dplyr::summarise(my_quantile(.data$intensity, quantiles))
       p <- p + ggplot2::geom_point(ggplot2::aes(x = .data$names, 
                                                 y = .data$intensity), 
-                          col = "black", 
-                          shape = 3, #95,
-                          size = 3,
-                          data = quantile_intensities)
+                                   col = "black", 
+                                   shape = 3, #95,
+                                   size = 3,
+                                   data = quantile_intensities)
     }
     
     plots_list[[length(plots_list) + 1]] <- p
@@ -584,7 +588,7 @@ PlotFileScatters <- function(input,
 
 #' Process a FlowJo workspace file
 #'
-#' Reads a FlowJo workspace file using the \code{\link{flowWorkspace}} library 
+#' Reads a FlowJo workspace file using the flowWorkspace library 
 #' and returns a list with a matrix containing gating results and a vector with 
 #' a label for each cell from a set of specified gates
 #'
@@ -641,61 +645,60 @@ GetFlowJoLabels <- function(files,
                             cellTypes = NULL,
                             getData = FALSE,
                             ...) {
-  
-  ws <- CytoML::open_flowjo_xml(wspFile)
-  gates <- CytoML::flowjo_to_gatingset(ws, 
-                                       name = group,
-                                       ...)
-  
-  
-  files_in_wsp <- flowWorkspace::sampleNames(gates)
-  counts <- as.numeric(gsub(".*_([0-9]*)$", "\\1", files_in_wsp)) 
-  files_in_wsp <- gsub("_[0-9]*$", "", files_in_wsp)
-  result <- list()
-  for(file in files){
-    print(paste0("Processing ", file))
-    file_id <- grep(paste0("^\\Q", basename(file), "\\E$"), 
-                    files_in_wsp)
-    if(length(file_id) == 0) {stop("File ", basename(file), 
-                                   " not found. Files available: \n",
-                                   paste0(files_in_wsp, "\n"))}
-    gate_names <- flowWorkspace::gs_get_pop_paths(gates, path = "auto")
-    
-    gatingMatrix <- matrix(NA,
-                           nrow = counts[file_id],
-                           ncol = length(gate_names),
-                           dimnames = list(NULL,
-                                           gate_names))
-    for(gate in gate_names){
-      gatingMatrix[, gate] <- 
-        flowWorkspace::gh_pop_get_indices(gates[[file_id]], gate)
+  if (requireNamespace("CytoML", quietly = TRUE) & 
+      requireNamespace("flowWorkspace", quietly = TRUE)) {
+    ws <- CytoML::open_flowjo_xml(wspFile)
+    gates <- CytoML::flowjo_to_gatingset(ws, 
+                                         name = group,
+                                         ...)
+    files_in_wsp <- flowWorkspace::sampleNames(gates)
+    counts <- as.numeric(gsub(".*_([0-9]*)$", "\\1", files_in_wsp)) 
+    files_in_wsp <- gsub("_[0-9]*$", "", files_in_wsp)
+    result <- list()
+    for(file in files){
+      print(paste0("Processing ", file))
+      file_id <- grep(paste0("^\\Q", basename(file), "\\E$"), 
+                      files_in_wsp)
+      if(length(file_id) == 0) {stop("File ", basename(file), 
+                                     " not found. Files available: \n",
+                                     paste0(files_in_wsp, "\n"))}
+      gate_names <- flowWorkspace::gs_get_pop_paths(gates, path = "auto")
+      
+      gatingMatrix <- matrix(NA,
+                             nrow = counts[file_id],
+                             ncol = length(gate_names),
+                             dimnames = list(NULL,
+                                             gate_names))
+      for(gate in gate_names){
+        gatingMatrix[, gate] <- 
+          flowWorkspace::gh_pop_get_indices(gates[[file_id]], gate)
+      }
+      
+      if(is.null(cellTypes)){
+        cellTypes <- flowWorkspace::gs_get_leaf_nodes(gates,
+                                                      path = "auto")
+      }
+      
+      manual <- ManualVector(gatingMatrix, cellTypes)
+      
+      result[[file]] <- list("matrix" = gatingMatrix,
+                             "manual" = manual)
+      
+      if (getData) {
+        result[[file]]$flowFrame <- 
+          flowWorkspace::gh_pop_get_data(gates[[file_id]])
+      }
     }
     
-    if(is.null(cellTypes)){
-      cellTypes <- flowWorkspace::gs_get_leaf_nodes(gates,
-                                                    path = "auto")
+    if (length(files) == 1){
+      result <- result[[1]]
     }
     
-    manual <- ManualVector(gatingMatrix, cellTypes)
-    
-    result[[file]] <- list("matrix" = gatingMatrix,
-                           "manual" = manual)
-    
-    if (getData) {
-      result[[file]]$flowFrame <- 
-        flowWorkspace::gh_pop_get_data(gates[[file_id]])
-    }
+    return(result)
+  } else {
+    message(paste0("The packages \"CytoML\" and \"flowWorkspace\" are necessary", 
+                   " for the function GetFlowJoLabels, but are not available."))
   }
-  
-  if (length(files) == 1){
-    result <- result[[1]]
-  }
-  
-  #flowWorkspace::gs_cleanup_temp(gates) 
-  # Commenting this out might give issues with files in the temp folder not 
-  # being cleaned up, but otherwise the getData=TRUE won't work anymore
-  
-  return(result)
 }
 
 #' Summarize the gating matrix into one vector, only including the cell types of
@@ -859,4 +862,55 @@ GetMarkers <- function(object, channels, exact = TRUE) {
     }
   }
   return(markernames)
+}
+
+#' UpdateFlowSOM 
+#' 
+#' Update old FlowSOM object to a new one and checks if it is a flowSOM object
+#' 
+#' Determines whether or not the fsom input is of class "FlowSOM" and returns  
+#' the FlowSOM object and metaclustering object inside fsom
+#' 
+#' @param fsom  FlowSOM object, as generated by \code{\link{BuildMST}} or
+#'              \code{\link{FlowSOM}}
+#'                          
+#' @return A FlowSOM object
+#' 
+#' @seealso \code{\link{PlotFlowSOM}}
+#' 
+#' @importFrom dplyr group_by summarise_all select
+#' @importFrom stats  median
+#' 
+#' @export
+UpdateFlowSOM <- function(fsom){
+  if (is(fsom,"list") && !is.null(fsom$FlowSOM)) {
+    fsom$FlowSOM$metaclustering <- fsom$metaclustering
+    fsom <- fsom$FlowSOM
+  }
+  if (!is(fsom,"FlowSOM")) {
+    stop("fsom should be a FlowSOM object.")
+  }
+  fsom$prettyColnames <- gsub("\\((.*)\\)", "<\\1>", fsom$prettyColnames)
+  if (is.null(fsom$map$pctgs)){
+    pctgs <- rep(0, fsom$map$nNodes)
+    names(pctgs) <- as.character(seq_len(fsom$map$nNodes))
+    pctgs_tmp <- table(fsom$map$mapping[, 1]) / nrow(fsom$map$mapping)
+    pctgs[names(pctgs_tmp)] <- pctgs_tmp
+    fsom$map$pctgs <- pctgs
+  } 
+  if (is.null(fsom$map$nMetaclusters)){
+    fsom$map$nMetaclusters <- length(levels(fsom$metaclustering))
+  }
+  if (is.null(fsom$map$metaclusterMFIs) && !is.null(fsom$metaclustering)){
+    fsom$map$metaclusterMFIs <- 
+      data.frame(fsom$data, 
+                 mcl = fsom$metaclustering[fsom$map$mapping[, 1]],
+                 check.names = FALSE) %>% 
+      dplyr::group_by(.data$mcl, .drop = FALSE) %>% 
+      dplyr::summarise_all(stats::median) %>% 
+      dplyr::select(-.data$mcl) %>% 
+      data.frame(row.names = levels(fsom$metaclustering),
+                 check.names = FALSE)
+  }
+  return(fsom)
 }

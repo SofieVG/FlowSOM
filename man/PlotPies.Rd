@@ -34,19 +34,18 @@ Plot FlowSOM grid or tree, with pies indicating another clustering
 \examples{
 # Identify the files
 fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
-wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
+gating_file <- system.file("extdata", "gatingResult.csv", package = "FlowSOM")
 
 # Specify the cell types of interest for assigning one label per cell
 cellTypes <- c("B cells",
-                "gd T cells", "CD4 T cells", "CD8 T cells",
-                "NK cells", "NK T cells")
+               "gd T cells", "CD4 T cells", "CD8 T cells",
+               "NK cells", "NK T cells")
+                
+# Load manual labels (e.g. GetFlowJoLabels can be used to extract labels from
+# an fcs file)
+ 
+gatingResult <- as.factor(read.csv(gating_file, header = FALSE)[, 1])
 
-# Parse the FlowJo workspace     
-gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
-                                cellTypes = cellTypes)
-
-# Check the number of cells assigned to each gate
-colSums(gatingResult$matrix)
 
 # Build a FlowSOM tree
 flowSOM.res <- FlowSOM(fcs_file,
@@ -60,7 +59,7 @@ flowSOM.res <- FlowSOM(fcs_file,
    
  # Plot pies indicating the percentage of cell types present in the nodes
  PlotPies(flowSOM.res,
-          gatingResult$manual,
+          gatingResult,
           backgroundValues = flowSOM.res$metaclustering)
           
 }

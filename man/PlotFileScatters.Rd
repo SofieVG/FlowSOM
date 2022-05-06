@@ -8,8 +8,8 @@ PlotFileScatters(
   input,
   fileID = "File",
   channels = NULL,
-  yMargin = NULL,
-  yLabel = c("marker"),
+  yLim = NULL,
+  yLabel = "marker",
   quantiles = NULL,
   names = NULL,
   groups = NULL,
@@ -37,11 +37,10 @@ default to "File" (File ID column in the
 if NULL (default), all channels from the input will be 
 plotted}
 
-\item{yMargin}{Optional parameter to specify the margins of the 
-y-axis}
+\item{yLim}{Optional vector of a lower and upper limit of the y-axis}
 
 \item{yLabel}{Determines the label of the y-axis. Can be "marker" and\\or
-"channel". Default = "marker".}
+"channel" or abbrevations. Default = "marker".}
 
 \item{quantiles}{If provided (default NULL), a numeric vector with values
 between 0 and 1. These quantiles are indicated on the plot}

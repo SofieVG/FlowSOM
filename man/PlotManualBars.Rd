@@ -42,17 +42,17 @@ Function to plot the manual labels per FlowSOM (meta)cluster in a barplot
 \examples{
 # Identify the files
 fcs_file <- system.file("extdata", "68983.fcs", package = "FlowSOM")
-wsp_file <- system.file("extdata", "gating.wsp", package = "FlowSOM")
+gating_file <- system.file("extdata", "gatingResult.csv", package = "FlowSOM")
 
 # Specify the cell types of interest for assigning one label per cell
 cellTypes <- c("B cells",
                 "gd T cells", "CD4 T cells", "CD8 T cells",
                 "NK cells", "NK T cells")
                 
-# Parse the FlowJo workspace   
-library(flowWorkspace)             
-gatingResult <- GetFlowJoLabels(fcs_file, wsp_file,
-                                cellTypes = cellTypes)               
+# Load manual labels (e.g. GetFlowJoLabels can be used to extract labels from
+# an fcs file)
+ 
+gatingResult <- as.factor(read.csv(gating_file, header = FALSE)[, 1])
 
 # Build a FlowSOM object
 flowSOM.res <- FlowSOM(fcs_file,
@@ -68,7 +68,7 @@ flowSOM.res <- FlowSOM(fcs_file,
 pdf("PlotManualBars.pdf")
 PlotManualBars(fsom = flowSOM.res,
                fcs = fcs_file,
-               manualVector = gatingResult$manual,
+               manualVector = gatingResult,
                manualOrder = c(cellTypes, "Unlabeled"),
                colors = c("#F8766D", "#B79F00", "#00BA38", "#00BFC4", 
                           "#619CFF", "#F564E3", "#D3D3D3"))

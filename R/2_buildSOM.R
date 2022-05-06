@@ -617,10 +617,11 @@ GetClusterCVs <- function(fsom){
 #'                          or the BuildSOM function
 #' @param  files            Either a vector of FCS files or paths to FCS files  
 #' @param  level            Level(s) of interest. Default is c("clusters",
-#'                          "metaclusters"), but can also be only one of them
+#'                          "metaclusters"), but can also be only one of them. 
+#'                          Can be abbreviated.
 #' @param  type             Type of features to extract. Default is "counts", 
 #'                          can be a vector of "counts", "percentages", "MFIs"
-#'                          and/or "percentages_positive"
+#'                          and/or "percentages_positive" or abbreviations.
 #' @param  MFI              Vector with channels / markers for which the MFI 
 #'                          values must be returned when "MFIs" is in \code{type}
 #' @param  positive_cutoffs Named vector with fluorescence-intensity values
@@ -682,19 +683,21 @@ GetFeatures <- function(fsom,
   nclus <- NClusters(fsom)
   nfiles <- length(files)
   i <- 0
+  level <- pmatch(level, c("clusters", "metaclusters"))
+  type <- pmatch(type, c("counts", "percentages", "MFIs", "percentages_positive"))
   
   #----Warnings----
   if (!is.null(filenames) & length(filenames) != nfiles){
-    stop("Filenames vector should have same length as files vector.")
+    stop("\"filenames\" vector should have same length as \"files\" vector.")
   }
   
-  if (sum(level %in% c("clusters", "metaclusters")) != length(level)){
-    stop("level should be \"clusters\" and/or \"metaclusters\".")
-  }
+  if (any(is.na(level)) | length(level) > 2){
+    stop("\"level\" should be \"clusters\" and/or \"metaclusters\".")
+  } else {level <- c("clusters", "metaclusters")[level]}
   
-  if (sum(type %in% c("counts", "percentages", "MFIs", "percentages_positive")) != length(type)){
-    stop("level should be \"counts\", \"percentages\", \"MFIs\" and/or \"percentages_positive\".")
-  }
+  if (any(is.na(type)) | length(type) > 4){
+    stop("\"type\" should be \"counts\", \"percentages\", \"MFIs\" and/or \"percentages_positive\".")
+  } else {type <- c("counts", "percentages", "MFIs", "percentages_positive")[type]}
   
   if ("MFIs" %in% type & is.null(MFI)){
     stop("Please provide channel names for MFI calculation")
@@ -705,7 +708,7 @@ GetFeatures <- function(fsom,
   }
   
   if (!is.null(positive_cutoffs) & length(names(positive_cutoffs)) == 0){
-    stop("positive_cutoffs must be a named vector")
+    stop("\"positive_cutoffs\" must be a named vector")
   }
   
   matrices <- list()
@@ -1041,7 +1044,7 @@ GroupStats <- function(features, groups){
 #' 
 #' @param fsom        FlowSOM object
 #' @param level       Character string, should be either "clusters" or 
-#'                    "metaclusters" (default)
+#'                    "metaclusters" (default) or abbreviations.
 #' 
 #' @return A named vector with the counts
 #' 
@@ -1061,18 +1064,24 @@ GroupStats <- function(features, groups){
 #' GetCounts(flowSOM.res, level = "clusters")
 #' @export
 GetCounts <- function(fsom, level = "metaclusters"){
+  level <- pmatch(level, c("metaclusters", "clusters"))
   fsom <- UpdateFlowSOM(fsom)
-  if (!is.null(fsom$metaclustering) && level == "metaclusters"){
-    counts <- rep(NA, NMetaclusters(fsom))
-    names(counts) <- paste("MC", levels(fsom$metaclustering))
-    tmp <- table(GetMetaclusters(fsom))
-    counts[paste("MC", names(tmp))] <- tmp
-  } else if (level == "clusters"){
-    counts <- rep(NA, NClusters(fsom))
-    names(counts) <- paste("C", seq_len(NClusters(fsom)))
-    tmp <- table(GetClusters(fsom))
-    counts[paste("C", names(tmp))] <- tmp
-  } else stop("level should be \"clusters\" or \"metaclusters\"")
+  if (length(level) > 1 | any(is.na(level))){
+    stop("level should be \"clusters\" or \"metaclusters\"")
+  } else {
+    level <- c("metaclusters", "clusters")[level]
+    if (!is.null(fsom$metaclustering) && level == "metaclusters"){
+      counts <- rep(NA, NMetaclusters(fsom))
+      names(counts) <- paste("MC", levels(fsom$metaclustering))
+      tmp <- table(GetMetaclusters(fsom))
+      counts[paste("MC", names(tmp))] <- tmp
+    } else if (level == "clusters"){
+      counts <- rep(NA, NClusters(fsom))
+      names(counts) <- paste("C", seq_len(NClusters(fsom)))
+      tmp <- table(GetClusters(fsom))
+      counts[paste("C", names(tmp))] <- tmp
+    }
+  }
   return(counts)
 }
 
@@ -1082,7 +1091,7 @@ GetCounts <- function(fsom, level = "metaclusters"){
 #' 
 #' @param fsom        FlowSOM object
 #' @param level       Character string, should be either "clusters" or 
-#'                    "metaclusters" (default)
+#'                    "metaclusters" (default) or abbreviations.
 #' 
 #' @return A named vector with the percentages
 #' 

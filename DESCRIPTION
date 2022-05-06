@@ -1,6 +1,6 @@
 Package: FlowSOM
-Version: 2.3.1
-Date: 2022-02-24
+Version: 2.5.1
+Date: 2022-06-05
 Title: Using self-organizing maps for visualization and interpretation
     of cytometry data
 Authors@R: c(person("Sofie", "Van Gassen", role = c("aut", "cre"),
@@ -21,32 +21,28 @@ Depends:
 Imports:
     stats,
     utils,
-    BiocGenerics,
     colorRamps,
     ConsensusClusterPlus,
-    CytoML,
     dplyr,
     flowCore,
-    flowWorkspace,
     ggforce,
     ggnewscale,
     ggplot2,
-    ggpointdensity,
     ggpubr,
-    ggrepel,
     grDevices,
     magrittr,
     methods,
-    pheatmap,
-    RColorBrewer,
     rlang,
     Rtsne,
-    tidyr,
-    XML,
-    scattermore
+    tidyr
 Suggests:
     BiocStyle,
-    testthat
+    testthat,
+    CytoML,
+    flowWorkspace,
+    ggrepel,
+    pheatmap,
+    ggpointdensity
 Description: FlowSOM offers visualization options for cytometry data,
     by using Self-Organizing Map clustering and Minimal Spanning Trees.
 License: GPL (>= 2)

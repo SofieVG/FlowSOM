@@ -10,7 +10,7 @@ PlotNumbers(fsom, level = "clusters", maxNodeSize = 0, ...)
 \item{fsom}{FlowSOM object}
 
 \item{level}{Character string, should be either "clusters" or 
-"metaclusters"}
+"metaclusters". Can be abbreviated.}
 
 \item{maxNodeSize}{Determines the maximum node size. Default is 0. 
 See \code{\link{PlotFlowSOM}} for more options.}

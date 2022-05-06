@@ -1,3 +1,16 @@
+CHANGES IN VERSION 2.5.1 (2022/05/06)
+--------------------------------------
+o Version bump to get the same version as on BioConductor
+o Changed yMargin parameter in PlotFileScatters to yLim for consistency
+o Added possibility to use abbrevations in GetFeatures, GetCounts, GetPercentages, 
+  PlotFileScatters, PlotDimRed, ParseQuery, Plot2DScatters and PlotNumbers
+o Moved UpdateFlowSOM to 0_FlowSOM.R
+o Changed examples in PlotFlowSOM, PlotVariable and PlotStars
+o Fixed issues from check: deleted examples with GetFlowJoLabels and used a csv 
+  instead, changed geom_scattermore to geom_hex for less dependencies. 
+  Moved packages to Suggest instead of Import.
+o ParseNodeSize is now exported
+
 CHANGES IN VERSION 2.1.38 (2022/02/24)
 --------------------------------------
 o Added possibility to provide a seed when using metaClustering_hclust,

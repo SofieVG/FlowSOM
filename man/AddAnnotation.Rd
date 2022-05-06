@@ -46,7 +46,7 @@ Add annotation to a FlowSOM plot
 }
 \examples{
 
-#' # Identify the files
+# Identify the files
 fcs <- flowCore::read.FCS(system.file("extdata", "68983.fcs", 
                                       package = "FlowSOM"))
 # Build a FlowSOM object

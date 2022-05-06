@@ -10,7 +10,7 @@ GetCounts(fsom, level = "metaclusters")
 \item{fsom}{FlowSOM object}
 
 \item{level}{Character string, should be either "clusters" or 
-"metaclusters" (default)}
+"metaclusters" (default) or abbreviations.}
 }
 \value{
 A named vector with the counts

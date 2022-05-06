@@ -79,19 +79,9 @@ flowSOM.res <- FlowSOM(fcs_file,
                        
 # Plot with background coloring
 PlotFlowSOM(flowSOM.res,
-            backgroundValues = flowSOM.res$metaclustering)
+            backgroundValues = flowSOM.res$metaclustering) \%>\% 
+            AddLabels(seq(100))
 
-# Own layout
-mfis <- GetClusterMFIs(flowSOM.res)[,GetChannels(flowSOM.res, c("CD3", "CD4"))]
-PlotFlowSOM(flowSOM.res,
-            view = mfis,
-            maxNodeSize = 0.1,
-            backgroundValues = flowSOM.res$metaclustering)
-            
-# Adapted node sizes
-PlotFlowSOM(flowSOM.res,
-              nodeSizes = 1:100,
-              view = "grid")
 
 }
 \seealso{
