@@ -75,8 +75,6 @@
 #' # Get metaclustering per cell
 #' flowSOM.clustering <- GetMetaclusters(flowSOM.res)
 #' 
-#' 
-#' 
 #' @importFrom BiocGenerics colnames
 #' @importFrom ConsensusClusterPlus ConsensusClusterPlus
 #' @importFrom flowCore read.FCS compensate transform logicleTransform exprs 
@@ -84,7 +82,6 @@
 #' @importFrom igraph graph.adjacency minimum.spanning.tree layout.kamada.kawai
 #'             plot.igraph add.vertex.shape get.edges shortest.paths E V 'V<-'
 #'             igraph.shape.noclip
-#' @importFrom RColorBrewer brewer.pal
 #' @importFrom rlang .data
 #' @importFrom stats prcomp
 #' @importFrom utils capture.output packageVersion

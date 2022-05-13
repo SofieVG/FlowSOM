@@ -115,8 +115,6 @@ PlotStars(flowSOM.res,
 # Get metaclustering per cell
 flowSOM.clustering <- GetMetaclusters(flowSOM.res)
 
-
-
 }
 \seealso{
 \code{\link{scale}}, 

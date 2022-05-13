@@ -1164,6 +1164,10 @@ Plot2DScatters <- function(fsom,
     stop("Length of color list should be equal to the joined length ",
          "of the clusters and metaclusters")
   } 
+  if (density == TRUE & !requireNamespace("ggpointdensity", quietly = TRUE)){
+    message("\"ggpointdensity\" not available. Please install.")
+    density <- FALSE
+  }
   
   #----Join the clusters and metaclusters of interest----
   i <- sample(nrow(fsom$data), 
@@ -1260,14 +1264,11 @@ Plot2DScatters <- function(fsom,
         if (!is.null(yLim)) p <- p + ggplot2::ylim(yLim)
         
         if (density) {
-          if (requireNamespace("ggpointdensity", quietly = TRUE)) {
-            # subset density plot
-            p <- p  + ggpointdensity::geom_pointdensity(size = sizePoints) + 
-              ggplot2::scale_color_gradientn(colors = 
-                                               colorRamps::matlab.like2(10))
-          } else {
-            message("\"ggpointdensity\" not available. Please install.")
-          }
+          # subset density plot
+          p <- p  + ggpointdensity::geom_pointdensity(size = sizePoints) + 
+            ggplot2::scale_color_gradientn(colors = 
+                                             colorRamps::matlab.like2(10))
+          
         } else {
           # if no colors are given, the default colors of ggplot are used
           if (is.null(color)){ 
