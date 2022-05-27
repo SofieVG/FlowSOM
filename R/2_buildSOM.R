@@ -161,7 +161,7 @@ SOM <- function (data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
                  alpha = c(0.05, 0.01),
                  radius = stats::quantile(nhbrdist, 0.67) * c(1, 0), 
                  init = FALSE, initf = Initialize_KWSP, distf = 2, 
-                 silent = FALSE,
+                 silent = FALSE, map = FALSE,
                  codes = NULL, importance = NULL){
   if (!is.null(codes)){
     if((ncol(codes) != ncol(data)) | (nrow(codes) != xdim * ydim)){
@@ -225,7 +225,11 @@ SOM <- function (data, xdim = 10, ydim = 10, rlen = 10, mst = 1,
   }
   
   if(!silent) message("Mapping data to SOM\n")
-  mapping <- MapDataToCodes(codes, data)
+
+  if (map)
+    mapping <- MapDataToCodes(codes, data)
+  else
+    mapping <- NULL
   
   return(list(xdim = xdim, ydim = ydim, rlen = rlen, mst = mst, alpha = alpha,
               radius = radius, init = init, distf = distf,
