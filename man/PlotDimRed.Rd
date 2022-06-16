@@ -10,7 +10,9 @@ PlotDimRed(
   colorBy = "metaclusters",
   cTotal = NULL,
   dimred = Rtsne::Rtsne,
-  extractLayout = function(dimred) {     dimred$Y },
+  extractLayout = function(dimred) {
+     dimred$Y
+ },
   label = TRUE,
   returnLayout = FALSE,
   seed = NULL,

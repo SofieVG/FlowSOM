@@ -775,8 +775,8 @@ GetChannels <- function(object, markers, exact = TRUE) {
     }
     if (length(iChannel) != 0){
       for (i in iChannel){
-        channel <- object_channels[iChannel]
-        names(channel) <- object_markers[iChannel]
+        channel <- object_channels[i]
+        names(channel) <- object_markers[i]
         channelnames <- c(channelnames, channel)
       }
     } else {
