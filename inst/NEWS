@@ -1,3 +1,8 @@
+CHANGES IN VERSION 2.5.4 (2022/06/29)
+--------------------------------------
+o percentage_positives in GetFeatures now works with a FlowSOM with 
+  updated metacluster labels
+
 CHANGES IN VERSION 2.5.3 (2022/06/16)
 --------------------------------------
 o Bugfix in GetChannels

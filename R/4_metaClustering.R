@@ -275,7 +275,7 @@ GetMetaclusterMFIs <- function(fsom, colsUsed = FALSE, prettyColnames = FALSE){
 GetMetaclusterPercentagesPositive <- function(fsom, cutoffs, colsUsed = FALSE, prettyColnames = FALSE){
   fsom <- UpdateFlowSOM(fsom)
   mc_per_cell <- GetMetaclusters(fsom)
-  metaclusters <- seq_len(NMetaclusters(fsom))
+  metaclusters <- levels(fsom$metaclustering)
   
   if(is.null(fsom$map$colsUsed)) colsUsed <- FALSE
   if(is.null(fsom$prettyColnames)) prettyColnames <- FALSE
@@ -287,10 +287,8 @@ GetMetaclusterPercentagesPositive <- function(fsom, cutoffs, colsUsed = FALSE, p
   
   perc_pos <- matrix(NA,
                      nrow = length(metaclusters),
-                     ncol = length(cutoffs))
-  rownames(perc_pos) <- metaclusters
-  colnames(perc_pos) <- names(cutoffs)
-  
+                     ncol = length(cutoffs), dimnames = list(metaclusters,
+                                                             names(cutoffs)))
   i <- 0
   for (metacluster in metaclusters){
     i <- i + 1

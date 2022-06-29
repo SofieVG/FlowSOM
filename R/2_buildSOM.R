@@ -748,7 +748,7 @@ GetFeatures <- function(fsom,
                       ncol = nmarker * nmetaclus,
                       dimnames = list(filenames,
                                       paste0(rep(paste0("MC", 
-                                                        seq_len(nmetaclus)), 
+                                                        levels(fsom$metaclustering)), 
                                                  each = nmarker), 
                                              " ", fsom$prettyColnames[MFI])))
   }
@@ -770,7 +770,7 @@ GetFeatures <- function(fsom,
                           ncol = nmarker * nmetaclus,
                           dimnames = list(filenames,
                                           paste0(rep(paste0("MC", 
-                                                            seq_len(nmetaclus)), 
+                                                            levels(fsom$metaclustering)), 
                                                      each = nmarker), 
                                                  " ", fsom$prettyColnames[perc_pos])))
   }
