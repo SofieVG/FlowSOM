@@ -7,36 +7,27 @@
 AddAnnotation(
   p,
   fsom,
-  layout = fsom$MST$l,
-  cl = NULL,
-  mcl = NULL,
-  clCustomLabels = NULL,
-  mclCustomLabels = NULL,
-  hjust = 0.5,
+  toAnnotate = NULL,
+  prefix = list(metaclusters = "MCL ", clusters = "CL "),
   ...
 )
 }
 \arguments{
-\item{p}{Plot to add annotation to. When using type = "stars", please 
-use plot = FALSE in \code{\link{PlotFlowSOM}}.}
+\item{p}{Plot to add annotation to. When using \code{\link{PlotStars}},
+please use list_insteadof_ggarrange = TRUE.}
 
-\item{fsom}{FlowSOM object that goes with the plot}
+\item{fsom}{FlowSOM object that goes with the plot.}
 
-\item{layout}{Layout to use. Default fsom$MST$l}
+\item{toAnnotate}{A named list with "metaclusters" and/or "clusters" as names
+and a vector with the (meta)clusters that need to be 
+annotated. Names can be abbreviated. Use a named vector with 
+the old names as values and new labels as names for custom 
+labeling.}
 
-\item{cl}{Clusters to annotate. If cl = "all", all clusters will be 
-annotated}
+\item{prefix}{Prefix to be added to labels. Default is "MCL " and "CL " for
+metaclusters and clusters respectively.}
 
-\item{mcl}{Metaclusters to annotate. If mcl = "all", all metaclusters 
-will be annotated}
-
-\item{clCustomLabels}{Cluster labels to use for annotation}
-
-\item{mclCustomLabels}{Metacluster labels to use for annotation}
-
-\item{hjust}{Label adjustment. Default = 0.5}
-
-\item{...}{Arguments passed to geom_text_repel}
+\item{...}{Arguments passed to geom_text_repel.}
 }
 \value{
 The updated plot
@@ -61,6 +52,9 @@ flowSOM.res <- FlowSOM(fcs,
                        
 p <- PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering,
                list_insteadof_ggarrange = TRUE)
-AddAnnotation(p, flowSOM.res, cl = c(1, 2), mcl = c(3, 4))
+annotationList <- list("metaclusters" = c("CD8 T cells" = "1", "B cells" = "8"),
+                   "clusters" = c(97))
+AddAnnotation(p, flowSOM.res, toAnnotate = annotationList, 
+              prefix = list("metaclusters" = "", clusters = "CL "))
 
 }

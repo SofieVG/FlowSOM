@@ -1,3 +1,9 @@
+CHANGES IN VERSION 2.5.5 (2022/06/30)
+--------------------------------------
+o AddAnnotation now works correctly after using UpdateMetaclusters. The function
+  also works slightly different. See examples.
+o Fixed issue with wrong coloring in PlotDimRed
+  
 CHANGES IN VERSION 2.5.4 (2022/06/29)
 --------------------------------------
 o percentage_positives in GetFeatures now works with a FlowSOM with 

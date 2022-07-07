@@ -776,15 +776,17 @@ PlotDimRed <- function(fsom,
   if (colorBy == "marker"){
     dimred_plot <- dimred_plot %>% tidyr::pivot_longer(3:ncol(dimred_plot), 
                                                        names_to = "markers")
-    p <- ggplot2::ggplot(dimred_plot) + 
-      ggplot2::geom_hex(ggplot2::aes(x = .data$dimred_1, 
-                                     y = .data$dimred_2, 
-                                     weight = .data$value), 
-                                    bins = 200, size = 2) +
+    p <- ggplot(dimred_plot) + 
+      ggplot2::stat_summary_hex(fun = function(x) mean(x), 
+                       bins = 200, 
+                       ggplot2::aes(x = .data$dimred_1, 
+                                    y = .data$dimred_2, 
+                                    z = .data$value)) +
       ggplot2::facet_wrap(~markers) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
       ggplot2::scale_fill_gradientn(colors = FlowSOM_colors(9))
+    
   } else {
     colnames(dimred_plot) <- c("dimred_1", "dimred_2", "colors")
     
@@ -2604,18 +2606,17 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
 #' 
 #' Add annotation to a FlowSOM plot
 #' 
-#' @param p       Plot to add annotation to. When using type = "stars", please 
-#'                use plot = FALSE in \code{\link{PlotFlowSOM}}.
-#' @param fsom    FlowSOM object that goes with the plot
-#' @param layout  Layout to use. Default fsom$MST$l
-#' @param cl      Clusters to annotate. If cl = "all", all clusters will be 
-#'                annotated
-#' @param mcl     Metaclusters to annotate. If mcl = "all", all metaclusters 
-#'                will be annotated
-#' @param clCustomLabels Cluster labels to use for annotation
-#' @param mclCustomLabels Metacluster labels to use for annotation
-#' @param hjust   Label adjustment. Default = 0.5
-#' @param ...     Arguments passed to geom_text_repel
+#' @param p        Plot to add annotation to. When using \code{\link{PlotStars}},
+#'                 please use list_insteadof_ggarrange = TRUE.
+#' @param fsom     FlowSOM object that goes with the plot.
+#' @param toAnnotate A named list with "metaclusters" and/or "clusters" as names
+#'                 and a vector with the (meta)clusters that need to be 
+#'                 annotated. Names can be abbreviated. Use a named vector with 
+#'                 the old names as values and new labels as names for custom 
+#'                 labeling.
+#' @param prefix   Prefix to be added to labels. Default is "MCL " and "CL " for
+#'                 metaclusters and clusters respectively.
+#' @param ...      Arguments passed to geom_text_repel.
 #' 
 #' @return The updated plot
 #' 
@@ -2636,64 +2637,93 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
 #'                        
 #' p <- PlotStars(flowSOM.res, backgroundValues = flowSOM.res$metaclustering,
 #'                list_insteadof_ggarrange = TRUE)
-#' AddAnnotation(p, flowSOM.res, cl = c(1, 2), mcl = c(3, 4))
+#' annotationList <- list("metaclusters" = c("CD8 T cells" = "1", "B cells" = "8"),
+#'                    "clusters" = c(97))
+#' AddAnnotation(p, flowSOM.res, toAnnotate = annotationList, 
+#'               prefix = list("metaclusters" = "", clusters = "CL "))
 #' 
-#' @importFrom dplyr group_by filter row_number
-#' @importFrom ggplot2 geom_text
+#' @import ggplot2 
+#' @importFrom dplyr group_by filter slice
 #' @importFrom ggpubr ggarrange
 #' 
 #' @export
-AddAnnotation <- function(p, fsom, layout = fsom$MST$l, cl = NULL, mcl = NULL, 
-                          clCustomLabels = NULL, mclCustomLabels = NULL, 
-                          hjust = 0.5, ...){
+AddAnnotation <- function(p, 
+                          fsom, 
+                          toAnnotate = NULL, 
+                          prefix = list("metaclusters" = "MCL ", "clusters" = "CL "), 
+                          ...){
+  # Initialize
+  if (is.null(toAnnotate)) stop("Please add a named list to \"toAnnotate\"")
+  if (is(p, "ggarrange")){
+    stop(paste0("Please set \"list_insteadof_ggarrange = TRUE\" when using this",
+                " function in combination with PlotStars"))
+  }
   listOrGGplot <- "tree" %in% names(p)
   if (listOrGGplot) {
     l1 <- p[["starLegend"]]
     l2 <- p [["backgroundLegend"]]
     p <- p[["tree"]]
   }
+  abb_toAnnotate <- abb_prefix <- NULL
   fsom <- UpdateFlowSOM(fsom)
-  if (!is.data.frame(layout)) layout <- as.data.frame(layout)
+  for (toAnnotate_prefix in c("toAnnotate", "prefix")){
+    toCheck <- get(toAnnotate_prefix)
+    abbreviations <- pmatch(names(toCheck), c("clusters", "metaclusters"))
+    assign(paste0("abb_", toAnnotate_prefix), abbreviations)
+    if (any(is.na(abbreviations))){
+      stop(paste0("Please use \"clusters\" and/or \"metaclusters\" or abbrevations",
+                  " as names of the \"", toAnnotate_prefix,"\" list"))
+    }
+  }
+  names(toAnnotate) <- c("clusters", "metaclusters")[abb_toAnnotate]
+  names(prefix) <- c("clusters", "metaclusters")[abb_prefix]
+  oldClNames <- toAnnotate$clusters
+  if (any(!oldClNames %in% seq(NClusters(fsom)))){
+    stop("Cluster name is not present in the fsom object")
+  }
+  oldMclNames <- toAnnotate$metaclusters
+  layout <- as.data.frame(ggplot2::ggplot_build(p)$plot$data)[, seq(2)]
   colnames(layout) <- c("V1", "V2")
   clusterLabels <- data.frame(layout, 
                               cl = as.character(seq_len(fsom$map$nNodes)), 
                               metacl = as.character(fsom$metaclustering))
   labels <- list()
-  if (!is.null(mcl)){
+  if (!is.null(oldMclNames)){
     metaclusterLabels <- clusterLabels %>% 
       dplyr::group_by(.data$metacl) %>% 
-      dplyr::filter(dplyr::row_number() == 1) %>% 
-      as.data.frame()
-    if (!"all" %in% mcl){
-      metaclusterLabels <- metaclusterLabels[
-        which(metaclusterLabels$metacl %in% mcl), ]
+      dplyr::slice(1) %>% 
+      as.data.frame() %>% 
+      mutate(label = .data$metacl)
+    newMCLNames <- names(oldMclNames)
+    oldMclNames <- match(oldMclNames, metaclusterLabels$metacl)
+    if (any(is.na(oldMclNames))){
+      stop("Old metacluster name is not present in the fsom object")
     }
-    if (!is.null(mclCustomLabels)){
-      metaclusterLabels$label <- mclCustomLabels
-    } else {
-      metaclusterLabels$label <- paste0("MCL", metaclusterLabels$metacl)
-    }
-    labels[["metaclusters"]] <- metaclusterLabels
+    if (!is.null(newMCLNames)){
+      names(oldMclNames) <- newMCLNames
+      metaclusterLabels$label[oldMclNames] <- newMCLNames
+    } 
+    metaclusterLabels$label <- paste0(prefix$metaclusters, metaclusterLabels$label)
+    labels[["metaclusters"]] <- metaclusterLabels[oldMclNames, ]
   }
-  if (!is.null(cl)){
-    if (!"all" %in% cl){
-      clusterLabels <- clusterLabels[which(clusterLabels$cl %in% cl), ]
-    }
-    if (!is.null(clCustomLabels)){
-      clusterLabels$label <- clCustomLabels
-    } else {
-      clusterLabels$label <- paste0("CL", clusterLabels$cl)
-    }
-    labels[["clusters"]] <- clusterLabels
+  if (!is.null(oldClNames)){
+    clusterLabels <- clusterLabels %>% mutate(label = .data$cl)
+    newCLNames <- names(oldClNames)
+    if (!is.null(newCLNames)){
+      clusterLabels$label[as.numeric(oldClNames)] <- newCLNames
+    } 
+    clusterLabels$label <- paste0(prefix$clusters, clusterLabels$label)
+    labels[["clusters"]] <- clusterLabels[oldClNames, ]
   }
-  labels <- do.call(rbind, labels)
-  
+  labels <- do.call(rbind, labels) %>% as.data.frame() 
+  emptyString <- clusterLabels %>% mutate(label = "") 
+  labels <- rbind(labels, emptyString)
   if (requireNamespace("ggrepel", quietly = TRUE)) {
     p <- p + ggrepel::geom_text_repel(data = labels, 
                                       ggplot2::aes(x = .data$V1, y = .data$V2, 
                                                    label = .data$label), 
                                       segment.color = "gray", force = 20, 
-                                      segment.size = 0.2, point.padding = 0.5,
+                                      segment.size = 0.2, point.padding = 0.5, size = 5,
                                       ...)
   } else {
     p <- p + ggplot2::geom_text(data = labels, 
