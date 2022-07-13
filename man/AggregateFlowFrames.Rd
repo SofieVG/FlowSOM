@@ -17,7 +17,7 @@ AggregateFlowFrames(
 }
 \arguments{
 \item{fileNames}{Character vector containing full paths to the FCS files
-to aggregate}
+or a flowSet to aggregate}
 
 \item{cTotal}{Total number of cells to write to the output file}
 
