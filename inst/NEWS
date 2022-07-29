@@ -1,3 +1,9 @@
+CHANGES IN VERSION 2.5.6 (2022/07/29s)
+--------------------------------------
+o Reversed PlotDimred back to scattermore instead of geom_hex. Uses geom_point
+  if scattermore is not available.
+o Added support for custom colors and limits in PlotDimRed
+
 CHANGES IN VERSION 2.5.5 (2022/06/30)
 --------------------------------------
 o AddAnnotation now works correctly after using UpdateMetaclusters. The function
@@ -18,8 +24,9 @@ CHANGES IN VERSION 2.5.2 (2022/05/13)
 o Bugfixes to pass BioConductor check
 o Bugfixes in Plot2DScatters: when ggpointdensity is not installed, normal
   ggplot colors are used
-  
-o ParseNodeSize is now exportedCHANGES IN VERSION 2.5.1 (2022/05/06)
+o ParseNodeSize is now exported
+
+CHANGES IN VERSION 2.5.1 (2022/05/06)
 --------------------------------------
 o Version bump to get the same version as on BioConductor
 o Changed yMargin parameter in PlotFileScatters to yLim for consistency
@@ -189,7 +196,6 @@ o FlowSOMmary doesn't crash anymore with a column with the same values in
 o Included a print function for FlowSOM class
 o Fixed bug in PlotManualBars
 o PlotMarker also accept multiple markers now
-
 
 CHANGES IN VERSION 2.1.8 (2020/11/19)
 --------------------------------------

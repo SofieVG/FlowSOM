@@ -18,7 +18,7 @@ Plot2DScatters(
   xyLabels = c("marker"),
   density = TRUE,
   centers = TRUE,
-  color = NULL,
+  colors = NULL,
   plotFile = "2DScatterPlots.png"
 )
 }
@@ -56,7 +56,7 @@ use a plain color}
 
 \item{centers}{Default is \code{TRUE} to show the cluster centers}
 
-\item{color}{Colors for all the cells in the selected nodes 
+\item{colors}{Colors for all the cells in the selected nodes 
 (ordered list). First the clusters are colored, 
 then the metaclusters. If \code{NULL}, the default 
 ggplot colors, indexed by metacluster number, are used.}
@@ -107,6 +107,6 @@ Plot2DScatters(fsom = flowSOM.res,
                channelpairs = list(c("PE-Texas Red-A", "Pacific Blue-A")),
                metaclusters = list(c(1, 4)),
                density = FALSE,
-               color = list(c("red", "green")))
+               colors = list(c("red", "green")))
 
 }
