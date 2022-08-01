@@ -723,32 +723,36 @@ PlotDimRed <- function(fsom,
                        title = NULL,
                        ...){
   dimred_data <- fsom$data
-  if (length(colorBy) == 1 && colorBy == "metaclusters") {
-    if (is.null(fsom$metaclustering)) stop("No metaclustering present")
-    dimred_col <- as.data.frame(GetMetaclusters(fsom))
-  } else if (length(colorBy) == 1 && colorBy == "clusters") {
-    dimred_col <- as.data.frame(as.factor(GetClusters(fsom)))
-  } else if (all(colorBy %in% colnames(dimred_data)) ||
-             all(colorBy %in% GetMarkers(fsom, colnames(dimred_data))) ||
-             all(colorBy %in% seq_len(ncol(dimred_data)))){
-    dimred_col <- fsom$data[, GetChannels(fsom, colorBy), drop = FALSE]
-    colnames(dimred_col) <- GetMarkers(fsom, colnames(dimred_col))
-    colorBy <- "marker"
-  } else stop(paste0("colorBy should be \"metaclusters\", \"clusters\" or a ",
-                     "vector of channels, markers or indices"))
-   if (is.null(colors)){
-     if (colorBy == "marker") colors <- FlowSOM_colors(9)
-     else colors <- gg_color_hue(nlevels(dimred_col[, 1]))
-   } else {
-     if (length(colors) != nlevels(dimred_col[, 1]) && colorBy != "marker") {
-       stop(paste0("Length of \"colors\" (", length(colors), ") should be ",
-                   "equal to the amount of levels in \"", colorBy, "\" (", 
-                   nlevels(dimred_col[, 1]), ")."))
-     }
-   }
-
+  colorBy_pmatch <- pmatch(colorBy, c("metaclusters", "clusters"))
+  
+  if (any(is.na(colorBy_pmatch))){
+    if (all(colorBy %in% colnames(dimred_data)) ||
+        all(colorBy %in% GetMarkers(fsom, colnames(dimred_data))) ||
+        all(colorBy %in% seq_len(ncol(dimred_data)))){
+      dimred_col <- fsom$data[, GetChannels(fsom, colorBy), drop = FALSE]
+      colnames(dimred_col) <- GetMarkers(fsom, colnames(dimred_col))
+      colorBy <- "marker"
+    } else {
+      stop(paste0("\"colorBy\" should be \"metaclusters\", \"clusters\" or a ",
+                  "vector of channels, markers or indices"))
+    }
+  } else {
+    if (length(colorBy) > 1){
+      stop(paste0("\"colorBy\" should be \"metaclusters\", \"clusters\" or a ",
+                  "vector of channels, markers or indices"))
+    } 
+    
+    colorBy <- c("metaclusters", "clusters")[colorBy_pmatch]
+    if (length(colorBy) == 1 && colorBy == "metaclusters") {
+      if (is.null(fsom$metaclustering)) stop("No metaclustering present")
+      dimred_col <- as.data.frame(GetMetaclusters(fsom))
+    } else if (length(colorBy) == 1 && colorBy == "clusters") {
+      dimred_col <- as.data.frame(as.factor(GetClusters(fsom)))
+    }
+  }
+  
   if (!is.null(colsToUse)) dimred_data <- dimred_data[, GetChannels(fsom, 
-                                                                    colsToUse)]
+                                                                    colsToUse)]                                                                
   if (!is.null(seed)) set.seed(seed)
   if (!is.null(cTotal) && cTotal < nrow(dimred_data)) {
     downsample <- sample(seq_len(nrow(dimred_data)), cTotal)
