@@ -751,6 +751,17 @@ PlotDimRed <- function(fsom,
     }
   }
   
+  if (is.null(colors)){
+    if (colorBy == "marker") colors <- FlowSOM_colors(9)
+    else colors <- gg_color_hue(nlevels(dimred_col[, 1]))
+  } else {
+    if (length(colors) != nlevels(dimred_col[, 1]) && colorBy != "marker") {
+      stop(paste0("Length of \"colors\" (", length(colors), ") should be ",
+                  "equal to the amount of levels in \"", colorBy, "\" (", 
+                  nlevels(dimred_col[, 1]), ")."))
+    }
+  }
+  
   if (!is.null(colsToUse)) dimred_data <- dimred_data[, GetChannels(fsom, 
                                                                     colsToUse)]                                                                
   if (!is.null(seed)) set.seed(seed)
