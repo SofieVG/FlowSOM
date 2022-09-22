@@ -667,6 +667,12 @@ PlotVariable <- function(fsom,
 #' @param colorBy         Defines how the dimensionality reduction will be 
 #'                        colored. Can be "metaclusters" (default), "clusters" 
 #'                        (or abbreviations) or a marker/channel/index.
+#' @param colors          A vector of custom colors. Default returns ggplot
+#'                        colors for categorical variables and the FlowSOM colors
+#'                        for continuous variables. When using a categorical 
+#'                        variable, the vector must be as long as
+#'                        the levels of the categorical variable.
+#' @param lim             Limits for the colorscale
 #' @param cTotal          The total amount of cells to be used in the 
 #'                        dimensionality reduction. Default is all the cells.
 #' @param dimred          A dimensionality reduction function. 
@@ -706,6 +712,8 @@ PlotVariable <- function(fsom,
 PlotDimRed <- function(fsom,
                        colsToUse = fsom$map$colsUsed,
                        colorBy = "metaclusters",
+                       colors = NULL,
+                       lim = NULL,
                        cTotal = NULL,
                        dimred = Rtsne::Rtsne,
                        extractLayout  = function(dimred){dimred$Y},
@@ -742,9 +750,20 @@ PlotDimRed <- function(fsom,
       dimred_col <- as.data.frame(as.factor(GetClusters(fsom)))
     }
   }
-   
+  
+  if (is.null(colors)){
+    if (colorBy == "marker") colors <- FlowSOM_colors(9)
+    else colors <- gg_color_hue(nlevels(dimred_col[, 1]))
+  } else {
+    if (length(colors) != nlevels(dimred_col[, 1]) && colorBy != "marker") {
+      stop(paste0("Length of \"colors\" (", length(colors), ") should be ",
+                  "equal to the amount of levels in \"", colorBy, "\" (", 
+                  nlevels(dimred_col[, 1]), ")."))
+    }
+  }
+  
   if (!is.null(colsToUse)) dimred_data <- dimred_data[, GetChannels(fsom, 
-                                                                    colsToUse)]
+                                                                    colsToUse)]                                                                
   if (!is.null(seed)) set.seed(seed)
   if (!is.null(cTotal) && cTotal < nrow(dimred_data)) {
     downsample <- sample(seq_len(nrow(dimred_data)), cTotal)
@@ -776,55 +795,57 @@ PlotDimRed <- function(fsom,
   if (colorBy == "marker"){
     dimred_plot <- dimred_plot %>% tidyr::pivot_longer(3:ncol(dimred_plot), 
                                                        names_to = "markers")
-    p <- ggplot(dimred_plot) + 
-      ggplot2::stat_summary_hex(fun = function(x) mean(x), 
-                       bins = 200, 
-                       ggplot2::aes(x = .data$dimred_1, 
-                                    y = .data$dimred_2, 
-                                    z = .data$value)) +
+    p <- ggplot2::ggplot(dimred_plot) + 
+      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
+                                                 y = .data$dimred_2, 
+                                                 col = .data$value), 
+                                    pointsize = 1) +
       ggplot2::facet_wrap(~markers) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
-      ggplot2::scale_fill_gradientn(colors = FlowSOM_colors(9))
-    
+      ggplot2::scale_color_gradientn(colors = colors, limits = lim)
   } else {
     colnames(dimred_plot) <- c("dimred_1", "dimred_2", "colors")
-    
     median_x <- tapply(dimred_plot[,"dimred_1"], dimred_plot[,"colors"], median)
     median_y <- tapply(dimred_plot[,"dimred_2"], dimred_plot[,"colors"], median)
-    
-    p <- ggplot2::ggplot(dimred_plot) +
-      ggplot2::geom_hex(ggplot2::aes(x = .data$dimred_1, 
-                                     y = .data$dimred_2, 
-                                     fill = .data$colors), 
-                        size = 2, bins = 200) +
-      ggplot2::theme_minimal() +
-      ggplot2::coord_fixed() 
+    if (requireNamespace("scattermore", quietly = TRUE)) {
+      p <- ggplot2::ggplot(dimred_plot) +
+        scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
+                                                   y = .data$dimred_2, 
+                                                   col = .data$colors), 
+                                      pointsize = 1)
+    } else {
+      message("For faster plotting with more datapoints, please install \"scattermore\"")
+      p <- ggplot2::ggplot(dimred_plot) +
+        ggplot2::geom_point(ggplot2::aes(x = .data$dimred_1, 
+                                         y = .data$dimred_2, 
+                                         col = .data$colors), 
+                            size = 1) 
+    }
+    p <- p +  ggplot2::theme_minimal() + ggplot2::coord_fixed() + 
+      scale_color_manual(values = colors)
     if (label){
       if (requireNamespace("ggrepel", quietly = TRUE)) {
         p <- p + ggrepel::geom_label_repel(ggplot2::aes(x = .data$x, 
-                                               y = .data$y, 
-                                               label = .data$label, 
-                                               color = .data$label),
+                                                        y = .data$y, 
+                                                        label = .data$label, 
+                                                        color = .data$label),
                                            data = data.frame(x = median_x,
                                                              y = median_y,
                                                              label = names(median_x)),
                                            segment.color = "gray", force = 20, 
-                                           segment.size = 0.2, point.padding = 0.5) +
-          labs(col = colorBy)
-        
+                                           segment.size = 0.2, point.padding = 0.5)
       } else {
         message("For better labels, please install \"ggrepel\"")
         p <- p + ggplot2::geom_label(ggplot2::aes(x = .data$x, 
-                                        y = .data$y, 
-                                        label = .data$label, 
-                                        color = .data$label),
-                                    data = data.frame(x = median_x,
-                                                      y = median_y,
-                                                      label = names(median_x))) +
-          labs(col = colorBy)
+                                                  y = .data$y, 
+                                                  label = .data$label, 
+                                                  color = .data$label),
+                                     data = data.frame(x = median_x,
+                                                       y = median_y,
+                                                       label = names(median_x)))
       }
-      
+      p <- p + labs(col = colorBy)
     }
   }
   if (!is.null(title)) p <- p + ggplot2::ggtitle(title)
@@ -1081,7 +1102,7 @@ PlotManualBars <- function(fsom, fcs = NULL,
 #'                          points according to density. Set to \code{FALSE} to 
 #'                          use a plain color
 #' @param centers           Default is \code{TRUE} to show the cluster centers
-#' @param color             Colors for all the cells in the selected nodes 
+#' @param colors            Colors for all the cells in the selected nodes 
 #'                          (ordered list). First the clusters are colored, 
 #'                          then the metaclusters. If \code{NULL}, the default 
 #'                          ggplot colors, indexed by metacluster number, are used.
@@ -1124,7 +1145,7 @@ PlotManualBars <- function(fsom, fcs = NULL,
 #'                channelpairs = list(c("PE-Texas Red-A", "Pacific Blue-A")),
 #'                metaclusters = list(c(1, 4)),
 #'                density = FALSE,
-#'                color = list(c("red", "green")))
+#'                colors = list(c("red", "green")))
 #' 
 #' @import     ggplot2
 #' @importFrom colorRamps matlab.like2
@@ -1146,7 +1167,7 @@ Plot2DScatters <- function(fsom,
                            xyLabels = c("marker"),
                            density = TRUE, 
                            centers = TRUE, 
-                           color = NULL,
+                           colors = NULL,
                            plotFile = "2DScatterPlots.png"){
   if(!is.null(fsom$metaclustering)){
     metacluster <- as.numeric(fsom$metaclustering)
@@ -1161,9 +1182,9 @@ Plot2DScatters <- function(fsom,
   xyLabels <- pmatch(xyLabels, c("marker", "channel"))
   #----Warnings----
   if (density == FALSE & 
-      !is.null(color) & 
-      !((length(clusters) + length(metaclusters)) == length(color))){
-    stop("Length of color list should be equal to the joined length ",
+      !is.null(colors) & 
+      !((length(clusters) + length(metaclusters)) == length(colors))){
+    stop("Length of colors list should be equal to the joined length ",
          "of the clusters and metaclusters")
   } 
   if (density == TRUE & !requireNamespace("ggpointdensity", quietly = TRUE)){
@@ -1273,20 +1294,20 @@ Plot2DScatters <- function(fsom,
           
         } else {
           # if no colors are given, the default colors of ggplot are used
-          if (is.null(color)){ 
+          if (is.null(colors)){ 
             p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
                                          size = sizePoints) +
               ggplot2::scale_color_manual(values = col) 
           } else {
             #subset plot, metacluster colors
-            if (length(color[[color_n]]) != nlevels(df_ss$Population)){
+            if (length(colors[[color_n]]) != nlevels(df_ss$Population)){
               stop(paste0("For \"", title, "\", we expect ",  
                           nlevels(df_ss$Population), " colors while only ",
-                          length(color[[color_n]]), " are given."))
+                          length(colors[[color_n]]), " are given."))
             }
             p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Population),
                                          size = sizePoints) +
-              ggplot2::scale_color_manual(values = color[[color_n]])
+              ggplot2::scale_color_manual(values = colors[[color_n]])
           }
           
         }
@@ -1294,8 +1315,8 @@ Plot2DScatters <- function(fsom,
         #----add cluster centers----
         if (centers) { 
           if (!density){
-            if (!is.null(color)){
-              col_c <- color[[color_n]]
+            if (!is.null(colors)){
+              col_c <- colors[[color_n]]
             } else {
               col_c <- col
             }
@@ -2141,7 +2162,7 @@ AddScale <- function(p,
       
       # If a function: make into the right amount of values
       if(is.function(colors)){
-        colors <- colors(length(levels(values)))
+        colors <- colors(nlevels(values))
       }
       
       # Check color names vs backgroundValues

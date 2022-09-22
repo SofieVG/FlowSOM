@@ -8,6 +8,8 @@ PlotDimRed(
   fsom,
   colsToUse = fsom$map$colsUsed,
   colorBy = "metaclusters",
+  colors = NULL,
+  lim = NULL,
   cTotal = NULL,
   dimred = Rtsne::Rtsne,
   extractLayout = function(dimred) {
@@ -29,6 +31,14 @@ Default = fsom$map$colsUsed.}
 \item{colorBy}{Defines how the dimensionality reduction will be 
 colored. Can be "metaclusters" (default), "clusters" 
 (or abbreviations) or a marker/channel/index.}
+
+\item{colors}{A vector of custom colors. Default returns ggplot
+colors for categorical variables and the FlowSOM colors
+for continuous variables. When using a categorical 
+variable, the vector must be as long as
+the levels of the categorical variable.}
+
+\item{lim}{Limits for the colorscale}
 
 \item{cTotal}{The total amount of cells to be used in the 
 dimensionality reduction. Default is all the cells.}

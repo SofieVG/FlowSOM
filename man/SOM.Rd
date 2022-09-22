@@ -16,6 +16,7 @@ SOM(
   initf = Initialize_KWSP,
   distf = 2,
   silent = FALSE,
+  map = TRUE,
   codes = NULL,
   importance = NULL
 )
@@ -44,6 +45,8 @@ SOM(
 4 = cosine)}
 
 \item{silent}{If FALSE, print status updates}
+
+\item{map}{If FALSE, data is not mapped to the SOM. Default TRUE.}
 
 \item{codes}{Cluster centers to start with}
 
