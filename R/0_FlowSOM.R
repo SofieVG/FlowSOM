@@ -201,7 +201,7 @@ print.FlowSOM <- function(x, ...){
 #' value between 0 and 0.1).
 #' 
 #' @param fileNames   Character vector containing full paths to the FCS files
-#'                    to aggregate
+#'                    or a flowSet to aggregate
 #' @param cTotal      Total number of cells to write to the output file
 #' @param channels    Channels/markers to keep in the aggregate. Default NULL 
 #'                    takes all channels of the first file.
@@ -227,8 +227,9 @@ print.FlowSOM <- function(x, ...){
 #' ff_new <- AggregateFlowFrames(c(fileName, fileName), 1000)
 #' 
 #' @importFrom flowCore read.FCS fr_append_cols keyword colnames markernames 
-#'             exprs write.FCS
+#'             exprs write.FCS sampleNames
 #' @importFrom stats rnorm
+#' @importFrom methods is
 #' 
 #' @export
 AggregateFlowFrames <- function(fileNames, 
@@ -249,8 +250,14 @@ AggregateFlowFrames <- function(fileNames,
   diffMarkers <- FALSE
   
   for(i in seq_len(nFiles)){
-    if(!silent) {message("Reading ", fileNames[i])}
-    f <- flowCore::read.FCS(fileNames[i], ...)
+    if(is(fileNames, "flowSet")) {
+      file_name <- sampleNames(fileNames)[i]
+      f <- fileNames[[i]]
+    } else {
+      file_name <- fileNames[i]
+      if(!silent) {message("Reading ", file_name)}
+      f <- flowCore::read.FCS(fileNames[i], ...)
+    }
     # Random sampling
     ids <- sample(seq_len(nrow(f)), min(nrow(f), cFile))
     
