@@ -2437,13 +2437,19 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   #----File distribution----
   if (filePresent){
     message("Plot file distribution")
-    p6 <- PlotPies(fsom, cellTypes = factor(fsom$data[, "File"]), 
+    file_cols <- fsom$data[,rev(grep("File[0-9]*$", colnames(fsom$data), 
+                                     value = TRUE)), drop = FALSE]
+    if(file_cols[1,1] != round(file_cols[1,1])){ # In case of scaled data
+      file_cols <- apply(file_cols, 2, function(x) as.numeric(factor(x)))
+    }
+    file_label <- apply(file_cols, 1, paste, collapse = " ")
+    p6 <- PlotPies(fsom, cellTypes = factor(file_label), 
                    equalNodeSize = TRUE, view = "grid", 
                    title = "File distribution per cluster", 
                    colorPalette = FlowSOM_colors)
     
     filesI <- as.character(unique(fsom$data[, "File"]))
-    expectedDistr <- rep(1, length(filesI))
+    expectedDistr <- c(table(file_label))
     names(expectedDistr) <- filesI
     arcsDf <- ParseArcs(0, 0, expectedDistr, 0.7)
     arcsDf$Markers <- factor(arcsDf$Markers, levels = filesI)

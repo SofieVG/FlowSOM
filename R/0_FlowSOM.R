@@ -246,6 +246,8 @@ AggregateFlowFrames <- function(fileNames,
   cFile <- ceiling(cTotal/nFiles)
   
   flowFrame <- NULL
+  fileMatrix <- NULL
+  
   diffNumberChannels <- FALSE
   diffMarkers <- FALSE
   
@@ -263,26 +265,27 @@ AggregateFlowFrames <- function(fileNames,
     
     if(keepOrder) ids <- sort(ids)
     
-    colnames <- c("File", "File_scattered", "Original_ID")
-    prev_agg <- length(grep("File[0-9]*$", colnames(f)))
-    if(prev_agg > 0){
-      colnames[c(1, 2)] <- paste0(colnames[c(1, 2)], prev_agg + 1)
-    }
-    prev_ids <- length(grep("Original_ID[0-9]*$", colnames(f)))
-    if(prev_ids > 0){
-      colnames[3] <- paste0(colnames[3], prev_ids + 1)
-    }
+    
     
     file_ids <- rep(i, min(nrow(f), cFile))
     
     m <- cbind(file_ids,
                file_ids + stats::rnorm(length(file_ids), 0, 0.1),
                ids)
-    colnames(m) <- colnames
     
-    f <- flowCore::fr_append_cols(f[ids, ], m)
+    f <- f[ids,] 
+    if(!all(channels %in% colnames(f))){
+      diffNumberChannels <- TRUE
+      channelsToAdd <- channels[ ! channels %in% colnames(f)]
+      extracols <- matrix(0, 
+                          nrow = flowCore::nrow(f), 
+                          ncol = length(channelsToAdd),
+                          dimnames = list(NULL, channelsToAdd))
+      f <- flowCore::fr_append_cols(f, extracols)
+    }
     
     if(is.null(flowFrame)){
+      fileMatrix <- m
       if(is.null(channels)){
         channels <- colnames(f)
         flowFrame <- f
@@ -313,11 +316,25 @@ AggregateFlowFrames <- function(fileNames,
         rbind(flowCore::exprs(flowFrame)[, commonCols, drop = FALSE], 
               flowCore::exprs(f)[, commonCols, drop = FALSE])
       
+      fileMatrix <- rbind(fileMatrix, m)
     }
   }
   
+  colnames <- c("File", "File_scattered", "Original_ID")
+  prev_agg <- length(grep("File[0-9]*$", colnames(flowFrame)))
+  if(prev_agg > 0){
+    colnames[c(1, 2)] <- paste0(colnames[c(1, 2)], prev_agg + 1)
+  }
+  prev_ids <- length(grep("Original_ID[0-9]*$", colnames(flowFrame)))
+  if(prev_ids > 0){
+    colnames[3] <- paste0(colnames[3], prev_ids + 1)
+  }
+  colnames(fileMatrix) <- colnames
+  flowFrame <- flowCore::fr_append_cols(flowFrame, fileMatrix)
+  
   if (diffNumberChannels){
-    warning("Files do not contain the same number of channels/markers")
+    warning("Files do not contain the same number of channels/markers. ",
+            "Zeros might have been imputed for missing values.")
   }
   
   if (diffMarkers){ 
