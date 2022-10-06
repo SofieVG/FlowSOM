@@ -291,7 +291,7 @@ AggregateFlowFrames <- function(fileNames,
         flowFrame <- f
       } else {
         channels <- GetChannels(f, channels)
-        flowFrame <- f[, c(channels, colnames(m)), drop = FALSE]
+        flowFrame <- f[, channels, drop = FALSE]
       }
       flowCore::keyword(flowFrame)[["$FIL"]] <- basename(outputFile)
       flowCore::keyword(flowFrame)[["FILENAME"]] <- basename(outputFile)
