@@ -1077,12 +1077,12 @@ GetCounts <- function(fsom, level = "metaclusters"){
   } else {
     level <- c("metaclusters", "clusters")[level]
     if (!is.null(fsom$metaclustering) && level == "metaclusters"){
-      counts <- rep(NA, NMetaclusters(fsom))
+      counts <- rep(0, NMetaclusters(fsom))
       names(counts) <- paste("MC", levels(fsom$metaclustering))
       tmp <- table(GetMetaclusters(fsom))
       counts[paste("MC", names(tmp))] <- tmp
     } else if (level == "clusters"){
-      counts <- rep(NA, NClusters(fsom))
+      counts <- rep(0, NClusters(fsom))
       names(counts) <- paste("C", seq_len(NClusters(fsom)))
       tmp <- table(GetClusters(fsom))
       counts[paste("C", names(tmp))] <- tmp
