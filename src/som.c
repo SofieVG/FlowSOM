@@ -68,9 +68,9 @@ void C_SOM(double *data,
             double *nhbrdist,
             double *alphas, double *radii,
             double *xdists, /* working arrays */
-            Sint *pn, Sint *ppx,
-            Sint *pncodes, Sint *prlen,
-            Sint *dist)
+            int *pn, int *ppx,
+            int *pncodes, int *prlen,
+            int *dist)
 {
     int n = *pn, px = *ppx, ncodes = *pncodes, rlen = *prlen;
     int cd, i, j, k, nearest, niter;
