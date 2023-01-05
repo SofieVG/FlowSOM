@@ -213,6 +213,10 @@ print.FlowSOM <- function(x, ...){
 #'                  FALSE.
 #' @param silent If FALSE, prints an update every time it starts processing a
 #'               new file. Default = FALSE. 
+#' @param sampleWithReplacement If TRUE and more cells per file are requested
+#'                              than actually present, all cells will be included
+#'                              plus additional resampling. Otherwise, at most 
+#'                              all cells will be included once. Default = FALSE.
 #' @param ...     Additional arguments to pass to read.FCS
 #'                  
 #' @return This function does not return anything, but will write a file with
@@ -239,6 +243,7 @@ AggregateFlowFrames <- function(fileNames,
                                 outputFile  = "aggregate.fcs",
                                 keepOrder = FALSE, 
                                 silent = FALSE,
+                                sampleWithReplacement = FALSE,
                                 ...){
   
   # Compute number of cells per file
@@ -261,7 +266,13 @@ AggregateFlowFrames <- function(fileNames,
       f <- flowCore::read.FCS(fileNames[i], ...)
     }
     # Random sampling
-    ids <- sample(seq_len(nrow(f)), min(nrow(f), cFile))
+    if(sampleWithReplacement & nrow(f) < cFile){
+      ids <- c(seq_len(nrow(f)),
+               sample(seq_len(nrow(f)), cFile-nrow(f), replace = TRUE))
+    } else {
+      ids <- sample(seq_len(nrow(f)), min(nrow(f), cFile))
+    }
+   
     
     if(keepOrder) ids <- sort(ids)
     

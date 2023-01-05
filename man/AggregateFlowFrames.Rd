@@ -12,6 +12,7 @@ AggregateFlowFrames(
   outputFile = "aggregate.fcs",
   keepOrder = FALSE,
   silent = FALSE,
+  sampleWithReplacement = FALSE,
   ...
 )
 }
@@ -35,6 +36,11 @@ FALSE.}
 
 \item{silent}{If FALSE, prints an update every time it starts processing a
 new file. Default = FALSE.}
+
+\item{sampleWithReplacement}{If TRUE and more cells per file are requested
+than actually present, all cells will be included
+plus additional resampling. Otherwise, at most 
+all cells will be included once. Default = FALSE.}
 
 \item{...}{Additional arguments to pass to read.FCS}
 }
