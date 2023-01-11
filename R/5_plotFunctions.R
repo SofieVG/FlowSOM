@@ -795,12 +795,21 @@ PlotDimRed <- function(fsom,
   if (colorBy == "marker"){
     dimred_plot <- dimred_plot %>% tidyr::pivot_longer(3:ncol(dimred_plot), 
                                                        names_to = "markers")
+    if (requireNamespace("scattermore", quietly = TRUE)) {
     p <- ggplot2::ggplot(dimred_plot) + 
       scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
                                                  y = .data$dimred_2, 
                                                  col = .data$value), 
-                                    pointsize = 1) +
-      ggplot2::facet_wrap(~markers) +
+                                    pointsize = 1) 
+    } else {
+      message("For faster plotting with more datapoints, please install \"scattermore\"")
+      p <- ggplot2::ggplot(dimred_plot) + 
+        ggplot2::geom_point(ggplot2::aes(x = .data$dimred_1, 
+                                         y = .data$dimred_2, 
+                                         col = .data$value), 
+                            size = 1) 
+    }
+    p <- p + ggplot2::facet_wrap(~markers) +
       ggplot2::theme_minimal() +
       ggplot2::coord_fixed() +
       ggplot2::scale_color_gradientn(colors = colors, limits = lim)
@@ -913,6 +922,7 @@ PlotDimRed <- function(fsom,
 #' dev.off()
 #' 
 #' @import     ggplot2
+#' @importFrom dplyr mutate
 #' 
 #' @export
 #' 
@@ -933,29 +943,11 @@ PlotManualBars <- function(fsom, fcs = NULL,
   } 
   
   #----Map FCS on fsom----
-  C_counts <- matrix(0,
-                     nrow = 1,
-                     ncol = fsom$map$nNodes,
-                     dimnames = 
-                       list("fcs",
-                            paste0("C", seq_len(fsom$map$nNodes))))
   if (!is.null(fcs)){
     fsom_tmp <- NewData(fsom, fcs)
   } else {
     fsom_tmp <- fsom
   }
-  
-  cluster_table <- table(GetClusters(fsom_tmp))
-  
-  C_counts["fcs", paste0("C", names(cluster_table))] <- cluster_table
-  C_perc <- 100 * prop.table(C_counts, margin = 1)
-  MC_counts <- t(apply(C_counts,
-                       1,
-                       function(x){
-                         tapply(x, fsom$metaclustering, sum)
-                       }))
-  colnames(MC_counts) <- paste0("MC", colnames(MC_counts))
-  MC_perc <- 100 * prop.table(MC_counts, margin  = 1)
   
   df <- data.frame("Manual" = manualVector, 
                    "MC" = GetMetaclusters(fsom_tmp),
@@ -966,21 +958,19 @@ PlotManualBars <- function(fsom, fcs = NULL,
   }
   
   #----Relative barplots MC----
-  df_s <- data.frame(table(df[, 1:2]))
-  p1 <- ggplot2::ggplot(data = 
-                          transform(df_s,
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)),
+  df_s <- data.frame(table(df[, 1:2])) %>% 
+    dplyr::mutate("Freq" = 100 * (Freq / sum(Freq))) %>% 
+    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+  p1 <- ggplot2::ggplot(data = df_s,
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$MC)) +
     ggplot2::geom_bar(position = "stack", stat = "identity") +
     ggplot2::theme_minimal() +
-    ggplot2::ggtitle("Manual labels per MC") +
-    ggplot2::ylab("size") +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank()) 
+    ggplot2::ggtitle("Manual labels per metacluster") +
+    ggplot2::ylab("Percentage of cells") +
+    ggplot2::xlab("")
   
   if(!is.null(colors)) {
     p1 <- p1 + ggplot2::scale_fill_manual(values = colors)
@@ -992,45 +982,43 @@ PlotManualBars <- function(fsom, fcs = NULL,
     df_s$Freq[df_s$MC == mc] <- 
       df_s$Freq[df_s$MC == mc] / sum(df_s$Freq[df_s$MC == mc])
   }
-  p2 <- ggplot2::ggplot(data = 
-                          transform(df_s,
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)), 
+  df_s <- df_s %>% 
+    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+  
+  p2 <- ggplot2::ggplot(data = df_s, 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$MC)) +
     ggplot2::geom_bar(position = "stack", stat = "identity") +
     ggplot2::theme_minimal() +
     ggplot2::ylab("") +
-    ggplot2::ggtitle("Manual labels per MC") +
+    ggplot2::xlab("") +
+    ggplot2::ggtitle("Manual labels per metacluster") +
     ggplot2::theme(axis.text.y = ggplot2::element_blank())
   if(!is.null(colors)) {
     p2 <- p2 + ggplot2::scale_fill_manual(values = colors)
   }
   
   #----Relative barplots C----
-  df_s <- data.frame(table(df[, c(1, 3)]))
-  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
-  p3 <- ggplot2::ggplot(data =
-                          transform(df_s,
-                                    C = factor(df_s$C,
-                                               levels = seq_len(NClusters(fsom))),
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)),
+  df_s <- data.frame(table(df[, c(1, 3)])) %>% 
+    dplyr::mutate("Freq" = 100 * (Freq / sum(Freq))) %>% 
+    dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(C))[C]]) %>% 
+    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("C" = factor(C, levels = seq_len(NClusters(fsom)))) %>% 
+    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+
+  p3 <- ggplot2::ggplot(data = df_s,
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$C)) +
     ggplot2::geom_bar(position = "stack", stat = "identity") +
     ggplot2::theme_minimal() +
-    ggplot2::ggtitle("Manual labels per C") +
+    ggplot2::ggtitle("Manual labels per cluster") +
     ggplot2::facet_wrap(~.data$MC, scales = "free_x") +
-    ggplot2::ylab("size") +
-    ggplot2::theme(axis.text.y = ggplot2:: element_blank(), 
-                   strip.text = ggplot2::element_text(color = "gray"))
+    ggplot2::ylab("Percentage of cells") +
+    ggplot2::xlab("") + 
+    ggplot2::theme(strip.text = ggplot2::element_text(color = "gray"))
   if(!is.null(colors)) {
     p3 <- p3 + ggplot2::scale_fill_manual(values = colors)
   }
@@ -1040,23 +1028,20 @@ PlotManualBars <- function(fsom, fcs = NULL,
   for (c in seq_len(NClusters(fsom))){
     df_s$Freq[df_s$C == c] <- df_s$Freq[df_s$C == c]/sum(df_s$Freq[df_s$C == c])
   }
-  df_s$MC <- fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]
-  p4 <- ggplot2::ggplot(data = 
-                          transform(df_s,
-                                    C = factor(df_s$C,
-                                               levels = seq_len(
-                                                 NClusters(fsom))),
-                                    MC = factor(df_s$MC,
-                                                levels = levels(fsom$metaclustering)),
-                                    Manual = factor(df_s$Manual,
-                                                    levels = manualOrder)), 
+  df_s <- df_s %>% 
+    dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]) %>% 
+    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("C" = factor(C, levels = seq_len(NClusters(fsom)))) %>% 
+    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+  p4 <- ggplot2::ggplot(data = df_s, 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
                                      x = .data$C)) +
     ggplot2::geom_bar(position = "stack", stat = "identity") +
     ggplot2::theme_minimal() +
     ggplot2::ylab("") +
-    ggplot2::ggtitle("Main labels per C") +
+    ggplot2::xlab("") +
+    ggplot2::ggtitle("Manual labels per cluster") +
     ggplot2::facet_wrap(~.data$MC, scales = "free_x") +
     ggplot2::theme(axis.text.y = ggplot2::element_blank())
   if(!is.null(colors)) {
@@ -1625,7 +1610,7 @@ PlotStarLegend <- function(markers,
                                        xend = .data$xend, 
                                        yend = .data$yend, 
                                        color = .data$Markers), 
-                          size = 0.6)
+                          linewidth = 0.6)
   
   l <- AddLabels(l, 
                  labels = markers, 
@@ -1920,7 +1905,7 @@ AddMST <- function(p,
                                               y = .data$y, 
                                               xend = .data$xend, 
                                               yend = .data$yend),
-                                 size = 0.2)
+                                 linewidth = 0.2)
   return(p)
 }
 
