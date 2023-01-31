@@ -266,7 +266,7 @@ AggregateFlowFrames <- function(fileNames,
       f <- flowCore::read.FCS(fileNames[i], ...)
     }
     # Random sampling
-    if(sampleWithReplacement & nrow(f) < cFile){
+    if(sampleWithReplacement & (nrow(f) < cFile)){
       ids <- c(seq_len(nrow(f)),
                sample(seq_len(nrow(f)), cFile-nrow(f), replace = TRUE))
     } else {
