@@ -268,7 +268,17 @@ NewData <- function(fsom,
 #'                         nClus = 10)
 #'    
 #'  # Map new data
-#'  outlier_report <- TestOutliers(flowSOM.res, channels = flowSOM.res$map$colsUsed)
+#'  outlier_report <- TestOutliers(flowSOM.res, 
+#'                                 madAllowed = 5,
+#'                                 channels = flowSOM.res$map$colsUsed)
+#' 
+#'  # Number of cells which is an outlier for x channels                               
+#'  outlier_on_multiple_markers <- table(rowSums(outlier_report$channel_specific != 0))          
+#'  outlier_type <- paste(GetClusters(flowSOM.res),
+#'                        apply(outlier_report$channel_specific, 1, paste0, collapse = ""))
+#'  outlier_counts <- table(grep(" .*1.*", outlier_type, value = TRUE))
+#'  outliers_of_interest <- names(which(outlier_counts > 10))
+#'  outlier_boolean <- outlier_type %in% outliers_of_interest
 #'  
 #' @import     ggplot2
 #' @importFrom grDevices pdf dev.off
@@ -293,6 +303,7 @@ TestOutliers <- function(fsom,
   clusters <- factor(GetClusters(fsom), 
                      levels = seq_len(fsom$map$nNodes))
   
+  # Distance in high-dimensional space
   medians <- tapply(fsomReference$map$mapping[,2], 
                     referenceClusters,
                     stats::median)
@@ -305,50 +316,24 @@ TestOutliers <- function(fsom,
   max_distances_new <- tapply(fsom$map$mapping[,2], 
                              clusters,
                              max)
-  outliers <- (fsom$map$mapping[,2] > thresholds[GetClusters(fsom)])
+  outliers <- (fsom$map$mapping[,2] > thresholds[clusters])
   outlier_count <- tapply(outliers, clusters, sum)
   
   if (!is.null(channels)){
     outliers_list <- list()
     for (channel in channels){
-      distances_median_channel <- 
-        sapply(seq_len(fsomReference$map$nNodes), 
-               function(x) {
-                 ids <- which(GetClusters(fsomReference) == x)
-                 if (length(ids) > 0) {
-                   m <- stats::median(abs(fsomReference$data[ids, channel] - 
-                                            fsomReference$map$codes[x, channel]))
-                 }
-                 else {
-                   m <- 0
-                 }
-                 return(m)
-               })
-      distances_mad_channel <- 
-        sapply(seq_len(fsomReference$map$nNodes), 
-               function(x) {
-                 ids <- which(GetClusters(fsomReference) == x)
-                 if (length(ids) > 0) {
-                   m <- stats::mad(abs(fsomReference$data[ids, 
-                                                          channel] - 
-                                         fsomReference$map$codes[x, 
-                                                                 channel]))
-                                        }
-                                        else {
-                                          m <- 0
-                                        }
-                                        return(m)
-                                      })
+      medians_channel <- tapply(fsomReference$data[,channel], 
+                                referenceClusters,
+                                stats::median)
+      mads_channel <- tapply(fsomReference$data[,channel], 
+                             referenceClusters,
+                             stats::mad)
       
-      thresholds_channel <- distances_median_channel + madAllowed * distances_mad_channel
-      
-      outliers_channel <- sapply(seq_len(fsom$map$nNodes), function(x) {
-        ids <- which(GetClusters(fsom) == x)
-        distances <- abs(fsom$data[ids,channel] - fsomReference$map$codes[x,
-                                                                          channel])
-        return(sum(distances > thresholds_channel[x]))
-      })
-      
+      max_thresholds_channel <- medians_channel + madAllowed * mads_channel
+      min_thresholds_channel <- medians_channel - madAllowed * mads_channel
+      outliers_channel <- rep(0, nrow(fsom$data))
+      outliers_channel[fsom$data[,channel] > max_thresholds_channel[clusters]] <- 1
+      outliers_channel[fsom$data[,channel] < min_thresholds_channel[clusters]] <- -1
       
       outliers_list[[GetMarkers(fsom,channel)]] <- outliers_channel
     }
@@ -367,7 +352,8 @@ TestOutliers <- function(fsom,
                        Maximum_outlier_distance = max_distances_new)
   
   if (!is.null(channels)){
-    result <- cbind(result, do.call(cbind, outliers_list))
+    result <- list(report = result, 
+                   channel_specific = do.call(cbind, outliers_list))
   }
   # result <- result[outliers > 
   #                    0, ][order(outliers[outliers > 0], decreasing = TRUE),]
