@@ -1,4 +1,8 @@
-CHANGES IN VERSION 2.7.5 (2023/01/11)
+CHANGES IN VERSION 2.7.7 (2023/02/09)
+--------------------------------------
+o Updates to TestOutliers
+  
+  CHANGES IN VERSION 2.7.5 (2023/01/11)
 --------------------------------------
 o Edited PlotManualBars so that it shows percentages of cells
 o Edited PlotDimRed so that it optionally uses scattermore if it installed

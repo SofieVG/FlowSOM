@@ -318,6 +318,7 @@ TestOutliers <- function(fsom,
                              max)
   outliers <- (fsom$map$mapping[,2] > thresholds[clusters])
   outlier_count <- tapply(outliers, clusters, sum)
+  outlier_count[is.na(outlier_count)] <- 0 # empty cluster does not have outliers
   
   if (!is.null(channels)){
     outliers_list <- list()

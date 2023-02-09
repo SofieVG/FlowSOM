@@ -47,10 +47,20 @@ deviation of the distances.
  flowSOM.res <- FlowSOM(ff,
                         compensate = TRUE, transform = TRUE, scale = TRUE,
                         colsToUse = c(9, 12, 14:18),
-                        maxMeta = 10)
+                        nClus = 10)
    
  # Map new data
- outlier_report <- TestOutliers(flowSOM.res)
+ outlier_report <- TestOutliers(flowSOM.res, 
+                                madAllowed = 5,
+                                channels = flowSOM.res$map$colsUsed)
+
+ # Number of cells which is an outlier for x channels                               
+ outlier_on_multiple_markers <- table(rowSums(outlier_report$channel_specific != 0))          
+ outlier_type <- paste(GetClusters(flowSOM.res),
+                       apply(outlier_report$channel_specific, 1, paste0, collapse = ""))
+ outlier_counts <- table(grep(" .*1.*", outlier_type, value = TRUE))
+ outliers_of_interest <- names(which(outlier_counts > 10))
+ outlier_boolean <- outlier_type \%in\% outliers_of_interest
  
 }
 \seealso{
