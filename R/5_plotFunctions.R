@@ -2776,29 +2776,29 @@ AddAnnotation <- function(p,
 #'                        colsToUse = c(9, 12, 14:18),
 #'                        nClus = 10,
 #'                        seed = 1)
-#' outlier_report <- TestOutliers(flowSOM.res)
-#' p <- PlotOutliers(flowSOM.res, outlier_report)                       
+#' outlierReport <- TestOutliers(flowSOM.res)
+#' p <- PlotOutliers(flowSOM.res, outlierReport)                       
 #' 
 #' @import ggplot2 
 #' @importFrom ggpubr ggarrange
 #' 
 #' @export
-PlotOutliers <- function(fsom, outlier_report){
+PlotOutliers <- function(fsom, outlierReport){
   xdim <- fsom$map$xdim
   ydim <- fsom$map$ydim
   plotList <- lapply(seq_len(xdim * ydim), function(i) {
     ids <- which(GetClusters(fsom) == i)
     values <- fsom$map$mapping[ids, 2]
     if (length(values) > 1) {
-      nOutliers <- sum(values > outlier_report$Threshold[i])
+      nOutliers <- sum(values > outlierReport$Threshold[i])
       p <- suppressMessages(ggplot2::ggplot() + 
                               ggplot2::geom_histogram(ggplot2::aes(values), 
                                                       fill = "grey90", 
                                                       col = "black", 
                                                       size = 0.2) + 
-                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlier_report$Median_distance[i]), 
+                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlierReport$Median_distance[i]), 
                                                   col = "black") + 
-                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlier_report$Threshold[i]), 
+                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlierReport$Threshold[i]), 
                                                   col = "red") + 
                               ggplot2::ggtitle(paste0(i, 
                                                       " (", nOutliers, ")")) + 
