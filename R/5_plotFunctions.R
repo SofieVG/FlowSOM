@@ -2776,8 +2776,8 @@ AddAnnotation <- function(p,
 #'                        colsToUse = c(9, 12, 14:18),
 #'                        nClus = 10,
 #'                        seed = 1)
-#' outlier_report <- TestOutliers(flowSOM.res)
-#' p <- PlotOutliers(flowSOM.res, outlier_report)                       
+#' outlierReport <- TestOutliers(flowSOM.res)
+#' p <- PlotOutliers(flowSOM.res, outlierReport)                       
 #' 
 #' @import ggplot2 
 #' @importFrom ggpubr ggarrange
