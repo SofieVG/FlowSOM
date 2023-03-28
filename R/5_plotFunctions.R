@@ -959,9 +959,9 @@ PlotManualBars <- function(fsom, fcs = NULL,
   
   #----Relative barplots MC----
   df_s <- data.frame(table(df[, 1:2])) %>% 
-    dplyr::mutate("Freq" = 100 * (Freq / sum(Freq))) %>% 
-    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
-    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+    dplyr::mutate("Freq" = 100 * (.data$Freq / sum(.data$Freq))) %>% 
+    dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
   p1 <- ggplot2::ggplot(data = df_s,
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
@@ -1002,11 +1002,11 @@ PlotManualBars <- function(fsom, fcs = NULL,
   
   #----Relative barplots C----
   df_s <- data.frame(table(df[, c(1, 3)])) %>% 
-    dplyr::mutate("Freq" = 100 * (Freq / sum(Freq))) %>% 
-    dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(C))[C]]) %>% 
-    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
-    dplyr::mutate("C" = factor(C, levels = seq_len(NClusters(fsom)))) %>% 
-    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+    dplyr::mutate("Freq" = 100 * (.data$Freq / sum(.data$Freq))) %>% 
+    dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(.data$C))[.data$C]]) %>% 
+    dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("C" = factor(.data$C, levels = seq_len(NClusters(fsom)))) %>% 
+    dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
 
   p3 <- ggplot2::ggplot(data = df_s,
                         ggplot2::aes(fill = .data$Manual, 
@@ -1030,9 +1030,9 @@ PlotManualBars <- function(fsom, fcs = NULL,
   }
   df_s <- df_s %>% 
     dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]) %>% 
-    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
-    dplyr::mutate("C" = factor(C, levels = seq_len(NClusters(fsom)))) %>% 
-    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+    dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("C" = factor(.data$C, levels = seq_len(NClusters(fsom)))) %>% 
+    dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
   p4 <- ggplot2::ggplot(data = df_s, 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
@@ -2783,22 +2783,22 @@ AddAnnotation <- function(p,
 #' @importFrom ggpubr ggarrange
 #' 
 #' @export
-PlotOutliers <- function(fsom, outlier_report){
+PlotOutliers <- function(fsom, outlierReport){
   xdim <- fsom$map$xdim
   ydim <- fsom$map$ydim
   plotList <- lapply(seq_len(xdim * ydim), function(i) {
     ids <- which(GetClusters(fsom) == i)
     values <- fsom$map$mapping[ids, 2]
     if (length(values) > 1) {
-      nOutliers <- sum(values > outlier_report$Threshold[i])
+      nOutliers <- sum(values > outlierReport$Threshold[i])
       p <- suppressMessages(ggplot2::ggplot() + 
                               ggplot2::geom_histogram(ggplot2::aes(values), 
                                                       fill = "grey90", 
                                                       col = "black", 
                                                       size = 0.2) + 
-                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlier_report$Median_distance[i]), 
+                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlierReport$Median_distance[i]), 
                                                   col = "black") + 
-                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlier_report$Threshold[i]), 
+                              ggplot2::geom_vline(ggplot2::aes(xintercept = outlierReport$Threshold[i]), 
                                                   col = "red") + 
                               ggplot2::ggtitle(paste0(i, 
                                                       " (", nOutliers, ")")) + 
