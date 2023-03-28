@@ -26,8 +26,8 @@ FlowSOM(
 )
 }
 \arguments{
-\item{input}{a flowFrame, a flowSet or an array of paths to files or 
-directories}
+\item{input}{a flowFrame, a flowSet, a matrix with column names or
+an array of paths to files or directories}
 
 \item{pattern}{if input is an array of file- or directorynames, select 
 only files containing pattern}

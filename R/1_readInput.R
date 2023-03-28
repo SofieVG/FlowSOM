@@ -3,8 +3,8 @@
 #' Take some input and return FlowSOM object containing a matrix with 
 #' the preprocessed data (compensated, transformed, scaled)
 #'
-#' @param input         a flowFrame, a flowSet or an array of paths to files 
-#'                      or directories
+#' @param input         a flowFrame, a flowSet, a matrix with column names or
+#'                      an array of paths to files or directories
 #' @param pattern       if input is an array of file- or directorynames, 
 #'                      select only files containing pattern
 #' @param compensate    logical, does the data need to be compensated
