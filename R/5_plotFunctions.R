@@ -1230,13 +1230,13 @@ Plot2DScatters <- function(fsom,
             medianValues[which(metacluster[1:nrow(medianValues)] %in% n), 
                          c(channelpair[1], channelpair[2]),
                          drop = FALSE],
-            "Population" = factor(df_c_Population, 
-                                  levels = unique(df_c_Population)))
+            "Population" = df_c_Population)
           col <- gg_color_hue(nMetaclusters)[n]
         }
         df_ss <- data.frame(df_ss[sample(nrow(df_ss), 
                                          min(nrow(df_ss), maxPoints)), ])
         df_ss$Population <- factor(df_ss$Population, levels = subset)
+        df_c$Population <- factor(df_c$Population, levels = subset)
         colnames(df_c) <- c("m1", "m2", "Population")
         colnames(df_ss)[1:2] <- colnames(df_bg) <- c("m1", "m2")
         
