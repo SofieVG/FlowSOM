@@ -959,9 +959,9 @@ PlotManualBars <- function(fsom, fcs = NULL,
   
   #----Relative barplots MC----
   df_s <- data.frame(table(df[, 1:2])) %>% 
-    dplyr::mutate("Freq" = 100 * (Freq / sum(Freq))) %>% 
-    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
-    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+    dplyr::mutate("Freq" = 100 * (.data$Freq / sum(.data$Freq))) %>% 
+    dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
   p1 <- ggplot2::ggplot(data = df_s,
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
@@ -1002,11 +1002,11 @@ PlotManualBars <- function(fsom, fcs = NULL,
   
   #----Relative barplots C----
   df_s <- data.frame(table(df[, c(1, 3)])) %>% 
-    dplyr::mutate("Freq" = 100 * (Freq / sum(Freq))) %>% 
-    dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(C))[C]]) %>% 
-    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
-    dplyr::mutate("C" = factor(C, levels = seq_len(NClusters(fsom)))) %>% 
-    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+    dplyr::mutate("Freq" = 100 * (.data$Freq / sum(.data$Freq))) %>% 
+    dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(.data$C))[.data$C]]) %>% 
+    dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("C" = factor(.data$C, levels = seq_len(NClusters(fsom)))) %>% 
+    dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
 
   p3 <- ggplot2::ggplot(data = df_s,
                         ggplot2::aes(fill = .data$Manual, 
@@ -1030,9 +1030,9 @@ PlotManualBars <- function(fsom, fcs = NULL,
   }
   df_s <- df_s %>% 
     dplyr::mutate("MC" = fsom$metaclustering[as.numeric(levels(df_s$C))[df_s$C]]) %>% 
-    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
-    dplyr::mutate("C" = factor(C, levels = seq_len(NClusters(fsom)))) %>% 
-    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+    dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("C" = factor(.data$C, levels = seq_len(NClusters(fsom)))) %>% 
+    dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
   p4 <- ggplot2::ggplot(data = df_s, 
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 

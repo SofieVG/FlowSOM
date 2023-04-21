@@ -341,16 +341,17 @@ TestOutliers <- function(fsom,
   }
   
   
-  if (!is.null(plotFile)) {
-    grDevices::pdf(plotFile, width = 20, height = 20)
-    print(PlotOutliers(fsom, thresholds))
-    grDevices::dev.off()
-  }
+  
   result <- data.frame(Median_distance = medians, 
                        Median_absolute_deviation = mads, 
                        Threshold = thresholds, 
                        Number_of_outliers = outlier_count, 
                        Maximum_outlier_distance = max_distances_new)
+  if (!is.null(plotFile)) {
+    grDevices::pdf(plotFile, width = 20, height = 20)
+    print(PlotOutliers(fsom, result))
+    grDevices::dev.off()
+  }
   
   if (!is.null(channels)){
     result <- list(report = result, 
