@@ -983,8 +983,8 @@ PlotManualBars <- function(fsom, fcs = NULL,
       df_s$Freq[df_s$MC == mc] / sum(df_s$Freq[df_s$MC == mc])
   }
   df_s <- df_s %>% 
-    dplyr::mutate("MC" = factor(MC, levels = levels(fsom$metaclustering))) %>% 
-    dplyr::mutate("Manual" = factor(Manual, levels = manualOrder))
+    dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
+    dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
   
   p2 <- ggplot2::ggplot(data = df_s, 
                         ggplot2::aes(fill = .data$Manual, 

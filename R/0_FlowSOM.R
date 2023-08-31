@@ -679,7 +679,7 @@ GetFlowJoLabels <- function(files,
                             ...) {
   if (requireNamespace("CytoML", quietly = TRUE) & 
       requireNamespace("flowWorkspace", quietly = TRUE)) {
-    ws <- CytoML::open_flowjo_xml(wspFile)
+    ws <- CytoML::open_flowjo_xml(wspFile, sample_names_from = "sampleNode")
     gates <- CytoML::flowjo_to_gatingset(ws, 
                                          name = group,
                                          ...)
@@ -694,7 +694,8 @@ GetFlowJoLabels <- function(files,
       if(length(file_id) == 0) {stop("File ", basename(file), 
                                      " not found. Files available: \n",
                                      paste0(files_in_wsp, "\n"))}
-      gate_names <- flowWorkspace::gs_get_pop_paths(gates, path = "auto")
+      gate_names <- flowWorkspace::gs_get_pop_paths(gates[[file_id]], 
+                                                    path = "auto")
       
       gatingMatrix <- matrix(NA,
                              nrow = counts[file_id],
@@ -707,11 +708,13 @@ GetFlowJoLabels <- function(files,
       }
       
       if(is.null(cellTypes)){
-        cellTypes <- flowWorkspace::gs_get_leaf_nodes(gates,
-                                                      path = "auto")
+        cellTypes_tmp <- flowWorkspace::gs_get_leaf_nodes(gates[[file_id]],
+                                                          path = "auto")
+      } else {
+        cellTypes_tmp <- cellTypes
       }
       
-      manual <- ManualVector(gatingMatrix, cellTypes)
+      manual <- ManualVector(gatingMatrix, cellTypes_tmp)
       
       result[[file]] <- list("matrix" = gatingMatrix,
                              "manual" = manual)
