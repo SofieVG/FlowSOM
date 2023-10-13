@@ -1,3 +1,12 @@
+CHANGES IN VERSION 2.9.3 (2023/10/13)
+--------------------------------------
+o Added the option to adapt background size in PlotFlowSOM
+
+CHANGES IN VERSION 2.9.2 (2023/08/31)
+--------------------------------------
+o Version bump
+o Small adaptations to make the GetFlowJoLabels function more robust
+
 CHANGES IN VERSION 2.7.10 (2023/04/21)
 --------------------------------------
 o Fixed colored metacluster centers when using Plot2DScatters

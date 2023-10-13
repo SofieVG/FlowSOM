@@ -27,6 +27,9 @@
 #' @param backgroundColors  Color palette to be used for the background coloring.
 #'                          Can be either a function or an array specifying
 #'                          colors.
+#' @param backgroundSize    The size of the background. Will be multiplied by the 
+#'                          size of the nodes.
+#' @param equalBackgroundSize If you want the background sizes to be the same size.
 #' @param backgroundLim     Only used when backgroundValues are numerical. 
 #'                          Defaults to min and max of the backgroundValues.
 #' @param title             Title of the plot
@@ -69,6 +72,8 @@ PlotFlowSOM <- function(fsom,
                         equalNodeSize = FALSE,
                         backgroundValues = NULL,
                         backgroundColors = NULL,
+                        backgroundSize = 1.5,
+                        equalBackgroundSize = FALSE,
                         backgroundLim = NULL,
                         title = NULL)
 {
@@ -96,7 +101,7 @@ PlotFlowSOM <- function(fsom,
     warning(paste0("In the new FlowSOM version \"backgroundColors\"",
                    " is used instead of \"backgroundColor\""))
   }
-    
+  
   
   #---- Layout----
   layout <- ParseLayout(fsom, view)
@@ -104,8 +109,8 @@ PlotFlowSOM <- function(fsom,
   
   #---- Nodesize----
   autoNodeSize <- AutoMaxNodeSize(layout = layout, 
-                                 overlap = ifelse(view %in% c("grid"),
-                                                  -0.3, 1)) 
+                                  overlap = ifelse(view %in% c("grid"),
+                                                   -0.3, 1)) 
   maxNodeSize <- autoNodeSize * maxNodeSize
   
   if (equalNodeSize){
@@ -117,10 +122,15 @@ PlotFlowSOM <- function(fsom,
   if (any(isEmpty)) {scaledNodeSize[isEmpty] <- min(maxNodeSize, 0.05)}
   
   #----ggplot----
+  if (equalBackgroundSize){
+    backgroundSize <- rep(maxNodeSize, nNodes) * backgroundSize
+  } else {
+    backgroundSize <- ParseNodeSize(nodeSizes, maxNodeSize, refNodeSize) * backgroundSize
+  }
   plot_df <- data.frame(x = layout$x,
                         y = layout$y,
                         size = scaledNodeSize,
-                        bg_size = scaledNodeSize * 1.5)
+                        bg_size = backgroundSize)
   
   p <- ggplot2::ggplot(plot_df) 
   
@@ -226,7 +236,7 @@ PlotStars <- function(fsom,
   
   if (length(names(list(...))) > 0 && "backgroundColor" %in% names(list(...))){
     warning(paste0("\"backgroundColor\" is deprecated, ",
-                       "please use \"backgroundColors\" instead."))
+                   "please use \"backgroundColors\" instead."))
   }
   
   channels <- GetChannels(fsom, markers)
@@ -485,7 +495,7 @@ PlotNumbers <- function(fsom,
                   ...)
   return(p)
 }
-  
+
 #' PlotMarker 
 #' 
 #' Plot comparison with other clustering
@@ -563,7 +573,7 @@ PlotMarker <- function(fsom,
   
   # Get column names
   channels <- GetChannels(fsom, marker)
-
+  
   # Compute limits based on all reference markers
   ref_channels <- GetChannels(fsom, refMarkers)
   if (is.null(lim)) lim <- c(min(mfis[, ref_channels]), 
@@ -583,7 +593,7 @@ PlotMarker <- function(fsom,
     if (is.na(title[channelI])) title[channelI] <- ""
     p <- p + ggplot2::ggtitle(title[channelI])
   })
-
+  
   p <- ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE, 
                          legend = "right")
   
@@ -796,11 +806,11 @@ PlotDimRed <- function(fsom,
     dimred_plot <- dimred_plot %>% tidyr::pivot_longer(3:ncol(dimred_plot), 
                                                        names_to = "markers")
     if (requireNamespace("scattermore", quietly = TRUE)) {
-    p <- ggplot2::ggplot(dimred_plot) + 
-      scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
-                                                 y = .data$dimred_2, 
-                                                 col = .data$value), 
-                                    pointsize = 1) 
+      p <- ggplot2::ggplot(dimred_plot) + 
+        scattermore::geom_scattermore(ggplot2::aes(x = .data$dimred_1, 
+                                                   y = .data$dimred_2, 
+                                                   col = .data$value), 
+                                      pointsize = 1) 
     } else {
       message("For faster plotting with more datapoints, please install \"scattermore\"")
       p <- ggplot2::ggplot(dimred_plot) + 
@@ -1007,7 +1017,7 @@ PlotManualBars <- function(fsom, fcs = NULL,
     dplyr::mutate("MC" = factor(.data$MC, levels = levels(fsom$metaclustering))) %>% 
     dplyr::mutate("C" = factor(.data$C, levels = seq_len(NClusters(fsom)))) %>% 
     dplyr::mutate("Manual" = factor(.data$Manual, levels = manualOrder))
-
+  
   p3 <- ggplot2::ggplot(data = df_s,
                         ggplot2::aes(fill = .data$Manual, 
                                      y = .data$Freq, 
@@ -1946,7 +1956,7 @@ AddStarsPies <- function(p, arcs, colorPalette, showLegend = TRUE){
                                               start = .data$start, 
                                               end = .data$end, 
                                               fill = .data$Markers),
-                                 size = 0.2)
+                                 linewidth = 0.2)
   
   
   return(p)
@@ -2038,7 +2048,7 @@ AddNodes <- function(p,
                                                y0 = .data$y,
                                                r =  .data$size),
                                   fill = fillColor,
-                                  size = 0.2,
+                                  linewidth = 0.2,
                                   ...) 
   } else {
     
@@ -2055,7 +2065,7 @@ AddNodes <- function(p,
                                                y0 = .data$y, 
                                                r =  .data$size,
                                                fill = values),
-                                  size = 0.2,
+                                  linewidth = 0.2,
                                   ...)
   }
   return(p)
@@ -2510,12 +2520,12 @@ FlowSOMmary <- function(fsom, plotFile = "FlowSOMmary.pdf"){
   if (metaclustersPresent) {
     datatable1[, "Total number of metaclusters"] <- nMetaclusters
   }
-
+  
   markersInFlowSOM <- split(fsom$prettyColnames[fsom$map$colsUsed], 
                             rep(seq_len(ceiling(length(fsom$prettyColnames[
                               fsom$map$colsUsed])/5)), 
-                                each = 5)[seq_len(length(fsom$prettyColnames[
-                                  fsom$map$colsUsed]))]) %>% 
+                              each = 5)[seq_len(length(fsom$prettyColnames[
+                                fsom$map$colsUsed]))]) %>% 
     sapply(paste, collapse =", ") %>% 
     paste(collapse = ",\n")
   
@@ -2744,7 +2754,7 @@ AddAnnotation <- function(p,
                                 nudge_x = 0.5, ...)
     message("Please install \"ggrepel\" for more clear annotation.")
   }
-
+  
   if (listOrGGplot){
     p <- ggpubr::ggarrange(p, ggpubr::ggarrange(l1, l2, ncol = 1), NULL,
                            ncol = 3, widths = c(3, 1, 0.3), legend = "none")
