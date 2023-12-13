@@ -680,8 +680,11 @@ GetFlowJoLabels <- function(files,
   if (requireNamespace("CytoML", quietly = TRUE) & 
       requireNamespace("flowWorkspace", quietly = TRUE)) {
     ws <- CytoML::open_flowjo_xml(wspFile, sample_names_from = "sampleNode")
+    samples_in_ws <- CytoML::fj_ws_get_samples(ws)
+    subset <- unlist(lapply(basename(files), function(f) which(samples_in_ws[,"name"] == f)))
     gates <- CytoML::flowjo_to_gatingset(ws, 
                                          name = group,
+                                         subset = subset,
                                          ...)
     files_in_wsp <- flowWorkspace::sampleNames(gates)
     counts <- as.numeric(gsub(".*_([0-9]*)$", "\\1", files_in_wsp)) 

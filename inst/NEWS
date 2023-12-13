@@ -1,3 +1,7 @@
+CHANGES IN VERSION 2.11.1 (2023/04/21)
+--------------------------------------
+o Made GetFlowJoLabels more efficient
+
 CHANGES IN VERSION 2.7.10 (2023/04/21)
 --------------------------------------
 o Fixed colored metacluster centers when using Plot2DScatters
