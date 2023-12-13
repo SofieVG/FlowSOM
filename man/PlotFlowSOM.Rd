@@ -13,6 +13,8 @@ PlotFlowSOM(
   equalNodeSize = FALSE,
   backgroundValues = NULL,
   backgroundColors = NULL,
+  backgroundSize = 1.5,
+  equalBackgroundSize = FALSE,
   backgroundLim = NULL,
   title = NULL
 )
@@ -45,6 +47,11 @@ a factor (e.g. a clustering)}
 \item{backgroundColors}{Color palette to be used for the background coloring.
 Can be either a function or an array specifying
 colors.}
+
+\item{backgroundSize}{The size of the background. Will be multiplied by the 
+size of the nodes.}
+
+\item{equalBackgroundSize}{If you want the background sizes to be the same size.}
 
 \item{backgroundLim}{Only used when backgroundValues are numerical. 
 Defaults to min and max of the backgroundValues.}
